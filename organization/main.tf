@@ -8,6 +8,11 @@ data "aws_organizations_organization" "org" {}
 locals {
   org_root_id = data.aws_organizations_organization.org.roots[0].id
 
+  kms_tag_enforcement_policy = templatefile("${path.module}/policies/scps/tag-enforcement.json", {
+    environment_tags = jsonencode(var.environment_tags)
+  })
+
+
   # Default tags to apply to all resources
   default_tags = {
     ManagedBy   = "Terraform"
@@ -28,7 +33,7 @@ data "local_file" "kms_tag_enforcement_policy" {
 resource "aws_organizations_policy" "kms_tag_enforcement" {
   name        = "kms-tag-enforcement"
   description = "Enforces tagging standards for KMS keys"
-  content     = data.local_file.kms_tag_enforcement_policy.content
+  content     = local.kms_tag_enforcement_policy
   type        = "SERVICE_CONTROL_POLICY"
 
   tags = merge(local.default_tags, {

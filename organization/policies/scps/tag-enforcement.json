@@ -40,7 +40,7 @@
       "Resource": "*",
       "Condition": {
         "ForAnyValue:StringNotLike": {
-          "aws:RequestTag/environment": "${environment_tags}"
+          "aws:RequestTag/environment": ${environment_tags}
         }
       }
     }
