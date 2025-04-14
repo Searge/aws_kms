@@ -1,0 +1,18 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "EnforceKMSKeyWaitingPeriod",
+      "Effect": "Deny",
+      "Action": [
+        "kms:ScheduleKeyDeletion"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "NumericLessThan": {
+          "kms:PendingDeletionWindowInDays": "${waiting_period_days}"
+        }
+      }
+    }
+  ]
+}
