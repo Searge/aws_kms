@@ -1,48 +1,48 @@
 {
   "Version": "2012-10-17",
   "Statement": [
-      {
-          "Sid": "DenyCreateKeyWithoutRequiredTags",
-          "Effect": "Deny",
-          "Action": [
-              "kms:CreateKey",
-              "kms:CreateReplica"
-          ],
-          "Resource": "*",
-          "Condition": {
-              "Null": {
-                  "aws:RequestTag/environment": "true"
-              }
-          }
-      },
-      {
-          "Sid": "DenyRemovalOfRequiredTags",
-          "Effect": "Deny",
-          "Action": [
-              "kms:TagResource",
-              "kms:UntagResource"
-          ],
-          "Resource": "*",
-          "Condition": {
-              "Null": {
-                  "aws:RequestTag/environment": "true"
-              }
-          }
-      },
-      {
-          "Sid": "DenyInvalidTagValues",
-          "Effect": "Deny",
-          "Action": [
-              "kms:CreateKey",
-              "kms:CreateReplica",
-              "kms:TagResource"
-          ],
-          "Resource": "*",
-          "Condition": {
-              "ForAnyValue:StringNotLike": {
-                  "aws:RequestTag/environment": "${valid_environments}"
-              }
-          }
+    {
+      "Sid": "DenyCreateKeyWithoutRequiredTags",
+      "Effect": "Deny",
+      "Action": [
+        "kms:CreateKey",
+        "kms:CreateReplica"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "Null": {
+          "aws:RequestTag/environment": "true"
+        }
       }
+    },
+    {
+      "Sid": "DenyRemovalOfRequiredTags",
+      "Effect": "Deny",
+      "Action": [
+        "kms:TagResource",
+        "kms:UntagResource"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "Null": {
+          "aws:RequestTag/environment": "true"
+        }
+      }
+    },
+    {
+      "Sid": "DenyInvalidTagValues",
+      "Effect": "Deny",
+      "Action": [
+        "kms:CreateKey",
+        "kms:CreateReplica",
+        "kms:TagResource"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "ForAnyValue:StringNotLike": {
+          "aws:RequestTag/environment": "${environment_tags}"
+        }
+      }
+    }
   ]
 }

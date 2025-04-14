@@ -8,7 +8,7 @@ locals {
 
   # Load built-in policies from files
   kms_tag_enforcement_policy = var.kms_tag_enforcement_enabled ? templatefile("${path.module}/policies/kms/tag-enforcement.json", {
-    valid_environments = jsonencode(var.environment_tags)
+    environment_tags = jsonencode(var.environment_tags)
   }) : null
 
   kms_waiting_period_policy = var.kms_waiting_period_enabled ? templatefile("${path.module}/policies/kms/waiting-period.json", {
@@ -27,7 +27,7 @@ locals {
       policy      = local.kms_tag_enforcement_policy
       policy_file = null
       targets     = lookup(var.policy_targets, "kms_tag_enforcement", [])
-      tags        = merge(local.default_tags, {
+      tags = merge(local.default_tags, {
         PolicyType = "Compliance"
         Service    = "KMS"
         Purpose    = "TagEnforcement"
@@ -40,7 +40,7 @@ locals {
       policy      = local.kms_waiting_period_policy
       policy_file = null
       targets     = lookup(var.policy_targets, "kms_waiting_period", [])
-      tags        = merge(local.default_tags, {
+      tags = merge(local.default_tags, {
         PolicyType = "Security"
         Service    = "KMS"
         Purpose    = "DeletionControl"
@@ -53,7 +53,7 @@ locals {
       policy      = local.kms_environment_enforcement_policy
       policy_file = null
       targets     = lookup(var.policy_targets, "kms_environment_enforcement", [])
-      tags        = merge(local.default_tags, {
+      tags = merge(local.default_tags, {
         PolicyType = "Security"
         Service    = "KMS"
         Purpose    = "EnvSegregation"
