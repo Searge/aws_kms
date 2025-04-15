@@ -2,7 +2,7 @@
     "Version": "2012-10-17",
     "Statement": [
         {
-            "Sid": "DenyDevKeyAccessExceptDevOU",
+            "Sid": "DenyEnvKeyAccessExceptTargetOU",
             "Effect": "Deny",
             "Action": [
                 "kms:*"
@@ -10,10 +10,10 @@
             "Resource": "*",
             "Condition": {
                 "StringEquals": {
-                    "aws:ResourceTag/environment": "dev"
+                    "aws:ResourceTag/environment": "${environment}"
                 },
                 "StringNotLike": {
-                    "aws:PrincipalOrgPath": "/root/dev/*"
+                    "aws:PrincipalOrgPath": "/root/${environment}/*"
                 }
             }
         }

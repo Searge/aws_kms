@@ -4,6 +4,12 @@ variable "aws_region" {
   default     = "us-east-1"
 }
 
+# variable "account_emails" {
+#   description = "Map of account names to email addresses"
+#   type        = map(string)
+#   sensitive   = true
+# }
+
 # OU variables
 variable "organization_id" {
   description = "AWS Organizations ID"
@@ -11,28 +17,11 @@ variable "organization_id" {
   default     = ""
 }
 
-variable "dev_account_id" {
-  description = "Account ID for Arena (dev)"
-  type        = string
-  sensitive   = true
-}
-
-variable "dev_account_email" {
-  description = "Email for Arena account"
-  type        = string
-  sensitive   = true
-}
-
-variable "prod_account_id" {
-  description = "Account ID for Browbeat (prod)"
-  type        = string
-  sensitive   = true
-}
-
-variable "prod_account_email" {
-  description = "Email for Browbeat account"
-  type        = string
-  sensitive   = true
+variable "accounts_list" {
+  description = "List of accounts in the organization"
+  type = map(object({
+    name = string
+  }))
 }
 
 # Environment variables
@@ -54,20 +43,27 @@ variable "tpl_scp_path" {
   type        = string
   default     = "templates/policies/scps"
 }
+
+variable "tag_enforcement_policy" {
+  description = "File path for tag enforcement policy"
+  type        = string
+  default     = "tag_enforcement.json.tftpl"
+}
+
+variable "waiting_period_policy" {
+  description = "File path for waiting period policy"
+  type        = string
+  default     = "waiting_period.json.tftpl"
+}
+
 variable "env_enforcement_policy" {
   description = "File path for environment enforcement policy"
   type        = string
   default     = "env-enforcement.json.tftpl"
 }
 
-variable "tag_enforcement_policy" {
-  description = "File path for tag enforcement policy"
+variable "kms_admin_policy" {
+  description = "File path for KMS admin policy"
   type        = string
-  default     = "tag-enforcement.json.tftpl"
-}
-
-variable "waiting_period_policy" {
-  description = "File path for waiting period policy"
-  type        = string
-  default     = "waiting-period.json.tftpl"
+  default     = "kms_admin_policy.json.tftpl"
 }

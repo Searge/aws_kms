@@ -2,104 +2,146 @@ provider "aws" {
   region = var.aws_region
 }
 
-# Get the Organization root
+# Data sources
 data "aws_organizations_organization" "org" {}
 
-data "aws_organizations_organizational_units" "ou" {
+# Create the AWS Organization structure
+resource "aws_organizations_organizational_unit" "list" {
+  for_each  = var.accounts_list
+  name      = each.value.name
   parent_id = data.aws_organizations_organization.org.roots[0].id
 }
 
-# Create OUs for dev and prod environments
-resource "aws_organizations_organizational_unit" "dev" {
-  name      = "dev"
-  parent_id = data.aws_organizations_organization.org.roots[0].id
+
+# Create the accounts
+resource "aws_organizations_account" "org_account" {
+  for_each  = var.accounts_list
+  name      = each.value.name
+  email     = each.value.email
+  parent_id = aws_organizations_organizational_unit.list[each.key].id
 }
 
-resource "aws_organizations_organizational_unit" "prod" {
-  name      = "prod"
-  parent_id = data.aws_organizations_organization.org.roots[0].id
-}
+# Policy definitions with templates
+module "org_policies" {
+  source = "../modules/aws-org-policies"
 
-# Move Arena account to dev OU
-resource "aws_organizations_account" "arena" {
-  name      = "arena"
-  email     = var.dev_account_email
-  parent_id = aws_organizations_organizational_unit.dev.id
+  template_dir = "${path.module}/templates"
 
-  lifecycle {
-    ignore_changes = [email, name, role_name]
+  policies = {
+    # KMS Tag Enforcement Policy
+    kms_tag_enforcement = {
+      template = "${path.module}/${var.tag_enforcement_policy}"
+      vars = {
+        allowed_environments = ["dev", "prod"]
+      }
+      name        = "kms-tag-enforcement"
+      description = "Enforces tagging standards for KMS keys"
+      type        = "SERVICE_CONTROL_POLICY"
+      targets = [
+        aws_organizations_organizational_unit.dev.id,
+        aws_organizations_organizational_unit.prod.id
+      ]
+      tags = {
+        PolicyType = "Compliance",
+        Service    = "KMS"
+      }
+    },
+
+    # KMS Waiting Period Policy
+    kms_waiting_period = {
+      template = "${path.module}/${var.waiting_period_policy}"
+      vars = {
+        waiting_period_days = 30
+      }
+      name        = "kms-waiting-period"
+      description = "Enforces minimum waiting period for KMS key deletion"
+      type        = "SERVICE_CONTROL_POLICY"
+      targets = [
+        data.aws_organizations_organization.org.roots[0].id
+      ]
+      tags = {
+        PolicyType = "Security",
+        Service    = "KMS"
+      }
+    },
+
+    # Dev Environment Enforcement Policy
+    dev_env_enforcement = {
+      template = "${path.module}/${var.env_enforcement_policy}"
+      vars = {
+        environment = "dev"
+      }
+      name        = "dev-env-enforcement"
+      description = "Controls access to dev environment KMS resources"
+      type        = "SERVICE_CONTROL_POLICY"
+      targets = [
+        aws_organizations_organizational_unit.dev.id
+      ]
+      tags = {
+        PolicyType  = "Governance",
+        Service     = "KMS",
+        Environment = "dev"
+      }
+    },
+
+    # Prod Environment Enforcement Policy
+    prod_env_enforcement = {
+      template = "${path.module}/${var.env_enforcement_policy}"
+      vars = {
+        environment = "prod"
+      }
+      name        = "prod-env-enforcement"
+      description = "Controls access to prod environment KMS resources"
+      type        = "SERVICE_CONTROL_POLICY"
+      targets = [
+        aws_organizations_organizational_unit.prod.id
+      ]
+      tags = {
+        PolicyType  = "Governance",
+        Service     = "KMS",
+        Environment = "prod"
+      }
+    },
+
+    # KMS Admin Policy for DevOps team
+    kms_admin_devops = {
+      template = "${path.module}/${var.kms_admin_policy}"
+      vars = {
+        managed_environments = ["dev", "test"]
+      }
+      name        = "kms-admin-devops"
+      description = "KMS administration permissions for DevOps team"
+      type        = "SERVICE_CONTROL_POLICY"
+      targets = [
+        aws_organizations_organizational_unit.dev.id
+      ]
+      tags = {
+        PolicyType = "Administrative",
+        Service    = "KMS",
+        Team       = "DevOps"
+      }
+    },
+
+    # KMS Admin Policy for SRE team
+    kms_admin_sre = {
+      template = "${path.module}/${var.kms_admin_policy}"
+      vars = {
+        managed_environments = ["prod"]
+      }
+      name        = "kms-admin-sre"
+      description = "KMS administration permissions for SRE team"
+      type        = "SERVICE_CONTROL_POLICY"
+      targets = [
+        aws_organizations_organizational_unit.prod.id
+      ]
+      tags = {
+        PolicyType = "Administrative",
+        Service    = "KMS",
+        Team       = "SRE"
+      }
+    }
   }
-}
 
-# Move Browbeat account to prod OU
-resource "aws_organizations_account" "browbeat" {
-  name      = "browbeat"
-  email     = var.prod_account_email
-  parent_id = aws_organizations_organizational_unit.prod.id
-
-  lifecycle {
-    ignore_changes = [email, name, role_name]
-  }
-}
-
-locals {
-  org_root_id = data.aws_organizations_organization.org.roots[0].id
-
-  kms_tag_enforcement_policy = templatefile("${path.module}/${var.tpl_scp_path}/${var.tag_enforcement_policy}", {
-    environment_tags = jsonencode(var.environment_tags)
-  })
-
-  kms_waiting_period_policy = templatefile("${path.module}/${var.tpl_scp_path}/${var.waiting_period_policy}", {
-    waiting_period_days = jsonencode(var.waiting_period_days)
-  })
-
-  # Default tags to apply to all resources
-  default_tags = {
-    ManagedBy  = "Terraform"
-    Repository = "infrastructure"
-  }
-}
-
-#---------------------------------------------------------------
-# Service Control Policy for KMS Tag Enforcement
-#---------------------------------------------------------------
-
-# Read the policy document from file
-data "local_file" "kms_tag_enforcement_policy" {
-  filename = "${path.module}/${var.tpl_scp_path}/${var.tag_enforcement_policy}"
-}
-
-data "local_file" "kms_waiting_period_policy" {
-  filename = "${path.module}/${var.tpl_scp_path}/${var.waiting_period_policy}"
-}
-
-# Create the SCP
-resource "aws_organizations_policy" "kms_tag_enforcement" {
-  name        = "kms-tag-enforcement"
-  description = "Enforces tagging standards for KMS keys"
-  content     = local.kms_tag_enforcement_policy
-  type        = "SERVICE_CONTROL_POLICY"
-
-  tags = merge(local.default_tags, {
-    PolicyType = "Compliance"
-    Service    = "KMS"
-  })
-}
-
-resource "aws_organizations_policy" "kms_waiting_period" {
-  name        = "kms-waiting-period"
-  description = "Enforces minimum waiting period for KMS key deletion"
-  content     = local.kms_waiting_period_policy
-  type        = "SERVICE_CONTROL_POLICY"
-
-  tags = merge(local.default_tags, {
-    PolicyType = "Security"
-    Service    = "KMS"
-  })
-}
-
-# Attach the policy to the root (can be changed to specific OUs later)
-resource "aws_organizations_policy_attachment" "kms_tag_attachment" {
-  policy_id = aws_organizations_policy.kms_tag_enforcement.id
-  target_id = local.org_root_id
+  repository_name = "infrastructure"
+  service_name    = "AWS"
 }
