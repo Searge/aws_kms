@@ -5,18 +5,58 @@ provider "aws" {
 # Get the Organization root
 data "aws_organizations_organization" "org" {}
 
+data "aws_organizations_organizational_units" "ou" {
+  parent_id = data.aws_organizations_organization.org.roots[0].id
+}
+
+# Create OUs for dev and prod environments
+resource "aws_organizations_organizational_unit" "dev" {
+  name      = "dev"
+  parent_id = data.aws_organizations_organization.org.roots[0].id
+}
+
+resource "aws_organizations_organizational_unit" "prod" {
+  name      = "prod"
+  parent_id = data.aws_organizations_organization.org.roots[0].id
+}
+
+# Move Arena account to dev OU
+resource "aws_organizations_account" "arena" {
+  name      = "arena"
+  email     = var.dev_account_email
+  parent_id = aws_organizations_organizational_unit.dev.id
+
+  lifecycle {
+    ignore_changes = [email, name, role_name]
+  }
+}
+
+# Move Browbeat account to prod OU
+resource "aws_organizations_account" "browbeat" {
+  name      = "browbeat"
+  email     = var.prod_account_email
+  parent_id = aws_organizations_organizational_unit.prod.id
+
+  lifecycle {
+    ignore_changes = [email, name, role_name]
+  }
+}
+
 locals {
   org_root_id = data.aws_organizations_organization.org.roots[0].id
 
-  kms_tag_enforcement_policy = templatefile("${path.module}/policies/scps/tag-enforcement.json", {
+  kms_tag_enforcement_policy = templatefile("${path.module}/${var.tpl_scp_path}/${var.tag_enforcement_policy}", {
     environment_tags = jsonencode(var.environment_tags)
   })
 
+  kms_waiting_period_policy = templatefile("${path.module}/${var.tpl_scp_path}/${var.waiting_period_policy}", {
+    waiting_period_days = jsonencode(var.waiting_period_days)
+  })
 
   # Default tags to apply to all resources
   default_tags = {
-    ManagedBy   = "Terraform"
-    Repository  = "infrastructure"
+    ManagedBy  = "Terraform"
+    Repository = "infrastructure"
   }
 }
 
@@ -26,7 +66,11 @@ locals {
 
 # Read the policy document from file
 data "local_file" "kms_tag_enforcement_policy" {
-  filename = "${path.module}/policies/scps/tag-enforcement.json"
+  filename = "${path.module}/${var.tpl_scp_path}/${var.tag_enforcement_policy}"
+}
+
+data "local_file" "kms_waiting_period_policy" {
+  filename = "${path.module}/${var.tpl_scp_path}/${var.waiting_period_policy}"
 }
 
 # Create the SCP
