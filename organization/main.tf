@@ -86,6 +86,18 @@ resource "aws_organizations_policy" "kms_tag_enforcement" {
   })
 }
 
+resource "aws_organizations_policy" "kms_waiting_period" {
+  name        = "kms-waiting-period"
+  description = "Enforces minimum waiting period for KMS key deletion"
+  content     = local.kms_waiting_period_policy
+  type        = "SERVICE_CONTROL_POLICY"
+
+  tags = merge(local.default_tags, {
+    PolicyType = "Security"
+    Service    = "KMS"
+  })
+}
+
 # Attach the policy to the root (can be changed to specific OUs later)
 resource "aws_organizations_policy_attachment" "kms_tag_attachment" {
   policy_id = aws_organizations_policy.kms_tag_enforcement.id

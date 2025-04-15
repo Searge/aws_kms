@@ -63,3 +63,8 @@ output "kms_tag_enforcement_policy_arn" {
   description = "ARN of the KMS tag enforcement policy"
   value       = aws_organizations_policy.kms_tag_enforcement.arn
 }
+
+output "kms_waiting_period_policy_id" {
+  description = "ID of the KMS waiting period policy"
+  value       = aws_organizations_policy.kms_waiting_period.id
+}
