@@ -4,6 +4,11 @@ variable "aws_region" {
   default     = "us-east-1"
 }
 
+variable "env" {
+  type        = string
+  description = "Environment name"
+}
+
 variable "aws_access_key_id" {
   type        = string
   description = "AWS access key ID"
