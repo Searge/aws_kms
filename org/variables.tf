@@ -15,7 +15,6 @@ variable "aws_secret_access_key" {
 }
 
 # Organizational Units
-# variable "ou" {}
 variable "ou_map" {
   type = map(any)
   default = {
@@ -40,26 +39,7 @@ variable "policy_type" {
   }
 }
 
-variable "policy_type_list" {
-  type = list(string)
-  default = [
-    "RESOURCE_CONTROL_POLICY",
-    "SERVICE_CONTROL_POLICY",
-  ]
-}
-
 variable "policies_directory" {
   type    = string
   default = "policies"
 }
-# variable "policies" {}
-
-# variable "policy_id" {}
-
-# variable "policies_directory_name" {}
-
-variable "environment" {
-  type    = list(string)
-  default = ["dev", "prod"]
-}
-

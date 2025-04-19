@@ -35,9 +35,7 @@
 | aws\_access\_key\_id | AWS access key ID | `string` | n/a | yes |
 | aws\_region | AWS region | `string` | `"us-east-1"` | no |
 | aws\_secret\_access\_key | AWS secret access key | `string` | n/a | yes |
-| environment | n/a | `list(string)` | ```[ "dev", "prod" ]``` | no |
-| ou\_map | Organizational Units variable "ou" {} | `map(any)` | ```{ "dev": "/root/dev/*", "prod": "/root/prod/*" }``` | no |
+| ou\_map | Organizational Units | `map(any)` | ```{ "dev": "/root/dev/*", "prod": "/root/prod/*" }``` | no |
 | policies\_directory | n/a | `string` | `"policies"` | no |
 | policy\_type | Policies | `string` | `"SERVICE_CONTROL_POLICY"` | no |
-| policy\_type\_list | n/a | `list(string)` | ```[ "RESOURCE_CONTROL_POLICY", "SERVICE_CONTROL_POLICY" ]``` | no |
 <!-- END_TF_DOCS -->
