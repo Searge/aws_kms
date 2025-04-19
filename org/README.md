@@ -1,0 +1,43 @@
+# AWS Organization Policies
+
+<!-- BEGIN_TF_DOCS -->
+## Requirements
+
+| Name | Version |
+|------|---------|
+| terraform | >= 1.10 |
+| aws | ~> 5.94 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| aws | 5.94.1 |
+
+## Modules
+
+| Name | Source | Version |
+|------|--------|---------|
+| rcps | ../modules/org_policies | n/a |
+| scps | ../modules/org_policies | n/a |
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [aws_organizations_organizational_unit.list](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/organizations_organizational_unit) | resource |
+| [aws_organizations_organization.org](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/organizations_organization) | data source |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| aws\_access\_key\_id | AWS access key ID | `string` | n/a | yes |
+| aws\_region | AWS region | `string` | `"us-east-1"` | no |
+| aws\_secret\_access\_key | AWS secret access key | `string` | n/a | yes |
+| environment | n/a | `list(string)` | ```[ "dev", "prod" ]``` | no |
+| ou\_map | Organizational Units variable "ou" {} | `map(any)` | ```{ "dev": "/root/dev/*", "prod": "/root/prod/*" }``` | no |
+| policies\_directory | n/a | `string` | `"policies"` | no |
+| policy\_type | Policies | `string` | `"SERVICE_CONTROL_POLICY"` | no |
+| policy\_type\_list | n/a | `list(string)` | ```[ "RESOURCE_CONTROL_POLICY", "SERVICE_CONTROL_POLICY" ]``` | no |
+<!-- END_TF_DOCS -->
