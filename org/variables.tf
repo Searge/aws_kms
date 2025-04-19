@@ -23,6 +23,17 @@ variable "ou_map" {
   }
 }
 
+# Accounts
+variable "accounts_list" {
+  description = "List of accounts in the organization"
+  type = map(object({
+    name       = string
+    email      = string
+    account_id = string
+    tags       = map(string)
+  }))
+}
+
 # Policies
 variable "policy_type" {
   type    = string
