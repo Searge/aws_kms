@@ -1,0 +1,23 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "RCPEnforceConfusedDeputyProtection",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "kms:*",
+      "Resource": "*",
+      "Condition": {
+        "StringNotEqualsIfExists": {
+          "aws:SourceOrgID": "my-org-id"
+        },
+        "Bool": {
+          "aws:PrincipalIsAWSService": "true"
+        },
+        "Null": {
+          "aws:SourceAccount": "false"
+        }
+      }
+    }
+  ]
+}

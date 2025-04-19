@@ -1,0 +1,33 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "RequireMFAForCriticalKMSActions",
+      "Effect": "Deny",
+      "Action": [
+        "kms:ScheduleKeyDeletion",
+        "kms:DeleteImportedKeyMaterial",
+        "kms:DisableKey",
+        "kms:UpdateKeyDescription",
+        "kms:ImportKeyMaterial",
+        "kms:CreateKey",
+        "kms:DeleteCustomKeyStore",
+        "kms:UpdateCustomKeyStore",
+        "kms:CreateCustomKeyStore",
+        "kms:EnableKey",
+        "kms:PutKeyPolicy",
+        "kms:UpdateAlias",
+        "kms:CreateAlias",
+        "kms:DeleteAlias",
+        "kms:ConnectCustomKeyStore",
+        "kms:DisconnectCustomKeyStore"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "BoolIfExists": {
+          "aws:MultiFactorAuthPresent": "false"
+        }
+      }
+    }
+  ]
+}
