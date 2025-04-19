@@ -3,7 +3,7 @@
 ###############################
 locals {
   name_prefix = "${var.project}-${var.environment_name}"
-  type        = var.environment_name == "prod" ? "prod" : "non-prod"
+  type        = var.environment_name == "prod" ? "prod" : "dev"
   common_tags = merge(
     {
       "Type"      = local.type,

@@ -22,7 +22,7 @@ variable "env" {
 variable "project" {
   description = "Project name"
   type        = string
-  default = ""
+  default     = ""
 }
 
 variable "tags" {

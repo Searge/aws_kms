@@ -8,4 +8,8 @@ terraform {
       version = "~> 5.94"
     }
   }
+
+  backend "local" {
+    path = "./terraform.tfstate"
+  }
 }
