@@ -13,6 +13,13 @@ variable "aws_secret_access_key" {
   description = "AWS secret access key"
 }
 
+variable "ou_map" {
+  type = map(any)
+  default = {
+    "dev" = ["root"]
+    "prod" = ["root"]
+  }
+}
 # Policies
 variable "policy_type" {
   type    = string
