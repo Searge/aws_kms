@@ -31,5 +31,5 @@ variable "policy_type" {
 
 variable "policies_directory" {
   type    = string
-  default = "policies"
+  default = null
 }

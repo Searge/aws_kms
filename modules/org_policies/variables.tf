@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MIT-0
 variable "policies_directory" {
   type    = string
-  default = "policies"
 }
 
 variable "policy_type" {
