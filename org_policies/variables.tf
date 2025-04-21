@@ -16,7 +16,7 @@ variable "aws_secret_access_key" {
 variable "ou_map" {
   type = map(any)
   default = {
-    "dev" = ["root"]
+    "dev"  = ["root"]
     "prod" = ["root"]
   }
 }
