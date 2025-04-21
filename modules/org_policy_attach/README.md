@@ -1,5 +1,8 @@
-<!-- BEGIN_TF_DOCS -->
+# Attach Organization Policies
 
+This module will attach organization policies to organizational units and root.
+
+<!-- BEGIN_TF_DOCS -->
 
 ## Providers
 
