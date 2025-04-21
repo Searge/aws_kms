@@ -5,6 +5,6 @@ locals {
   policies_directory = var.policies_directory == null ? lower(var.policy_type) : var.policies_directory
   policy_ids = {
     for policy in aws_organizations_policy.this :
-    policy.name => policy.id
+    policy.id => policy.id
   }
 }
