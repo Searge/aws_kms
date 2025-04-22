@@ -1,33 +1,24 @@
-provider "aws" {
-  region = var.aws_region
-}
-
-data "aws_organizations_organization" "org" {}
-
-data "aws_organizations_organizational_unit" "list" {
-  for_each  = var.ou_map
-  name      = each.key
-  parent_id = data.aws_organizations_organization.org.roots[0].id
-
-}
-
+# Configure AWS Organizations Service Control Policies (SCPs) for root and
+# organizational units.
 module "scps" {
   source             = "../modules/org_policies"
   policy_type        = "SERVICE_CONTROL_POLICY"
   policies_directory = format("policies/%s", lower(var.policy_type))
   ou_map = {
-    "${data.aws_organizations_organization.org.roots[0].id}"        = ["mfa-critical-api", "waiting-period"]
-    "${data.aws_organizations_organizational_unit.list["dev"].id}"  = ["env-enforcement", "tag-enforcement"]
-    "${data.aws_organizations_organizational_unit.list["prod"].id}" = ["env-enforcement", "tag-enforcement", "kms-spec-admin"]
+    "${local.root_id}" = ["mfa-critical-api", "waiting-period"]
+    "${local.dev_id}"  = ["env-enforcement", "tag-enforcement"]
+    "${local.prod_id}" = ["env-enforcement", "tag-enforcement", "kms-spec-admin"]
   }
 }
 
+# Configure AWS Organizations Resource Control Policies (RCPs) for root and
+# organizational units.
 module "rcps" {
   source             = "../modules/org_policies"
   policy_type        = "RESOURCE_CONTROL_POLICY"
   policies_directory = format("policies/%s", lower(var.policy_type))
   ou_map = {
-    "${data.aws_organizations_organization.org.roots[0].id}"        = ["ext-principal-protection", "svc-principal-protection"]
-    "${data.aws_organizations_organizational_unit.list["prod"].id}" = ["delete-protection"]
+    "${local.root_id}" = ["ext-principal-protection", "svc-principal-protection"]
+    "${local.prod_id}" = ["delete-protection"]
   }
 }

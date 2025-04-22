@@ -3,6 +3,12 @@
 This module provides the ability to create organization policies both for root and organizational units.
 
 <!-- BEGIN_TF_DOCS -->
+## Requirements
+
+| Name | Version |
+|------|---------|
+| terraform | >= 1.10 |
+| aws | ~> 5.94 |
 
 ## Providers
 
@@ -14,6 +20,7 @@ This module provides the ability to create organization policies both for root a
 
 | Name | Source | Version |
 |------|--------|---------|
+| rcps | ../modules/org_policies | n/a |
 | scps | ../modules/org_policies | n/a |
 
 ## Resources
