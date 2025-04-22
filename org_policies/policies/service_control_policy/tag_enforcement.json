@@ -42,9 +42,7 @@
                 "ForAnyValue:StringNotLike": {
                     "aws:RequestTag/environment": [
                         "dev",
-                        "prod",
-                        "stage",
-                        "test"
+                        "prod"
                     ]
                 }
             }

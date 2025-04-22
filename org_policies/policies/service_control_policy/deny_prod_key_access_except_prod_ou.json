@@ -1,0 +1,21 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "DenyProdKeyAccessExceptProdOU",
+            "Effect": "Deny",
+            "Action": [
+                "kms:*"
+            ],
+            "Resource": "*",
+            "Condition": {
+                "StringEquals": {
+                    "aws:ResourceTag/environment": "prod"
+                },
+                "StringNotLike": {
+                    "aws:PrincipalOrgPath": "/root/prod/*"
+                }
+            }
+        }
+    ]
+}

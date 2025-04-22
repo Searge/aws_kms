@@ -6,8 +6,15 @@ module "scps" {
   policies_directory = format("policies/%s", lower(var.policy_type))
   ou_map = {
     "${local.root_id}" = ["mfa-critical-api", "waiting-period"]
-    "${local.dev_id}"  = ["env-enforcement", "tag-enforcement"]
-    "${local.prod_id}" = ["env-enforcement", "tag-enforcement", "kms-spec-admin"]
+    "${local.dev_id}" = [
+      "deny_dev_key_access_except_dev_ou",
+      "tag_enforcement"
+    ]
+    "${local.prod_id}" = [
+      "deny_prod_key_access_except_prod_ou",
+      "tag_enforcement",
+      "kms_spec_admin"
+    ]
   }
 }
 
@@ -18,7 +25,10 @@ module "rcps" {
   policy_type        = "RESOURCE_CONTROL_POLICY"
   policies_directory = format("policies/%s", lower(var.policy_type))
   ou_map = {
-    "${local.root_id}" = ["ext-principal-protection", "svc-principal-protection"]
-    "${local.prod_id}" = ["delete-protection"]
+    "${local.root_id}" = [
+      "ext_principal_protection",
+      "svc_principal_protection"
+    ]
+    "${local.prod_id}" = ["delete_protection"]
   }
 }
