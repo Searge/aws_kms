@@ -3,6 +3,7 @@ variable "aws_region" {
   description = "AWS region"
   default     = "us-east-1"
 }
+
 variable "aws_access_key_id" {
   type        = string
   description = "AWS access key ID"
@@ -13,6 +14,7 @@ variable "aws_secret_access_key" {
   description = "AWS secret access key"
 }
 
+# Map of OUs
 variable "ou_map" {
   type = map(any)
   default = {
@@ -20,6 +22,7 @@ variable "ou_map" {
     "prod" = ["root"]
   }
 }
+
 # Policies
 variable "policy_type" {
   type    = string
