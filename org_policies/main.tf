@@ -1,3 +1,23 @@
+/*
+Organizational Policises and Policy Attachments
+
+Recommended Policy Attachments
+
+Root Account (Organization-wide policies):
+- MFA for Critical Operations aligns with section 3.2.4
+- Key Deletion Waiting Periodaligns with section 3.4.1
+
+Dev OU:
+- Environment Boundary aligns with section 3.2.2
+- Tag Enforcement aligns with section 3.1.1
+
+Prod OU:
+- Environment Boundary aligns with section 3.2.2
+- Tag Enforcement aligns with section 3.1.1
+- Admin Restrictions aligns with section 3.2.3
+- Key Delete Protection aligns with section 3.4.3
+*/
+
 # Configure AWS Organizations Service Control Policies (SCPs) for root and
 # organizational units.
 module "scps" {
@@ -5,23 +25,6 @@ module "scps" {
   policy_type        = "SERVICE_CONTROL_POLICY"
   policies_directory = format("policies/%s", lower(var.policy_type))
 
-  /*
-  Recommended Policy Attachments
-
-  Root Account (Organization-wide policies):
-  - MFA for Critical Operations aligns with section 3.2.4
-  - Key Deletion Waiting Periodaligns with section 3.4.1
-
-  Dev OU:
-  - Environment Boundary aligns with section 3.2.2
-  - Tag Enforcement aligns with section 3.1.1
-
-  Prod OU:
-  - Environment Boundary aligns with section 3.2.2
-  - Tag Enforcement aligns with section 3.1.1
-  - Admin Restrictions aligns with section 3.2.3
-  - Key Delete Protection aligns with section 3.4.3
-  */
   ou_map = {
     "${local.root_id}" = ["mfa_critical_api", "waiting_period"]
     "${local.dev_id}" = [

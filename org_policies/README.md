@@ -37,8 +37,8 @@ This module provides the ability to create organization policies both for root a
 | aws\_access\_key\_id | AWS access key ID | `string` | n/a | yes |
 | aws\_region | AWS region | `string` | `"us-east-1"` | no |
 | aws\_secret\_access\_key | AWS secret access key | `string` | n/a | yes |
-| ou\_map | n/a | `map(any)` | ```{ "dev": [ "root" ], "prod": [ "root" ] }``` | no |
-| policy\_type | Policies | `string` | `"SERVICE_CONTROL_POLICY"` | no |
+| ou\_map | Map of OUs | `map(any)` | ```{ "dev": [ "root" ], "prod": [ "root" ] }``` | no |
+| policy\_type | Policy type with validation | `string` | `"SERVICE_CONTROL_POLICY"` | no |
 
 ## Outputs
 

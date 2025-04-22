@@ -1,22 +1,23 @@
 variable "aws_region" {
-  type        = string
   description = "AWS region"
+  type        = string
   default     = "us-east-1"
 }
 
 variable "aws_access_key_id" {
-  type        = string
   description = "AWS access key ID"
+  type        = string
 }
 
 variable "aws_secret_access_key" {
-  type        = string
   description = "AWS secret access key"
+  type        = string
 }
 
 # Map of OUs
 variable "ou_map" {
-  type = map(any)
+  description = "Map of OUs"
+  type        = map(any)
   default = {
     "dev"  = ["root"]
     "prod" = ["root"]
@@ -25,8 +26,9 @@ variable "ou_map" {
 
 # Policies
 variable "policy_type" {
-  type    = string
-  default = "SERVICE_CONTROL_POLICY"
+  description = "Policy type with validation"
+  type        = string
+  default     = "SERVICE_CONTROL_POLICY"
   validation {
     condition = contains([
       "AISERVICES_OPT_OUT_POLICY",
