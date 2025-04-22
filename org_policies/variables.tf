@@ -35,8 +35,3 @@ variable "policy_type" {
     error_message = "unsupported policy type"
   }
 }
-
-variable "policies_directory" {
-  type    = string
-  default = null
-}
