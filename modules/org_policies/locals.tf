@@ -4,7 +4,7 @@
 locals {
   policies_directory = var.policies_directory == null ? lower(var.policy_type) : var.policies_directory
   policy_ids = {
-    for policy in aws_organizations_policy.this :
-    policy.id => policy.id
+    for path, policy in aws_organizations_policy.this :
+    trimprefix(trimsuffix(path, ".json"), "${local.policies_directory}/") => policy.id
   }
 }
