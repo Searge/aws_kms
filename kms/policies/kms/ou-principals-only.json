@@ -1,0 +1,20 @@
+{
+  "Sid": "Allow use of the KMS key for organization",
+  "Principal": {
+    "AWS": "*"
+  },
+  "Effect": "Allow",
+  "Action": [
+    "kms:Decrypt",
+    "kms:DescribeKey",
+    "kms:Encrypt",
+    "kms:ReEncrypt*",
+    "kms:GetKeyPolicy"
+  ],
+  "Resource": "*",
+  "Condition": {
+    "StringEquals": {
+      "aws:PrincipalOrgID": "o-xxxxxxxxxxx"
+    }
+  }
+}
