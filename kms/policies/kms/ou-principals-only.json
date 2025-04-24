@@ -1,5 +1,5 @@
 {
-  "Sid": "Allow use of the KMS key for organization",
+  "Sid": "AllowUseOfTheKmsKeyForOrganization",
   "Principal": {
     "AWS": "*"
   },
