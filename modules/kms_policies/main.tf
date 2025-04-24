@@ -3,10 +3,9 @@
 ###############################################################################
 resource "aws_kms_key" "main_cmk" {
   description             = "Main CMK for ${local.name_prefix} enviroment."
-  deletion_window_in_days = 7
-  policy                  = data.aws_iam_policy_document.this.json
+  deletion_window_in_days = var.deletion_window_in_days
+  policy                  = var.custom_policy != "" ? var.custom_policy : data.aws_iam_policy_document.this.json
   tags                    = var.tags
-
 }
 
 resource "aws_kms_alias" "main_cmk_alias" {
