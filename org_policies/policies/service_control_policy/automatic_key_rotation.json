@@ -1,0 +1,29 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "EnforceAutomaticKeyRotation",
+            "Effect": "Deny",
+            "Action": [
+                "kms:CreateKey"
+            ],
+            "Resource": "*",
+            "Condition": {
+                "Bool": {
+                    "kms:BypassPolicyLockoutSafetyCheck": "false"
+                },
+                "Null": {
+                    "kms:RotationPeriodInDays": []
+                }
+            }
+        },
+        {
+            "Sid": "PreventDisablingKeyRotation",
+            "Effect": "Deny",
+            "Action": [
+                "kms:DisableKeyRotation"
+            ],
+            "Resource": "*"
+        }
+    ]
+}

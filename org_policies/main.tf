@@ -26,7 +26,7 @@ module "scps" {
   policies_directory = "policies/service_control_policy"
 
   ou_map = {
-    "${local.root_id}" = ["mfa_critical_api", "waiting_period"]
+    "${local.root_id}" = ["mfa_critical_api", "waiting_period", "automatic_key_rotation"]
     "${local.dev_id}" = [
       "deny_dev_key_access_except_dev_ou",
       "tag_enforcement"
