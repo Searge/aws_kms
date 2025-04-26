@@ -1,7 +1,7 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: MIT-0
 variable "policies_directory" {
-  type    = string
+  type = string
 }
 
 variable "policy_type" {
@@ -20,3 +20,13 @@ variable "policy_type" {
 }
 
 variable "ou_map" {}
+
+# Variables for org_policy_attach
+# variable "ou" {}
+
+# variable "policies" {}
+
+# variable "policy_id" {}
+
+# variable "policies_directory_name" {}
+

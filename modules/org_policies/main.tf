@@ -8,12 +8,10 @@ resource "aws_organizations_policy" "this" {
   type     = var.policy_type
 }
 
-module "org_policy_attach" {
-  depends_on              = [aws_organizations_policy.this]
-  source                  = "../org_policy_attach"
-  for_each                = var.ou_map
-  ou                      = each.key
-  policies                = each.value
-  policy_id               = local.policy_ids
-  policies_directory_name = local.policies_directory
+resource "aws_organizations_policy_attachment" "this" {
+  depends_on = [aws_organizations_policy.this]
+  for_each   = { for entry in local.policy_attachments : entry.id => entry }
+
+  policy_id = local.policy_ids[each.value.policy]
+  target_id = each.value.ou
 }
