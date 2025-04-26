@@ -7,4 +7,7 @@ module "kms_keys" {
   environment_name = var.env
   project          = var.project
   tags             = var.tags
+
+  # Add custom policy for dev environment
+  custom_policy    = var.env == "dev" ? file("${path.module}/policies/kms/dev-custom-policy.json") : ""
 }

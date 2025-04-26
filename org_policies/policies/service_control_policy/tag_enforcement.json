@@ -16,21 +16,7 @@
 			}
 		},
 		{
-			"Sid": "DenyRemovalOfRequiredTags",
-			"Effect": "Deny",
-			"Action": [
-				"kms:TagResource",
-				"kms:UntagResource"
-			],
-			"Resource": "*",
-			"Condition": {
-				"Null": {
-					"aws:RequestTag/environment": "true"
-				}
-			}
-		},
-		{
-			"Sid": "DenyInvalidTagValues",
+			"Sid": "DenyInvalidEnvironmentTagValue",
 			"Effect": "Deny",
 			"Action": [
 				"kms:CreateKey",
@@ -45,6 +31,19 @@
 						"dev",
 						"prod"
 					]
+				}
+			}
+		},
+		{
+			"Sid": "DenyRemovalOfRequiredTags",
+			"Effect": "Deny",
+			"Action": [
+				"kms:UntagResource"
+			],
+			"Resource": "*",
+			"Condition": {
+				"Null": {
+					"aws:RequestTag/environment": "true"
 				}
 			}
 		}

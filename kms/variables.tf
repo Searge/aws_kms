@@ -30,3 +30,59 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+###############################################################################
+# KMS Policy Options
+###############################################################################
+variable "enable_prevent_permission_delegation" {
+  description = "Enable preventing permission delegation by restricting KMS access to Account principals only"
+  type        = bool
+  default     = false
+}
+
+variable "enable_ou_principals_only" {
+  description = "Enable restricting KMS operations to principals from a specific organization"
+  type        = bool
+  default     = false
+}
+
+variable "organization_id" {
+  description = "AWS Organization ID for organization-based access restrictions"
+  type        = string
+  default     = ""
+}
+
+variable "deletion_window_in_days" {
+  description = "Duration in days after which the key is deleted after destruction of the resource"
+  type        = number
+  default     = 7
+}
+
+variable "custom_policy" {
+  description = "Custom policy for the KMS key. If provided, this will replace the default policy"
+  type        = string
+  default     = ""
+}
+
+variable "additional_policy_statements" {
+  description = "Additional policy statements to include in the KMS key policy"
+  type = list(object({
+    sid        = string
+    effect     = string
+    principals = map(list(string))
+    actions    = list(string)
+    resources  = list(string)
+    conditions = optional(list(object({
+      test     = string
+      variable = string
+      values   = list(string)
+    })), [])
+  }))
+  default = []
+}
+
+variable "custom_policy" {
+  description = "Custom policy for the KMS key. If provided, this will replace the default policy"
+  type        = string
+  default     = ""
+}

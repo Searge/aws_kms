@@ -9,7 +9,7 @@
       "Resource": "*",
       "Condition": {
         "StringNotEqualsIfExists": {
-          "aws:SourceOrgID": "my-org-id"
+          "aws:SourceOrgID": "o-tmrcrnyq86"
         },
         "Bool": {
           "aws:PrincipalIsAWSService": "true"
