@@ -16,7 +16,7 @@
       "Condition": {
         "StringNotLike": {
           "aws:PrincipalArn": [
-            "arn:aws:iam::123456789123:role/name-of-admin-role-to-allow"
+            "arn:aws:iam::069137988389:role/principal_MFA_KMS_poweruser"
           ]
         }
       }
