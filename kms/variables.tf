@@ -80,3 +80,9 @@ variable "additional_policy_statements" {
   }))
   default = []
 }
+
+variable "custom_policy" {
+  description = "Custom policy for the KMS key. If provided, this will replace the default policy"
+  type        = string
+  default     = ""
+}
