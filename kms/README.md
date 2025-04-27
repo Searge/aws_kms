@@ -1,6 +1,6 @@
-# AWS KMS Keys Management
+# AWS KMS Key Management
 
-This module provides AWS KMS key management with enhanced security policies based on AWS best practices.
+This module manages AWS KMS keys with standardized naming conventions and enhanced security policies based on AWS best practices.
 
 ## Usage
 
@@ -30,6 +30,15 @@ The module uses environment-specific configurations from the following files:
 
 - **Development**: `env/dev/terraform.tfvars`
 - **Production**: `env/prod/terraform.tfvars`
+
+## Key Naming Convention
+
+Keys follow the naming pattern: `alias/<env>-<function>-<team>-<purpose>`
+
+Examples:
+
+- `alias/prod-db-payments-encryption`
+- `alias/dev-api-ml-tokenization`
 
 ## Features
 
@@ -110,7 +119,11 @@ kms/
 | enable\_ou\_principals\_only | Enable restricting KMS operations to principals from a specific organization | `bool` | `false` | no |
 | enable\_prevent\_permission\_delegation | Enable preventing permission delegation by restricting KMS access to Account principals only | `bool` | `false` | no |
 | env | Environment name | `string` | n/a | yes |
+| key\_function | Function of the KMS key (e.g., db, api) | `string` | `"aws"` | no |
+| key\_purpose | Purpose of the KMS key (e.g., encryption, tokenization) | `string` | `"cmk"` | no |
+| key\_team | Team responsible for the KMS key (e.g., payments, ml) | `string` | `""` | no |
 | organization\_id | AWS Organization ID for organization-based access restrictions | `string` | `""` | no |
+| policy\_file | Filename for a specific KMS policy file in the policies directory | `string` | `""` | no |
 | project | Project name | `string` | `""` | no |
 | tags | The map of tags | `map(string)` | `{}` | no |
 

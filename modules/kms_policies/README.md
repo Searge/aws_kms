@@ -103,14 +103,14 @@ module "kms_keys" {
 
 | Name | Version |
 |------|---------|
-| aws | ~> 5.94 |
+| aws | 5.96.0 |
 
 ## Resources
 
 | Name | Type |
 |------|------|
-| [aws_kms_alias.main_cmk_alias](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_alias) | resource |
-| [aws_kms_key.main_cmk](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key) | resource |
+| [aws_kms_alias.key_alias](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_alias) | resource |
+| [aws_kms_key.kms_key](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key) | resource |
 | [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
 | [aws_iam_policy_document.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 
@@ -124,7 +124,11 @@ module "kms_keys" {
 | enable\_ou\_principals\_only | Enable restricting KMS operations to principals from a specific organization | `bool` | `false` | no |
 | enable\_prevent\_permission\_delegation | Enable preventing permission delegation by restricting KMS access to Account principals only | `bool` | `false` | no |
 | environment\_name | Environment name for deployment | `string` | n/a | yes |
+| key\_function | Function of the KMS key (e.g., db, api) | `string` | `"aws"` | no |
+| key\_purpose | Purpose of the KMS key (e.g., encryption, tokenization) | `string` | `"cmk"` | no |
+| key\_team | Team responsible for the KMS key (e.g., payments, ml) | `string` | `""` | no |
 | organization\_id | AWS Organization ID for organization-based access restrictions | `string` | `""` | no |
+| policy\_file | Filename for a specific KMS policy file in the policies directory | `string` | `""` | no |
 | project | Project name for deployment | `string` | n/a | yes |
 | tags | The map of tags | `map(string)` | `{}` | no |
 
