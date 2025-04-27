@@ -86,6 +86,36 @@ variable "tags" {
 }
 
 ###############################################################################
+# KMS Naming conventions
+###############################################################################
+variable "key_function" {
+  description = "Function of the KMS key (e.g., db, api)"
+  type        = string
+  default     = "aws"
+}
+
+variable "key_team" {
+  description = "Team responsible for the KMS key (e.g., payments, ml)"
+  type        = string
+  default     = ""
+}
+
+variable "key_purpose" {
+  description = "Purpose of the KMS key (e.g., encryption, tokenization)"
+  type        = string
+  default     = "cmk"
+}
+
+###############################################################################
+# Policy paths
+###############################################################################
+variable "policy_file" {
+  description = "Filename for a specific KMS policy file in the policies directory"
+  type        = string
+  default     = ""
+}
+
+###############################################################################
 # KMS Policy Options
 ###############################################################################
 variable "enable_prevent_permission_delegation" {
@@ -121,15 +151,15 @@ variable "custom_policy" {
 variable "additional_policy_statements" {
   description = "Additional policy statements to include in the KMS key policy"
   type = list(object({
-    sid         = string
-    effect      = string
-    principals  = map(list(string))
-    actions     = list(string)
-    resources   = list(string)
-    conditions  = optional(list(object({
-      test      = string
-      variable  = string
-      values    = list(string)
+    sid        = string
+    effect     = string
+    principals = map(list(string))
+    actions    = list(string)
+    resources  = list(string)
+    conditions = optional(list(object({
+      test     = string
+      variable = string
+      values   = list(string)
     })), [])
   }))
   default = []

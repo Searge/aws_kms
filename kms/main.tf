@@ -8,6 +8,11 @@ module "kms_keys" {
   project          = var.project
   tags             = var.tags
 
-  # Add custom policy for dev environment
-  custom_policy    = var.env == "dev" ? file("${path.module}/policies/kms/dev-custom-policy.json") : ""
+  # Key alias naming components
+  key_function     = var.key_function
+  key_team         = var.key_team
+  key_purpose      = var.key_purpose
+
+  # Policy selection
+  custom_policy    = local.custom_policy
 }

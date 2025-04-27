@@ -81,8 +81,32 @@ variable "additional_policy_statements" {
   default = []
 }
 
-variable "custom_policy" {
-  description = "Custom policy for the KMS key. If provided, this will replace the default policy"
+###############################################################################
+# KMS Naming conventions
+###############################################################################
+variable "key_function" {
+  description = "Function of the KMS key (e.g., db, api)"
+  type        = string
+  default     = "aws"
+}
+
+variable "key_team" {
+  description = "Team responsible for the KMS key (e.g., payments, ml)"
+  type        = string
+  default     = ""
+}
+
+variable "key_purpose" {
+  description = "Purpose of the KMS key (e.g., encryption, tokenization)"
+  type        = string
+  default     = "cmk"
+}
+
+###############################################################################
+# Policy paths
+###############################################################################
+variable "policy_file" {
+  description = "Filename for a specific KMS policy file in the policies directory"
   type        = string
   default     = ""
 }
