@@ -100,7 +100,7 @@ data "aws_iam_policy_document" "this" {
   dynamic "statement" {
     for_each = var.additional_policy_statements
     content {
-      sid = statement.value.sid
+      sid    = statement.value.sid
       effect = statement.value.effect
       dynamic "principals" {
         for_each = statement.value.principals
