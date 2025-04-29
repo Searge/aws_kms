@@ -4,8 +4,7 @@ provider "aws" {
 
 module "kms_keys" {
   source           = "../modules/kms_policies"
-  environment_name = var.env
-  project          = var.project
+  environment_name = var.environment_name
   tags             = var.tags
 
   # Key alias naming components

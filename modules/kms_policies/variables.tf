@@ -1,15 +1,15 @@
 ###############################################################################
 # Project
 ###############################################################################
-variable "project" {
-  description = "Project name for deployment"
-  type        = string
+# variable "project" {
+#   description = "Project name for deployment"
+#   type        = string
 
-  validation {
-    condition     = length(var.project) >= 3 && var.project != null && var.project != ""
-    error_message = "Error: Incorrect project name."
-  }
-}
+#   validation {
+#     condition     = length(var.project) >= 3 && var.project != null && var.project != ""
+#     error_message = "Error: Incorrect project name."
+#   }
+# }
 
 variable "environment_name" {
   description = "Environment name for deployment"
@@ -115,6 +115,21 @@ variable "policy_file" {
   default     = ""
 }
 
+################################################################################
+# KMS Common Configuration
+###############################################################################
+variable "enable_key_rotation" {
+  description = "Enable automatic key rotation"
+  type = bool
+  default = true
+}
+
+variable "custom_policy" {
+  description = "Custom policy for the KMS key. If provided, this will replace the default policy"
+  type        = string
+  default     = ""
+}
+
 ###############################################################################
 # KMS Policy Options
 ###############################################################################
@@ -140,12 +155,6 @@ variable "deletion_window_in_days" {
   description = "Duration in days after which the key is deleted after destruction of the resource"
   type        = number
   default     = 7
-}
-
-variable "custom_policy" {
-  description = "Custom policy for the KMS key. If provided, this will replace the default policy"
-  type        = string
-  default     = ""
 }
 
 variable "additional_policy_statements" {

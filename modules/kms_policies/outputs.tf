@@ -17,3 +17,8 @@ output "alias_arn" {
   description = "The ARN of the KMS alias"
   value       = aws_kms_alias.key_alias.arn
 }
+
+output "dynamic_statements" {
+  description = "The dynamic policy statements"
+  value       = data.aws_iam_policy_document.this
+}

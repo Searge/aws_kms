@@ -14,42 +14,17 @@ variable "aws_secret_access_key" {
   description = "AWS secret access key"
 }
 
-variable "env" {
-  type        = string
-  description = "Environment name"
-}
+variable "environment_name" {}
 
-variable "project" {
-  description = "Project name"
-  type        = string
-  default     = ""
-}
-
-variable "tags" {
-  description = "The map of tags"
-  type        = map(string)
-  default     = {}
-}
+variable "tags" {}
 
 ###############################################################################
 # KMS Policy Options
 ###############################################################################
-variable "enable_prevent_permission_delegation" {
-  description = "Enable preventing permission delegation by restricting KMS access to Account principals only"
-  type        = bool
-  default     = false
-}
-
-variable "enable_ou_principals_only" {
-  description = "Enable restricting KMS operations to principals from a specific organization"
-  type        = bool
-  default     = false
-}
-
-variable "organization_id" {
-  description = "AWS Organization ID for organization-based access restrictions"
-  type        = string
-  default     = ""
+variable "enable_key_rotation" {
+  description = "Enable automatic key rotation"
+  type = bool
+  default = true
 }
 
 variable "deletion_window_in_days" {

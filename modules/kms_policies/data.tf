@@ -10,46 +10,8 @@ data "aws_caller_identity" "current" {}
 data "aws_iam_policy_document" "this" {
   policy_id = "key-policy-ssm-cloudwatch"
 
-  # Root account access - default or with permission delegation prevention
-  dynamic "statement" {
-    for_each = var.enable_prevent_permission_delegation ? [] : [1]
-    content {
-      sid = "AllowRootAccountKMSAccess"
-      actions = [
-        "kms:*",
-      ]
-      effect = "Allow"
-      principals {
-        type        = "AWS"
-        identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
-      }
-      resources = ["*"]
-    }
-  }
-
-  # Statement preventing permission delegation if enabled
-  dynamic "statement" {
-    for_each = var.enable_prevent_permission_delegation ? [1] : []
-    content {
-      sid = "EnableRootAccessAndPreventPermissionDelegation"
-      actions = [
-        "kms:*",
-      ]
-      effect = "Allow"
-      principals {
-        type        = "AWS"
-        identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
-      }
-      resources = ["*"]
-      condition {
-        test     = "StringEquals"
-        variable = "aws:PrincipalType"
-        values   = ["Account"]
-      }
-    }
-  }
-
-  # Statement allowing SSM and CloudWatch Logs access
+  # Example policy Statement allowing SSM and CloudWatch Logs access
+  # If you need to add more statements, use the dynamic block
   statement {
     sid = "AllowSSMandCloudWatchLogsAccess"
     actions = [
@@ -70,33 +32,8 @@ data "aws_iam_policy_document" "this" {
     resources = ["*"]
   }
 
-  # Statement restricting KMS operations to principals from the specified organization
-  dynamic "statement" {
-    for_each = var.enable_ou_principals_only && var.organization_id != "" ? [1] : []
-    content {
-      sid = "AllowUseOfTheKMSKeyForOrganization"
-      actions = [
-        "kms:Decrypt",
-        "kms:DescribeKey",
-        "kms:Encrypt",
-        "kms:ReEncrypt*",
-        "kms:GetKeyPolicy"
-      ]
-      effect = "Allow"
-      principals {
-        type        = "AWS"
-        identifiers = ["*"]
-      }
-      resources = ["*"]
-      condition {
-        test     = "StringEquals"
-        variable = "aws:PrincipalOrgID"
-        values   = [var.organization_id]
-      }
-    }
-  }
-
   # Additional policy statements
+  # which can be added using the additional_policy_statements variable
   dynamic "statement" {
     for_each = var.additional_policy_statements
     content {
