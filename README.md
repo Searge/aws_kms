@@ -333,6 +333,18 @@ conftest test plan.json --policy policies/kms
       }
     }
   ]
-}
+  }
 ```
 
+---
+
+# ✅ Best Practices включены:
+Enable key rotation: автоматически включено
+
+Scoped IAM roles: каждая среда получает только нужный доступ
+
+Region restriction: запрет использования за пределами нужного региона
+
+Use of aliases: для безопасного обращения к ключу без key_id
+
+Tagging: окружение и владелец
