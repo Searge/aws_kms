@@ -7,22 +7,17 @@ This module creates AWS KMS keys with customizable policies to implement securit
 - Creates a KMS Customer Master Key (CMK) with configurable policies
 - Creates an alias for the CMK
 - Supports various policy configurations:
-  - Permission delegation prevention
+  - File-based custom policies
+  - Dynamic policy generation
+  - Additional policy statements
   - Organization-based access restrictions
-  - Custom policy statements
-  - Complete policy customization
 
 ## Usage
 
 ```hcl
 module "kms_keys" {
-  source                           = "../modules/kms_policies"
-  environment_name                 = "prod"
-  project                          = "my-project"
-  enable_prevent_permission_delegation = true
-  enable_ou_principals_only        = true
-  organization_id                  = "o-xxxxxxxxxxx"
-  deletion_window_in_days          = 30
+  source           = "../modules/kms_policies"
+  environment_name = "prod"
   tags = {
     BU              = "Finance"
     BusinessOwner   = "Jane Doe"
@@ -35,61 +30,137 @@ module "kms_keys" {
 }
 ```
 
-## Additional Policy Examples
+## Policy Configuration
 
-### Prevent Permission Delegation
+The module supports three approaches to policy configuration in order of precedence:
 
-This policy ensures that only the account root can perform KMS operations, preventing delegation of permissions:
+1. **File-based custom policy** - Complete policy file referenced via `policy_file`
+2. **Inline custom policy** - Complete policy JSON passed as `custom_policy`
+3. **Dynamic policy generation** - Default policy plus `additional_policy_statements`
+
+### File-Based Custom Policy
+
+To use a file-based policy (recommended approach):
 
 ```hcl
+# In the root module
 module "kms_keys" {
-  source                           = "../modules/kms_policies"
-  environment_name                 = "prod"
-  project                          = "my-project"
-  enable_prevent_permission_delegation = true
-  # ... other variables
+  source           = "../modules/kms_policies"
+  environment_name = "prod"
+  # The policy_file is passed to the module
+  policy_file      = var.policy_file
+  # Other variables...
 }
+
+# In locals.tf of the root module
+locals {
+  # This handles reading the file content
+  policy_file_path = var.policy_file != "" ? "${path.module}/policies/kms/${var.policy_file}" : ""
+  custom_policy    = local.policy_file_path != "" ? file(local.policy_file_path) : ""
+}
+
+# In terraform.tfvars
+policy_file = "prod-custom-policy.json"
 ```
 
-### Organization-Based Access Restrictions
+Your policy file should be stored in `policies/kms/prod-custom-policy.json` and contain a complete KMS policy document.
 
-This policy restricts key usage to principals within your AWS organization:
+### Inline Custom Policy
 
-```hcl
-module "kms_keys" {
-  source                    = "../modules/kms_policies"
-  environment_name          = "prod"
-  project                   = "my-project"
-  enable_ou_principals_only = true
-  organization_id           = "o-xxxxxxxxxxx"
-  # ... other variables
-}
-```
-
-### Custom Policy Statements
-
-For more complex policies, you can add custom statements:
+You can also provide a complete policy directly:
 
 ```hcl
 module "kms_keys" {
-  source                    = "../modules/kms_policies"
-  environment_name          = "prod"
-  project                   = "my-project"
-  additional_policy_statements = [
+  source           = "../modules/kms_policies"
+  environment_name = "prod"
+  custom_policy    = <<EOT
+{
+  "Version": "2012-10-17",
+  "Statement": [
     {
-      sid       = "AllowRoleToUseKey"
-      effect    = "Allow"
-      principals = {
-        AWS = ["arn:aws:iam::123456789012:role/MyRole"]
-      }
-      actions   = ["kms:Decrypt", "kms:DescribeKey"]
-      resources = ["*"]
-      conditions = []
+      "Sid": "EnableRootAccess",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+      },
+      "Action": "kms:*",
+      "Resource": "*"
     }
   ]
-  # ... other variables
+}
+EOT
 }
 ```
+
+### Dynamic Policy Generation
+
+If no custom policy is provided, the module generates a policy with:
+
+- A default statement allowing SSM and CloudWatch Logs access
+- Any additional statements you define:
+
+```hcl
+module "kms_keys" {
+  source           = "../modules/kms_policies"
+  environment_name = "prod"
+
+  additional_policy_statements = [
+    {
+      sid    = "AllowAdminRole"
+      effect = "Allow"
+      principals = {
+        AWS = ["arn:aws:iam::*:role/KMSAdminRole"]
+      }
+      actions = [
+        "kms:Create*", "kms:Describe*", "kms:Enable*",
+        "kms:List*", "kms:Put*", "kms:Update*",
+        "kms:Revoke*", "kms:Disable*", "kms:Get*",
+        "kms:Delete*", "kms:TagResource", "kms:UntagResource"
+      ]
+      resources = ["*"]
+    },
+    {
+      sid    = "RequireMFA"
+      effect = "Deny"
+      principals = {
+        AWS = ["*"]
+      }
+      actions = [
+        "kms:ScheduleKeyDeletion",
+        "kms:DeleteImportedKeyMaterial",
+        "kms:DisableKey",
+        "kms:PutKeyPolicy"
+      ]
+      resources = ["*"]
+      conditions = [
+        {
+          test     = "BoolIfExists"
+          variable = "aws:MultiFactorAuthPresent"
+          values   = ["false"]
+        }
+      ]
+    }
+  ]
+}
+```
+
+## Policy Precedence
+
+The module applies policies in this order:
+
+1. If `custom_policy` is provided (either directly or via `policy_file`), it is used exclusively
+2. If no custom policy is provided, the dynamic policy is generated with:
+   - The default statement for AWS services (SSM, CloudWatch)
+   - Any additional statements specified in `additional_policy_statements`
+
+## Key Naming Convention
+
+Keys follow this naming pattern for their alias: `alias/<env>-<function>-<team>-<purpose>`
+
+Examples:
+
+- `alias/prod-db-payments-encryption`
+- `alias/dev-api-ml-tokenization`
 
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
