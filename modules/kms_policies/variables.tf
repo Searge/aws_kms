@@ -133,24 +133,6 @@ variable "custom_policy" {
 ###############################################################################
 # KMS Policy Options
 ###############################################################################
-variable "enable_prevent_permission_delegation" {
-  description = "Enable preventing permission delegation by restricting KMS access to Account principals only"
-  type        = bool
-  default     = false
-}
-
-variable "enable_ou_principals_only" {
-  description = "Enable restricting KMS operations to principals from a specific organization"
-  type        = bool
-  default     = false
-}
-
-variable "organization_id" {
-  description = "AWS Organization ID for organization-based access restrictions"
-  type        = string
-  default     = ""
-}
-
 variable "deletion_window_in_days" {
   description = "Duration in days after which the key is deleted after destruction of the resource"
   type        = number

@@ -114,18 +114,14 @@ kms/
 | aws\_access\_key\_id | AWS access key ID | `string` | n/a | yes |
 | aws\_region | AWS region | `string` | `"us-east-1"` | no |
 | aws\_secret\_access\_key | AWS secret access key | `string` | n/a | yes |
-| custom\_policy | Custom policy for the KMS key. If provided, this will replace the default policy | `string` | `""` | no |
 | deletion\_window\_in\_days | Duration in days after which the key is deleted after destruction of the resource | `number` | `7` | no |
-| enable\_ou\_principals\_only | Enable restricting KMS operations to principals from a specific organization | `bool` | `false` | no |
-| enable\_prevent\_permission\_delegation | Enable preventing permission delegation by restricting KMS access to Account principals only | `bool` | `false` | no |
-| env | Environment name | `string` | n/a | yes |
+| enable\_key\_rotation | Enable automatic key rotation | `bool` | `true` | no |
+| environment\_name | n/a | `any` | n/a | yes |
 | key\_function | Function of the KMS key (e.g., db, api) | `string` | `"aws"` | no |
 | key\_purpose | Purpose of the KMS key (e.g., encryption, tokenization) | `string` | `"cmk"` | no |
 | key\_team | Team responsible for the KMS key (e.g., payments, ml) | `string` | `""` | no |
-| organization\_id | AWS Organization ID for organization-based access restrictions | `string` | `""` | no |
 | policy\_file | Filename for a specific KMS policy file in the policies directory | `string` | `""` | no |
-| project | Project name | `string` | `""` | no |
-| tags | The map of tags | `map(string)` | `{}` | no |
+| tags | n/a | `any` | n/a | yes |
 
 ## Outputs
 
@@ -134,6 +130,7 @@ kms/
 | account\_id | The AWS account ID |
 | alias\_arn | The ARN of the KMS alias |
 | alias\_name | The name of the KMS alias |
+| custom\_policy | The custom policy |
 | environment | The current environment |
 | key\_arn | The ARN of the KMS key |
 | key\_id | The ID of the KMS key |

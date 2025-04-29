@@ -23,20 +23,14 @@ variable "tags" {}
 ###############################################################################
 variable "enable_key_rotation" {
   description = "Enable automatic key rotation"
-  type = bool
-  default = true
+  type        = bool
+  default     = true
 }
 
 variable "deletion_window_in_days" {
   description = "Duration in days after which the key is deleted after destruction of the resource"
   type        = number
   default     = 7
-}
-
-variable "custom_policy" {
-  description = "Custom policy for the KMS key. If provided, this will replace the default policy"
-  type        = string
-  default     = ""
 }
 
 variable "additional_policy_statements" {

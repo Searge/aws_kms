@@ -121,15 +121,12 @@ module "kms_keys" {
 | additional\_policy\_statements | Additional policy statements to include in the KMS key policy | ```list(object({ sid = string effect = string principals = map(list(string)) actions = list(string) resources = list(string) conditions = optional(list(object({ test = string variable = string values = list(string) })), []) }))``` | `[]` | no |
 | custom\_policy | Custom policy for the KMS key. If provided, this will replace the default policy | `string` | `""` | no |
 | deletion\_window\_in\_days | Duration in days after which the key is deleted after destruction of the resource | `number` | `7` | no |
-| enable\_ou\_principals\_only | Enable restricting KMS operations to principals from a specific organization | `bool` | `false` | no |
-| enable\_prevent\_permission\_delegation | Enable preventing permission delegation by restricting KMS access to Account principals only | `bool` | `false` | no |
+| enable\_key\_rotation | Enable automatic key rotation | `bool` | `true` | no |
 | environment\_name | Environment name for deployment | `string` | n/a | yes |
 | key\_function | Function of the KMS key (e.g., db, api) | `string` | `"aws"` | no |
 | key\_purpose | Purpose of the KMS key (e.g., encryption, tokenization) | `string` | `"cmk"` | no |
 | key\_team | Team responsible for the KMS key (e.g., payments, ml) | `string` | `""` | no |
-| organization\_id | AWS Organization ID for organization-based access restrictions | `string` | `""` | no |
 | policy\_file | Filename for a specific KMS policy file in the policies directory | `string` | `""` | no |
-| project | Project name for deployment | `string` | n/a | yes |
 | tags | The map of tags | `map(string)` | `{}` | no |
 
 ## Outputs
@@ -138,6 +135,7 @@ module "kms_keys" {
 |------|-------------|
 | alias\_arn | The ARN of the KMS alias |
 | alias\_name | The name of the KMS alias |
+| dynamic\_statements | The dynamic policy statements |
 | key\_arn | The ARN of the KMS key |
 | key\_id | The ID of the KMS key |
 <!-- END_TF_DOCS -->
