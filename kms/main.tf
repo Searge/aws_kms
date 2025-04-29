@@ -13,5 +13,5 @@ module "kms_keys" {
   key_purpose  = var.key_purpose
 
   # Policy selection
-  custom_policy = local.custom_policy
+  custom_policy = var.custom_policy
 }
