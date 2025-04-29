@@ -127,4 +127,169 @@ terraform apply -var-file=dev.tfvars
 
 ---
 
-Если нужно — могу сгенерировать шаблоны для `main.tf`, `kms_key` или `org_policies` модулей. Хочешь?
+Отлично. Тогда я сейчас полностью допишу:  
+- Проверку на обязательные **теги**  
+- Проверку, что политика **требует MFA** для операций удаления/отключения ключа  
+
+И всё оформлю в едином, красивом **Markdown документе** с пояснениями.
+
+---
+
+# 🛡 Policy as Code для AWS KMS Keys
+
+## 📁 Где создавать политики
+
+Создайте папку:
+
+```bash
+mkdir -p policies/kms
+```
+
+Создайте файл:
+
+```bash
+touch policies/kms/kms_security.rego
+```
+
+---
+
+## 📜 Полный Rego-файл `policies/kms/kms_security.rego`
+
+```rego
+package terraform.kms
+
+default allow = false
+
+############
+# Базовые проверки
+############
+
+# Проверка: ротация ключей включена
+rotation_enabled[key] {
+  input.resource_changes[_].change.after.enable_key_rotation == true
+  key := input.resource_changes[_].address
+}
+
+# Проверка: ключ имеет policy
+has_policy[key] {
+  input.resource_changes[_].change.after.policy != ""
+  key := input.resource_changes[_].address
+}
+
+# Проверка: запрещён доступ всем кроме списка ролей
+deny_all_except_listed[key] {
+  some i
+  policy := json.unmarshal(input.resource_changes[_].change.after.policy)
+  statement := policy.Statement[i]
+  statement.Effect == "Deny"
+  statement.Condition.StringNotLike["aws:PrincipalArn"]
+  key := input.resource_changes[_].address
+}
+
+############
+# Проверка тегов
+############
+
+# Проверка: у ключа есть теги "Environment" и "Owner"
+required_tags_present[key] {
+  tags := input.resource_changes[_].change.after.tags
+  tags["Environment"] != ""
+  tags["Owner"] != ""
+  key := input.resource_changes[_].address
+}
+
+############
+# Проверка MFA
+############
+
+# Проверка: для удаления/отключения ключа требуется MFA
+mfa_required_for_sensitive_actions[key] {
+  some i
+  policy := json.unmarshal(input.resource_changes[_].change.after.policy)
+  statement := policy.Statement[i]
+  statement.Effect == "Allow"
+  statement.Action[_] == "kms:ScheduleKeyDeletion"
+  statement.Condition.Bool["aws:MultiFactorAuthPresent"] == "true"
+  key := input.resource_changes[_].address
+}
+
+############
+# Финальное правило
+############
+
+allow {
+  count(rotation_enabled) > 0
+  count(has_policy) > 0
+  count(deny_all_except_listed) > 0
+  count(required_tags_present) > 0
+  count(mfa_required_for_sensitive_actions) > 0
+}
+```
+
+---
+
+## 📦 Что проверяет политика
+
+| Проверка                                              | Описание |
+|:------------------------------------------------------|:---------|
+| ✅ Включена ротация ключей                             | `enable_key_rotation = true` |
+| ✅ Прописана собственная KMS policy                    | Без policy ключ считается небезопасным |
+| ✅ В policy запрещён доступ всем, кроме нужных ролей   | Через `Deny` на `PrincipalArn` |
+| ✅ Установлены обязательные теги `Environment`, `Owner` | Для управления и аудита |
+| ✅ Требуется MFA для удаления ключа                    | Операция `ScheduleKeyDeletion` требует MFA |
+
+---
+
+## 🚀 Как использовать
+
+1. **Создать план Terraform**:
+
+```bash
+terraform plan -out=plan.tfplan
+terraform show -json plan.tfplan > plan.json
+```
+
+2. **Запустить проверку через conftest**:
+
+```bash
+conftest test plan.json --policy policies/kms
+```
+
+✅ Если все проверки пройдены — инфраструктуру можно деплоить.
+
+❌ Если хотя бы одна проверка не пройдена — пайплайн CI/CD должен упасть.
+
+---
+
+## 📂 Расширение: Можно разделить политики
+
+Если хочешь более чистую структуру, можешь создать несколько файлов:
+
+| Файл | Проверка |
+|:-----|:---------|
+| `kms_rotation.rego` | Только проверка ротации |
+| `kms_tags.rego` | Проверка тегов |
+| `kms_mfa.rego` | Проверка MFA |
+| `kms_policy_structure.rego` | Структура policy (Deny всем кроме разрешённых) |
+
+Но сейчас всё собрано **в одном** для удобства.
+
+---
+
+## 📚 Полезные ссылки
+
+- [Open Policy Agent (OPA)](https://www.openpolicyagent.org/docs/latest/)
+- [Conftest — Policy Testing for Terraform](https://www.conftest.dev/)
+- [AWS KMS Best Practices](https://docs.aws.amazon.com/kms/latest/developerguide/best-practices.html)
+- [AWS Condition Key: aws:MultiFactorAuthPresent](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-mfa)
+
+---
+
+# ✅ Итого
+
+Ты теперь сможешь:
+- Автоматически проверять безопасность KMS ключей
+- Отлавливать неправильные policy до деплоя
+- Требовать MFA для опасных операций
+- Обеспечивать теги для учёта и отчётности
+
