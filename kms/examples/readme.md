@@ -317,27 +317,43 @@ policy_file = "dev-custom-policy.json"
 policy_file = "prod-custom-policy.json"
 ```
 
-And in your module call:
+The flow for handling policy files works as follows:
 
-```hcl
-module "kms_keys" {
-  source       = "../modules/kms_policies"
-  environment_name = var.environment_name
-  policy_file  = var.policy_file
-  # Other configuration...
-}
-```
+1. In the root module (`kms/main.tf`), you define:
 
-The module handles the policy file path:
+   ```hcl
+   module "kms_keys" {
+     source           = "../modules/kms_policies"
+     environment_name = var.environment_name
+     tags             = var.tags
+     key_function     = var.key_function
+     key_team         = var.key_team
+     key_purpose      = var.key_purpose
 
-```hcl
-# In locals.tf
-locals {
-  # Determine policy file to use
-  policy_file_path = var.policy_file != "" ? "${path.module}/policies/kms/${var.policy_file}" : ""
-  custom_policy    = local.policy_file_path != "" ? file(local.policy_file_path) : ""
-}
-```
+     # Pass the custom policy content
+     custom_policy    = local.custom_policy
+   }
+   ```
+
+2. The root module's locals (`kms/locals.tf`) reads the policy file:
+
+   ```hcl
+   locals {
+     # Determine policy file to use
+     policy_file_path = var.policy_file != "" ? "${path.module}/policies/kms/${var.policy_file}" : ""
+     custom_policy    = local.policy_file_path != "" ? file(local.policy_file_path) : ""
+   }
+   ```
+
+3. The KMS module then uses the custom policy if provided:
+
+   ```hcl
+   resource "aws_kms_key" "kms_key" {
+     # ...
+     policy = var.custom_policy != "" ? var.custom_policy : data.aws_iam_policy_document.this.json
+     # ...
+   }
+   ```
 
 ### Policy Precedence
 
