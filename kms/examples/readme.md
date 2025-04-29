@@ -14,6 +14,8 @@ This document outlines different strategies for configuring secure KMS keys and 
   - [Service-Specific Access Patterns](#service-specific-access-patterns)
   - [Cross-Account Access Strategies](#cross-account-access-strategies)
   - [Custom Key Policies](#custom-key-policies)
+    - [File-Based Policy Approach](#file-based-policy-approach)
+    - [Policy Precedence](#policy-precedence)
   - [Combining Multiple Strategies](#combining-multiple-strategies)
   - [Implementation Examples](#implementation-examples)
     - [Development Environment](#development-environment)
@@ -289,53 +291,69 @@ This configuration:
 
 ## Custom Key Policies
 
-For advanced scenarios, use a complete custom policy.
+For advanced scenarios, use a custom policy file stored in a dedicated directory. This approach allows you to maintain policies outside your Terraform code and reuse them across different environments.
+
+### File-Based Policy Approach
+
+Store your KMS policies in a dedicated policy directory:
+
+```txt
+kms/
+├── policies/
+│   ├── kms/
+│   │   ├── dev-custom-policy.json
+│   │   ├── prod-custom-policy.json
+│   │   ├── pci-compliance-policy.json
+│   │   └── ...
+```
+
+Then reference these policy files in your Terraform variables:
+
+```hcl
+# In kms/env/dev/terraform.tfvars
+policy_file = "dev-custom-policy.json"
+
+# In kms/env/prod/terraform.tfvars
+policy_file = "prod-custom-policy.json"
+```
+
+And in your module call:
 
 ```hcl
 module "kms_keys" {
-  source           = "../modules/kms_policies"
-  environment_name = "prod"
-
-  custom_policy = <<POLICY
-{
-  "Version": "2012-10-17",
-  "Id": "custom-key-policy",
-  "Statement": [
-    {
-      "Sid": "EnableRootAccess",
-      "Effect": "Allow",
-      "Principal": {
-        "AWS": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
-      },
-      "Action": "kms:*",
-      "Resource": "*"
-    },
-    {
-      "Sid": "AllowEncryptionOperations",
-      "Effect": "Allow",
-      "Principal": {
-        "AWS": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/EncryptionRole"
-      },
-      "Action": [
-        "kms:Encrypt",
-        "kms:Decrypt",
-        "kms:ReEncrypt*",
-        "kms:GenerateDataKey*",
-        "kms:DescribeKey"
-      ],
-      "Resource": "*"
-    }
-  ]
-}
-POLICY
+  source       = "../modules/kms_policies"
+  environment_name = var.environment_name
+  policy_file  = var.policy_file
+  # Other configuration...
 }
 ```
 
-This configuration:
+The module handles the policy file path:
 
-- Provides complete control over the policy
-- Allows for complex, custom access patterns
-- Supports any policy structure needed
+```hcl
+# In locals.tf
+locals {
+  # Determine policy file to use
+  policy_file_path = var.policy_file != "" ? "${path.module}/policies/kms/${var.policy_file}" : ""
+  custom_policy    = local.policy_file_path != "" ? file(local.policy_file_path) : ""
+}
+```
+
+### Policy Precedence
+
+The module applies policies in this order:
+
+1. If `custom_policy` is specified (via `policy_file`), it will be used exclusively
+2. If no custom policy is provided, the default policy will be used:
+   - Basic permission for AWS services (SSM, CloudWatch)
+   - Plus any `additional_policy_statements` you define
+
+This approach:
+
+- Keeps policies as separate files for better organization
+- Allows environment-specific policies
+- Supports full policy customization when needed
+- Falls back to a sensible default with additional statements
 
 ## Combining Multiple Strategies
 
