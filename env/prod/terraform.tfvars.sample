@@ -1,0 +1,26 @@
+aws_region            = "us-east-1"
+aws_access_key_id     = "XXXX"
+aws_secret_access_key = "XX/XXXXX"
+
+environment_name = "prod"
+key_function     = "sign"
+key_team         = "security"
+key_purpose      = "cmk"
+
+policy_file = "prod-custom-policy.json"
+
+description = "KMS key for signing"
+
+deletion_window_in_days = 30 # Longer deletion window for production
+enable_key_rotation     = true
+custom_policy           = "prod-custom-policy.json"
+
+tags = {
+  BU             = "Security"
+  BusinessOwner  = "Security Team"
+  TechnicalOwner = "Cloud Security Team"
+  ProjectManager = "Security Manager"
+  Project        = "secure-kms"
+  Owner          = "Security Operations"
+  Environment    = "prod"
+}
