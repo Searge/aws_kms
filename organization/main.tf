@@ -23,7 +23,7 @@ Prod OU:
 module "scps" {
   source             = "../modules/org_policies"
   policy_type        = "SERVICE_CONTROL_POLICY"
-  policies_directory = "policies/service_control_policy"
+  policies_directory = "../policies/org/service_control_policy"
 
   ou_map = {
     "${local.root_id}" = ["mfa_critical_api", "waiting_period", "automatic_key_rotation"]
@@ -44,7 +44,7 @@ module "scps" {
 module "rcps" {
   source             = "../modules/org_policies"
   policy_type        = "RESOURCE_CONTROL_POLICY"
-  policies_directory = "policies/resource_control_policy"
+  policies_directory = "../policies/org/resource_control_policy"
   ou_map = {
     "${local.root_id}" = [
       "ext_principal_protection",
