@@ -183,21 +183,19 @@ Examples:
 | [aws_kms_alias.key_alias](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_alias) | resource |
 | [aws_kms_key.kms_key](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key) | resource |
 | [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
-| [aws_iam_policy_document.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| additional\_policy\_statements | Additional policy statements to include in the KMS key policy | ```list(object({ sid = string effect = string principals = map(list(string)) actions = list(string) resources = list(string) conditions = optional(list(object({ test = string variable = string values = list(string) })), []) }))``` | `[]` | no |
-| custom\_policy | Custom policy for the KMS key. If provided, this will replace the default policy | `string` | `""` | no |
+| custom\_policy | Custom policy file | `string` | `""` | no |
 | deletion\_window\_in\_days | Duration in days after which the key is deleted after destruction of the resource | `number` | `7` | no |
+| description | Description of the KMS key | `string` | n/a | yes |
 | enable\_key\_rotation | Enable automatic key rotation | `bool` | `true` | no |
 | environment\_name | Environment name for deployment | `string` | n/a | yes |
 | key\_function | Function of the KMS key (e.g., db, api) | `string` | `"aws"` | no |
 | key\_purpose | Purpose of the KMS key (e.g., encryption, tokenization) | `string` | `"cmk"` | no |
 | key\_team | Team responsible for the KMS key (e.g., payments, ml) | `string` | `""` | no |
-| policy\_file | Filename for a specific KMS policy file in the policies directory | `string` | `""` | no |
 | tags | The map of tags | `map(string)` | `{}` | no |
 
 ## Outputs
@@ -206,7 +204,6 @@ Examples:
 |------|-------------|
 | alias\_arn | The ARN of the KMS alias |
 | alias\_name | The name of the KMS alias |
-| dynamic\_statements | The dynamic policy statements |
 | key\_arn | The ARN of the KMS key |
 | key\_id | The ID of the KMS key |
 <!-- END_TF_DOCS -->

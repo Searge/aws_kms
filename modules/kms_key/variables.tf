@@ -106,11 +106,16 @@ variable "key_purpose" {
   default     = "cmk"
 }
 
+variable "description" {
+  description = "Description of the KMS key"
+  type        = string
+}
+
 ###############################################################################
 # Policy paths
 ###############################################################################
-variable "policy_file" {
-  description = "Filename for a specific KMS policy file in the policies directory"
+variable "custom_policy" {
+  description = "Custom policy file"
   type        = string
   default     = ""
 }
@@ -120,14 +125,8 @@ variable "policy_file" {
 ###############################################################################
 variable "enable_key_rotation" {
   description = "Enable automatic key rotation"
-  type = bool
-  default = true
-}
-
-variable "custom_policy" {
-  description = "Custom policy for the KMS key. If provided, this will replace the default policy"
-  type        = string
-  default     = ""
+  type        = bool
+  default     = true
 }
 
 ###############################################################################
@@ -137,21 +136,4 @@ variable "deletion_window_in_days" {
   description = "Duration in days after which the key is deleted after destruction of the resource"
   type        = number
   default     = 7
-}
-
-variable "additional_policy_statements" {
-  description = "Additional policy statements to include in the KMS key policy"
-  type = list(object({
-    sid        = string
-    effect     = string
-    principals = map(list(string))
-    actions    = list(string)
-    resources  = list(string)
-    conditions = optional(list(object({
-      test     = string
-      variable = string
-      values   = list(string)
-    })), [])
-  }))
-  default = []
 }

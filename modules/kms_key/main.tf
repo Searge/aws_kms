@@ -5,9 +5,9 @@ resource "aws_kms_key" "kms_key" {
   description             = var.description
   deletion_window_in_days = var.deletion_window_in_days
   enable_key_rotation     = var.enable_key_rotation
-  policy                  = var.custom_policy
   tags                    = var.tags
   custom_key_store_id     = local.custom_key_store_id
+  policy                  = local.custom_policy
 }
 
 resource "aws_kms_alias" "key_alias" {
