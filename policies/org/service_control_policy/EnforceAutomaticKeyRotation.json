@@ -16,14 +16,6 @@
                     "kms:RotationPeriodInDays": []
                 }
             }
-        },
-        {
-            "Sid": "PreventDisablingKeyRotation",
-            "Effect": "Deny",
-            "Action": [
-                "kms:DisableKeyRotation"
-            ],
-            "Resource": "*"
         }
     ]
 }

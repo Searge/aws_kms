@@ -1,0 +1,29 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DenyInvalidEnvironmentTagValue",
+      "Effect": "Deny",
+      "Action": [
+        "kms:CreateKey",
+        "kms:CreateAlias",
+        "kms:CreateCustomKeyStore",
+        "kms:TagResource"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "ForAnyValue:StringNotLike": {
+          "aws:RequestTag/environment": [
+            "dev",
+            "prod"
+          ],
+          "aws:ResourceTag/data-classification": [
+            "confidential",
+            "internal",
+            "public"
+          ]
+        }
+      }
+    }
+  ]
+}

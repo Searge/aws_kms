@@ -2,7 +2,7 @@
   "Version": "2012-10-17",
   "Statement": [
     {
-      "Sid": "DenyAccessWithException",
+      "Sid": "DenyAccessWithExceptionRole",
       "Effect": "Deny",
       "Action": [
         "kms:Create*",

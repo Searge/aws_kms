@@ -1,0 +1,21 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DenyCreateKeyWithoutRequiredTags",
+      "Effect": "Deny",
+      "Action": [
+        "kms:CreateKey",
+        "kms:CreateAlias"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "Null": {
+          "aws:RequestTag/owner": "true",
+          "aws:RequestTag/environment": "true",
+          "aws:RequestTag/data-classification": "true"
+        }
+      }
+    }
+  ]
+}
