@@ -30,6 +30,11 @@
 					"aws:RequestTag/environment": [
 						"dev",
 						"prod"
+					],
+					"aws:ResourceTag/data-classification": [
+						"confidential",
+						"internal",
+						"public"
 					]
 				}
 			}
