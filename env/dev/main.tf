@@ -13,7 +13,7 @@ module "kms_keys" {
   key_purpose  = var.key_purpose
 
   description = var.description
-
+  account_id = data.aws_caller_identity.current.id
   # Policy selection
   custom_policy = var.custom_policy
 }

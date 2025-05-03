@@ -99,3 +99,7 @@ variable "deletion_window_in_days" {
   type        = number
   default     = 7
 }
+variable "account_id" {
+  description = "ID of aws account"
+  type = string  
+}

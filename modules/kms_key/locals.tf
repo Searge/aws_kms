@@ -15,5 +15,8 @@ locals {
 
   # Using absolute path
   policies_directory = "${path.module}/../../policies/aws_keys_policies"
-  custom_policy      = var.custom_policy != null ? file("${local.policies_directory}/${var.custom_policy}") : null
+  custom_policy = templatefile("${local.policies_directory}/${var.custom_policy}", {
+      account_id = var.account_id,
+      env        = var.environment_name
+    })
 }

@@ -2,19 +2,14 @@
   "Version": "2012-10-17",
   "Id": "org_wide_kms_policy",
   "Statement": [
-    {
-      "Sid": "EnableRootAccessAndPreventPermissionDelegation",
+        {
+      "Sid": "AllowRootFullAccess",
       "Effect": "Allow",
       "Principal": {
-        "AWS": "arn:aws:iam::069137988389:root"
+        "AWS": "arn:aws:iam::007695491693:root"
       },
       "Action": "kms:*",
-      "Resource": "*",
-      "Condition": {
-        "StringEquals": {
-          "aws:PrincipalType": "Account"
-        }
-      }
+      "Resource": "*"
     },
     {
       "Sid": "Allow use of the KMS key for organization",
@@ -32,7 +27,7 @@
       "Resource": "*",
       "Condition": {
         "StringEquals": {
-          "aws:PrincipalOrgID": "o-tmrcrnyq86"
+          "aws:PrincipalOrgID": "o-gihnpgehpg"
         }
       }
     },
@@ -55,7 +50,7 @@
       "Resource": "*",
       "Condition": {
         "StringEquals": {
-          "aws:PrincipalOrgID": "o-tmrcrnyq86"
+          "aws:PrincipalOrgID": "o-gihnpgehpg"
         }
       }
     }

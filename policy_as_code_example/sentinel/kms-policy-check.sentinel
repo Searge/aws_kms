@@ -1,0 +1,41 @@
+import "tfplan/v2" as tfplan
+import "strings"
+
+required_tags = ["environment", "owner", "data-classification"]
+valid_environments = ["prod", "dev", "test", "uat"]
+
+kms_has_required_tags = func(resource) {
+    all required_tags as tag {
+        tag in keys(resource.applied.tags)
+    }
+}
+
+kms_environment_valid = func(resource) {
+    tag_value = resource.applied.tags["environment"]
+    tag_value in valid_environments
+}
+
+kms_rotation_enabled = func(resource) {
+    resource.applied.enable_key_rotation is true
+}
+
+kms_deletion_delay_ok = func(resource) {
+    resource.applied.deletion_window_in_days >= 30
+}
+
+kms_no_wildcards = func(resource) {
+    not strings.contains(resource.applied.policy, "\"Principal\": \"*\"") and
+    not strings.contains(resource.applied.policy, "\"Action\": \"kms:*\"")
+}
+
+main = rule {
+    all tfplan.resource_changes as address, rc {
+        rc.type is "aws_kms_key" and rc.mode is "managed" => {
+            kms_has_required_tags(rc.change) and
+            kms_rotation_enabled(rc.change) and
+            kms_deletion_delay_ok(rc.change) and
+            kms_environment_valid(rc.change) and
+            kms_no_wildcards(rc.change)
+        }
+    }
+}

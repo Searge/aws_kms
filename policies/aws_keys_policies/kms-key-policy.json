@@ -1,0 +1,94 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowRootFullAccess",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::${account_id}:root"
+      },
+      "Action": [
+        "kms:*",
+        "kms:PutKeyPolicy"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "DenyExternalAccounts",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "kms:*",
+      "Resource": "*",
+      "Condition": {
+        "StringNotEquals": {
+          "aws:PrincipalAccount": "${account_id}"
+        }
+      }
+    },
+    {
+      "Sid": "AllowCloudWatchAndSSM",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": [
+          "logs.amazonaws.com",
+          "ssm.amazonaws.com"
+        ]
+      },
+      "Action": [
+        "kms:Encrypt",
+        "kms:Decrypt",
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*",
+        "kms:DescribeKey"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "aws:PrincipalOrgID": "o-gihnpgehpg"
+        }
+      }
+    },
+    {
+      "Sid": "AllowUseWithinOrg",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "*"
+      },
+      "Action": [
+        "kms:Encrypt",
+        "kms:Decrypt",
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*",
+        "kms:DescribeKey"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "aws:PrincipalOrgID": "o-gihnpgehpg"
+        }
+      }
+    },
+    		{
+			"Sid": "DenyMFANotEnabled",
+			"Effect": "Deny",
+			"Action": [
+				"kms:DescribeKey",
+				"kms:GetKeyPolicy",
+				"kms:Decrypt",
+				"kms:Encrypt",
+				"kms:GenerateDataKey",
+				"kms:ReEncryptFrom",
+				"kms:ReEncryptTo"
+			],
+			"Resource": "*",
+			"Principal": {
+				"AWS": "*"
+			},
+			"Condition": {
+				"Bool": {
+					"aws:MultiFactorAuthPresent": "false"
+				}
+			}
+		}
+  ]
+}

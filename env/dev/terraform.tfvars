@@ -1,17 +1,15 @@
 aws_region            = "us-east-1"
-aws_access_key_id     = "XXXX"
-aws_secret_access_key = "XX/XXXXX"
 
 environment_name = "dev"
 key_function     = "sign"
 key_team         = "security"
-key_purpose      = "cmk"
+key_purpose      = "maks-7"
 
 description = "KMS key for signing"
 
 deletion_window_in_days = 7
 enable_key_rotation     = true
-custom_policy           = "org_wide_kms_policy.json"
+custom_policy           = "kms-key-policy.json"
 
 tags = {
   data-classification = "internal"
