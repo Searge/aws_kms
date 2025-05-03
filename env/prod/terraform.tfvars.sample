@@ -7,8 +7,6 @@ key_function     = "sign"
 key_team         = "security"
 key_purpose      = "cmk"
 
-policy_file = "prod-custom-policy.json"
-
 description = "KMS key for signing"
 
 deletion_window_in_days = 30 # Longer deletion window for production
