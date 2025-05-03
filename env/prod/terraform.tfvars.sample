@@ -11,7 +11,7 @@ description = "KMS key for signing"
 
 deletion_window_in_days = 30 # Longer deletion window for production
 enable_key_rotation     = true
-custom_policy           = "prod-custom-policy.json"
+custom_policy           = "org_wide_kms_policy.json"
 
 tags = {
   data-classification = "internal"
