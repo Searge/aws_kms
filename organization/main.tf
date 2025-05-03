@@ -23,18 +23,27 @@ Prod OU:
 module "scps" {
   source             = "../modules/org_policies"
   policy_type        = "SERVICE_CONTROL_POLICY"
-  policies_directory = "../policies/org/service_control_policy"
+  policies_directory = "../policies/aws_organization_policies/service_control_policy"
 
   ou_map = {
-    "${local.root_id}" = ["mfa_critical_api", "waiting_period", "automatic_key_rotation"]
+    "${local.root_id}" = [
+      "RequireMFAForCriticalKMSActions",
+      "PreventDisablingKeyRotation",
+      "EnforceAutomaticKeyRotation",
+      "EnforceKMSKeyWaitingPeriod"
+    ]
     "${local.dev_id}" = [
-      "deny_dev_key_access_except_dev_ou",
-      "tag_enforcement"
+      "DenyDevKeyAccessExceptDevOU",
+      "DenyCreateKeyWithoutRequiredTags",
+      "DenyInvalidEnvironmentTagValue",
+      "DenyRemovalOfRequiredTags"
     ]
     "${local.prod_id}" = [
-      "deny_prod_key_access_except_prod_ou",
-      "tag_enforcement",
-      "kms_spec_admin"
+      "DenyProdKeyAccessExceptProdOU",
+      "DenyCreateKeyWithoutRequiredTags",
+      "DenyInvalidEnvironmentTagValue",
+      "DenyRemovalOfRequiredTags",
+      "DenyAccessWithExceptionRole"
     ]
   }
 }
@@ -44,12 +53,12 @@ module "scps" {
 module "rcps" {
   source             = "../modules/org_policies"
   policy_type        = "RESOURCE_CONTROL_POLICY"
-  policies_directory = "../policies/org/resource_control_policy"
+  policies_directory = "../policies/aws_organization_policies/resource_control_policy"
   ou_map = {
     "${local.root_id}" = [
-      "ext_principal_protection",
-      "svc_principal_protection"
+      "RCPEnforceIdentityPerimeter",
+      "RCPEnforceConfusedDeputyProtection"
     ]
-    "${local.prod_id}" = ["delete_protection"]
+    "${local.prod_id}" = ["DenyAccidentalDeletionKMSKey"]
   }
 }
