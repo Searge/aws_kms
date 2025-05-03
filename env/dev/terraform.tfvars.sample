@@ -14,11 +14,7 @@ enable_key_rotation     = true
 custom_policy           = "dev-custom-policy.json"
 
 tags = {
-  BU             = "Security"
-  BusinessOwner  = "Security Team"
-  TechnicalOwner = "Cloud Security Team"
-  ProjectManager = "Security Manager"
-  Project        = "secure-kms"
-  Owner          = "Security Operations"
-  Environment    = "dev"
+  data-classification = "internal"
+  owner               = "Security Operations"
+  environment         = "dev"
 }
