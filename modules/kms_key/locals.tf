@@ -14,6 +14,6 @@ locals {
   key_alias           = "alias/${local.custom_key_store_id}"
 
   # Using absolute path
-  policies_directory = "${path.module}/../../policies/kms"
+  policies_directory = "${path.module}/../../policies/aws_keys_policies"
   custom_policy      = var.custom_policy != null ? file("${local.policies_directory}/${var.custom_policy}") : null
 }
