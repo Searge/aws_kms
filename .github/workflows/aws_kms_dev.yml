@@ -3,6 +3,8 @@ name: Terraform Deploy (dev)
 on:
   push:
     branches: [main]
+    paths:
+      - 'env/dev/**'
 
 permissions:
   id-token: write       # 🔐 For OIDC authentication
