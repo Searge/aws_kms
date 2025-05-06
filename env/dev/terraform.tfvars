@@ -3,7 +3,7 @@ aws_region            = "us-east-1"
 environment_name = "dev"
 key_function     = "sign"
 key_team         = "security"
-key_purpose      = "fun"
+key_purpose      = "funk"
 
 description = "KMS key for signing"
 
