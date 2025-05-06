@@ -3,8 +3,7 @@ name: Terraform Deploy (dev)
 on:
   push:
     branches: [main]
-    paths:
-      - "env/dev/**"
+    paths: ["env/dev/**"]
 
 permissions:
   id-token: write       # 🔐 For OIDC authentication
@@ -18,9 +17,13 @@ jobs:
       AWS_REGION: us-east-1
       ROLE_ARN: arn:aws:iam::007695491693:role/github-actions
       ROLE_SESSION_NAME: github-actions-session
+      TF_DIR: env/dev # keep paths in one place
+      SENTINEL_DIR: sentinel/env/dev
 
     steps:
-      # 1. AWS creds + checkout + TF CLI (без змін)
+      # ──────────────────────────────────────────────────────────────────────
+      #  AWS creds + checkout + Terraform CLI
+      # ──────────────────────────────────────────────────────────────────────
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -28,7 +31,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Checkout source code
+      - name: Checkout source
         uses: actions/checkout@v4
 
       - name: Setup Terraform
@@ -36,25 +39,28 @@ jobs:
         with:
           terraform_version: latest
 
-      # 2. Terraform init/validate
+      # ──────────────────────────────────────────────────────────────────────
+      #  Terraform init / validate / plan → JSON
+      # ──────────────────────────────────────────────────────────────────────
       - name: Terraform Init
-        working-directory: ./env/dev
-        run: terraform init
+        working-directory: ${{ env.TF_DIR }}
+        run: terraform init -input=false
 
       - name: Terraform Validate
-        working-directory: ./env/dev
+        working-directory: ${{ env.TF_DIR }}
         run: terraform validate
 
-      # 3. Terraform plan → JSON
       - name: Terraform Plan (save & export JSON)
         id: tfplan
-        working-directory: ./env/dev
+        working-directory: ${{ env.TF_DIR }}
         run: |
-          terraform plan -out=plan.tfplan
+          terraform plan -out=plan.tfplan -input=false
           terraform show -json plan.tfplan > plan.json
 
-      # 4. Install Python + sentinel-mock-plan helper
-      - name: Setup Python
+      # ──────────────────────────────────────────────────────────────────────
+      #  Convert plan.json → Sentinel mock
+      # ──────────────────────────────────────────────────────────────────────
+      - name: Setup Python for mock converter
         uses: actions/setup-python@v4
         with:
           python-version: "3.x"
@@ -62,27 +68,49 @@ jobs:
       - name: Install sentinel-mock-plan helper
         run: pip install sentinel-mock-plan
 
-      # 5. Convert plan.json → Sentinel mock
       - name: Generate Sentinel mock from plan
         run: |
+          mkdir -p ${{ env.SENTINEL_DIR }}/mocks
           python -m sentinel_mock_plan \
-            --infile env/dev/plan.json \
-            --outfile sentinel/env/dev/mocks/mock-tfplan-pass-v2.sentinel
+            --infile  ${{ env.TF_DIR }}/plan.json \
+            --outfile ${{ env.SENTINEL_DIR }}/mocks/mock-tfplan-v2.sentinel
 
-      # 6. Install Sentinel CLI
-      - name: Setup Sentinel CLI
-        uses: hashicorp/setup-sentinel@v1
-        with:
-          sentinel_version: latest
+      # ───────────────────────────────────────────────────────────────
+      #  Install Sentinel CLI (download → unzip → add to PATH)
+      # ───────────────────────────────────────────────────────────────
+      - name: Install Sentinel CLI
+        shell: bash
+        run: |
+          SENT_VERSION="0.30.0"
+          SENT_URL="https://releases.hashicorp.com/sentinel/${SENT_VERSION}/sentinel_${SENT_VERSION}_linux_amd64.zip"
 
-      # 7. Run Sentinel tests
-      - name: Sentinel Test
-        working-directory: ./sentinel/env/dev
-        run: sentinel test .
-        # Якщо політика провалюється, job завершується з exit != 0
+          echo "↳ downloading Sentinel $SENT_VERSION …"
+          mkdir -p /tmp/sentinel
+          curl -sSL "${SENT_URL}" -o /tmp/sentinel/sentinel.zip
 
-      # 8. (опційно) Terraform Apply лише якщо Sentinel пройшов
+          echo "↳ unzipping …"
+          unzip -q /tmp/sentinel/sentinel.zip -d /tmp/sentinel
+
+          echo "↳ adding to PATH …"
+          chmod +x /tmp/sentinel/sentinel
+          echo "/tmp/sentinel" >> $GITHUB_PATH   # makes `sentinel` available in later steps
+
+      # ───────────────────────────────────────────────────────────────
+      #  Run Sentinel tests
+      # ───────────────────────────────────────────────────────────────
+      - name: Run Sentinel tests
+        working-directory: ${{ env.SENTINEL_DIR }}
+        run: |
+          echo "Sentinel version:"
+          sentinel --version
+          echo "Running tests …"
+          sentinel test .
+          # ::error:: is emitted automatically if any test fails and exit-code ≠ 0
+
+      # ──────────────────────────────────────────────────────────────────────
+      #  Apply only if *everything* above has succeeded
+      # ──────────────────────────────────────────────────────────────────────
       - name: Terraform Apply
-        if: success() # запускається лише якщо всі попередні кроки OK
-        working-directory: ./env/dev
-        run: terraform apply --auto-approve
+        if: success() # skip if Sentinel or any previous step failed
+        working-directory: ${{ env.TF_DIR }}
+        run: terraform apply --auto-approve -input=false
