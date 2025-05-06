@@ -74,10 +74,10 @@ jobs:
           mkdir -p ./tmp
           python -m sentinel_mock_plan \
             --infile  ${{ env.TF_DIR }}/plan.json \
-            --outfile ./tmp/mocks/mock-tfplan-v2.sentinel
-          echo "Sentinel mock saved to ./tmp/mocks/mock-tfplan-v2.sentinel"
+            --outfile ./tmp/mock-tfplan-v2.sentinel
+          echo "Sentinel mock saved to ./tmp/mock-tfplan-v2.sentinel"
           echo "Moving file to ${{ env.SENTINEL_DIR }} ..."
-          mv ./tmp/mocks/mock-tfplan-v2.sentinel \
+          mv ./tmp/mock-tfplan-v2.sentinel \
             ${{ env.SENTINEL_DIR }}/mocks/mock-tfplan-v2.sentinel
 
       # ───────────────────────────────────────────────────────────────
