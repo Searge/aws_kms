@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'env/dev/**'
+      - "env/dev/**"
 
 permissions:
   id-token: write       # 🔐 For OIDC authentication
@@ -20,6 +20,7 @@ jobs:
       ROLE_SESSION_NAME: github-actions-session
 
     steps:
+      # 1. AWS creds + checkout + TF CLI (без змін)
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -35,6 +36,7 @@ jobs:
         with:
           terraform_version: latest
 
+      # 2. Terraform init/validate
       - name: Terraform Init
         working-directory: ./env/dev
         run: terraform init
@@ -43,10 +45,44 @@ jobs:
         working-directory: ./env/dev
         run: terraform validate
 
-      - name: Terraform Plan
+      # 3. Terraform plan → JSON
+      - name: Terraform Plan (save & export JSON)
+        id: tfplan
         working-directory: ./env/dev
-        run: terraform plan
+        run: |
+          terraform plan -out=plan.tfplan
+          terraform show -json plan.tfplan > plan.json
 
+      # 4. Install Python + sentinel-mock-plan helper
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+
+      - name: Install sentinel-mock-plan helper
+        run: pip install sentinel-mock-plan
+
+      # 5. Convert plan.json → Sentinel mock
+      - name: Generate Sentinel mock from plan
+        run: |
+          python -m sentinel_mock_plan \
+            --infile env/dev/plan.json \
+            --outfile sentinel/env/dev/mocks/mock-tfplan-pass-v2.sentinel
+
+      # 6. Install Sentinel CLI
+      - name: Setup Sentinel CLI
+        uses: hashicorp/setup-sentinel@v1
+        with:
+          sentinel_version: latest
+
+      # 7. Run Sentinel tests
+      - name: Sentinel Test
+        working-directory: ./sentinel/env/dev
+        run: sentinel test .
+        # Якщо політика провалюється, job завершується з exit != 0
+
+      # 8. (опційно) Terraform Apply лише якщо Sentinel пройшов
       - name: Terraform Apply
+        if: success() # запускається лише якщо всі попередні кроки OK
         working-directory: ./env/dev
         run: terraform apply --auto-approve
