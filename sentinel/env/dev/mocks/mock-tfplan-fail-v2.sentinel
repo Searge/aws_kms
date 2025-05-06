@@ -1,0 +1,141 @@
+terraform_version = "1.11.4"
+
+variables = {
+    "aws_region": {
+        "value": "us-east-1",
+        "name": "aws_region",
+    },
+    "custom_policy": {
+        "value": "kms-key-policy.json",
+        "name": "custom_policy",
+    },
+    "deletion_window_in_days": {
+        "value": 7,
+        "name": "deletion_window_in_days",
+    },
+    "description": {
+        "value": "KMS key for signing",
+        "name": "description",
+    },
+    "enable_key_rotation": {
+        "value": true,
+        "name": "enable_key_rotation",
+    },
+    "environment_name": {
+        "value": "dev",
+        "name": "environment_name",
+    },
+    "key_function": {
+        "value": "sign",
+        "name": "key_function",
+    },
+    "key_purpose": {
+        "value": "maks-7",
+        "name": "key_purpose",
+    },
+    "key_team": {
+        "value": "security",
+        "name": "key_team",
+    },
+    "tags": {
+        "value": {
+            "data-classification": "internal",
+            "environment": "dev",
+            "owner": "Security Operations",
+        },
+        "name": "tags",
+    },
+}#
+
+planned_values = {
+    "resources": {},
+}#
+
+resource_changes = {
+    "module.kms_keys.aws_kms_alias.key_alias": {
+        "address": "module.kms_keys.aws_kms_alias.key_alias",
+        "module_address": "module.kms_keys",
+        "mode": "managed",
+        "type": "aws_kms_alias",
+        "name": "key_alias",
+        "provider_name": "registry.terraform.io/hashicorp/aws",
+        "change": {
+            "actions": [
+                "create",
+            ],
+            "before": null,
+            "after": {
+                "name": "alias/dev-sign-security-maks-7",
+            },
+            "after_unknown": {
+                "arn": true,
+                "id": true,
+                "name_prefix": true,
+                "target_key_arn": true,
+                "target_key_id": true,
+            },
+            "before_sensitive": false,
+            "after_sensitive": {},
+        },
+    },
+    "module.kms_keys.aws_kms_key.kms_key": {
+        "address": "module.kms_keys.aws_kms_key.kms_key",
+        "module_address": "module.kms_keys",
+        "mode": "managed",
+        "type": "aws_kms_key",
+        "name": "kms_key",
+        "provider_name": "registry.terraform.io/hashicorp/aws",
+        "change": {
+            "actions": [
+                "create",
+            ],
+            "before": null,
+            "after": {
+                "bypass_policy_lockout_safety_check": false,
+                "custom_key_store_id": null,
+                "customer_master_key_spec": "SYMMETRIC_DEFAULT",
+                "deletion_window_in_days": 7,
+                "description": "KMS key for signing",
+                "enable_key_rotation": false,
+                "is_enabled": true,
+                "key_usage": "ENCRYPT_DECRYPT",
+                "policy": "{\"Statement\":[{\"Action\":[\"kms:*\",\"kms:PutKeyPolicy\"],\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::069137988389:root\"},\"Resource\":\"*\",\"Sid\":\"AllowRootFullAccess\"},{\"Action\":\"kms:*\",\"Condition\":{\"StringNotEquals\":{\"aws:PrincipalAccount\":\"069137988389\"}},\"Effect\":\"Deny\",\"Principal\":\"*\",\"Resource\":\"*\",\"Sid\":\"DenyExternalAccounts\"},{\"Action\":[\"kms:Encrypt\",\"kms:Decrypt\",\"kms:ReEncrypt*\",\"kms:GenerateDataKey*\",\"kms:DescribeKey\"],\"Condition\":{\"StringEquals\":{\"aws:PrincipalOrgID\":\"o-gihnpgehpg\"}},\"Effect\":\"Allow\",\"Principal\":{\"Service\":[\"logs.amazonaws.com\",\"ssm.amazonaws.com\"]},\"Resource\":\"*\",\"Sid\":\"AllowCloudWatchAndSSM\"},{\"Action\":[\"kms:Encrypt\",\"kms:Decrypt\",\"kms:ReEncrypt*\",\"kms:GenerateDataKey*\",\"kms:DescribeKey\"],\"Condition\":{\"StringEquals\":{\"aws:PrincipalOrgID\":\"o-gihnpgehpg\"}},\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Resource\":\"*\",\"Sid\":\"AllowUseWithinOrg\"},{\"Action\":[\"kms:DescribeKey\",\"kms:GetKeyPolicy\",\"kms:Decrypt\",\"kms:Encrypt\",\"kms:GenerateDataKey\",\"kms:ReEncryptFrom\",\"kms:ReEncryptTo\"],\"Condition\":{\"Bool\":{\"aws:MultiFactorAuthPresent\":\"false\"}},\"Effect\":\"Deny\",\"Principal\":{\"AWS\":\"*\"},\"Resource\":\"*\",\"Sid\":\"DenyMFANotEnabled\"}],\"Version\":\"2012-10-17\"}",
+                "tags": {
+                    "data-classification": "internal",
+                    "environment": "dev",
+                    "owner": "Security Operations",
+                },
+                "tags_all": {
+                    "data-classification": "internal",
+                    "environment": "dev",
+                    "owner": "Security Operations",
+                },
+                "timeouts": null,
+                "xks_key_id": null,
+            },
+            "after_unknown": {
+                "arn": true,
+                "id": true,
+                "key_id": true,
+                "multi_region": true,
+                "rotation_period_in_days": true,
+                "tags": {},
+                "tags_all": {},
+            },
+            "before_sensitive": false,
+            "after_sensitive": {
+                "tags": {},
+                "tags_all": {},
+            },
+        },
+    },
+}#
+
+strip_index = func(addr) {
+	s = strings.split(addr, ".")
+	for s as i, v {
+		s[i] = strings.split(v, "[")[0]
+	}
+
+	return strings.join(s, ".")
+}

@@ -1,0 +1,871 @@
+terraform_version = "1.11.4"
+
+variables = {
+    "aws_region": {
+        "value": "us-east-1",
+        "name": "aws_region",
+    },
+    "custom_policy": {
+        "value": "kms-key-policy.json",
+        "name": "custom_policy",
+    },
+    "deletion_window_in_days": {
+        "value": 7,
+        "name": "deletion_window_in_days",
+    },
+    "description": {
+        "value": "KMS key for signing",
+        "name": "description",
+    },
+    "enable_key_rotation": {
+        "value": true,
+        "name": "enable_key_rotation",
+    },
+    "environment_name": {
+        "value": "dev",
+        "name": "environment_name",
+    },
+    "key_function": {
+        "value": "sign",
+        "name": "key_function",
+    },
+    "key_purpose": {
+        "value": "maks-7",
+        "name": "key_purpose",
+    },
+    "key_team": {
+        "value": "security",
+        "name": "key_team",
+    },
+    "tags": {
+        "value": {
+            "data-classification": "internal",
+            "environment": "dev",
+            "owner": "Security Operations",
+        },
+        "name": "tags",
+    },
+}#
+
+planned_values = {
+    "resources": {},
+}#
+
+resource_changes = {
+    "module.kms_keys.aws_kms_alias.key_alias": {
+        "address": "module.kms_keys.aws_kms_alias.key_alias",
+        "module_address": "module.kms_keys",
+        "mode": "managed",
+        "type": "aws_kms_alias",
+        "name": "key_alias",
+        "provider_name": "registry.terraform.io/hashicorp/aws",
+        "change": {
+            "actions": [
+                "create",
+            ],
+            "before": null,
+            "after": {
+                "name": "alias/dev-sign-security-maks-7",
+            },
+            "after_unknown": {
+                "arn": true,
+                "id": true,
+                "name_prefix": true,
+                "target_key_arn": true,
+                "target_key_id": true,
+            },
+            "before_sensitive": false,
+            "after_sensitive": {},
+        },
+    },
+    "module.kms_keys.aws_kms_key.kms_key": {
+        "address": "module.kms_keys.aws_kms_key.kms_key",
+        "module_address": "module.kms_keys",
+        "mode": "managed",
+        "type": "aws_kms_key",
+        "name": "kms_key",
+        "provider_name": "registry.terraform.io/hashicorp/aws",
+        "change": {
+            "actions": [
+                "create",
+            ],
+            "before": null,
+            "after": {
+                "bypass_policy_lockout_safety_check": false,
+                "custom_key_store_id": null,
+                "customer_master_key_spec": "SYMMETRIC_DEFAULT",
+                "deletion_window_in_days": 7,
+                "description": "KMS key for signing",
+                "enable_key_rotation": false,
+                "is_enabled": true,
+                "key_usage": "ENCRYPT_DECRYPT",
+                "policy": "{\"Statement\":[{\"Action\":[\"kms:*\",\"kms:PutKeyPolicy\"],\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::069137988389:root\"},\"Resource\":\"*\",\"Sid\":\"AllowRootFullAccess\"},{\"Action\":\"kms:*\",\"Condition\":{\"StringNotEquals\":{\"aws:PrincipalAccount\":\"069137988389\"}},\"Effect\":\"Deny\",\"Principal\":\"*\",\"Resource\":\"*\",\"Sid\":\"DenyExternalAccounts\"},{\"Action\":[\"kms:Encrypt\",\"kms:Decrypt\",\"kms:ReEncrypt*\",\"kms:GenerateDataKey*\",\"kms:DescribeKey\"],\"Condition\":{\"StringEquals\":{\"aws:PrincipalOrgID\":\"o-gihnpgehpg\"}},\"Effect\":\"Allow\",\"Principal\":{\"Service\":[\"logs.amazonaws.com\",\"ssm.amazonaws.com\"]},\"Resource\":\"*\",\"Sid\":\"AllowCloudWatchAndSSM\"},{\"Action\":[\"kms:Encrypt\",\"kms:Decrypt\",\"kms:ReEncrypt*\",\"kms:GenerateDataKey*\",\"kms:DescribeKey\"],\"Condition\":{\"StringEquals\":{\"aws:PrincipalOrgID\":\"o-gihnpgehpg\"}},\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Resource\":\"*\",\"Sid\":\"AllowUseWithinOrg\"},{\"Action\":[\"kms:DescribeKey\",\"kms:GetKeyPolicy\",\"kms:Decrypt\",\"kms:Encrypt\",\"kms:GenerateDataKey\",\"kms:ReEncryptFrom\",\"kms:ReEncryptTo\"],\"Condition\":{\"Bool\":{\"aws:MultiFactorAuthPresent\":\"false\"}},\"Effect\":\"Deny\",\"Principal\":{\"AWS\":\"*\"},\"Resource\":\"*\",\"Sid\":\"DenyMFANotEnabled\"}],\"Version\":\"2012-10-17\"}",
+                "tags": {
+                    "data-classification": "internal",
+                    "environment": "dev",
+                    "owner": "Security Operations",
+                },
+                "tags_all": {
+                    "data-classification": "internal",
+                    "environment": "dev",
+                    "owner": "Security Operations",
+                },
+                "timeouts": null,
+                "xks_key_id": null,
+            },
+            "after_unknown": {
+                "arn": true,
+                "id": true,
+                "key_id": true,
+                "multi_region": true,
+                "rotation_period_in_days": true,
+                "tags": {},
+                "tags_all": {},
+            },
+            "before_sensitive": false,
+            "after_sensitive": {
+                "tags": {},
+                "tags_all": {},
+            },
+        },
+    },
+}#
+
+raw = {
+    "format_version": "1.2",
+    "terraform_version": "1.11.4",
+    "variables": {
+        "aws_region": {
+            "value": "us-east-1",
+        },
+        "custom_policy": {
+            "value": "kms-key-policy.json",
+        },
+        "deletion_window_in_days": {
+            "value": 7,
+        },
+        "description": {
+            "value": "KMS key for signing",
+        },
+        "enable_key_rotation": {
+            "value": false,
+        },
+        "environment_name": {
+            "value": "dev",
+        },
+        "key_function": {
+            "value": "sign",
+        },
+        "key_purpose": {
+            "value": "maks-7",
+        },
+        "key_team": {
+            "value": "security",
+        },
+        "tags": {
+            "value": {
+                "data-classification": "internal",
+                "environment": "dev",
+                "owner": "Security Operations",
+            },
+        },
+    },
+    "planned_values": {
+        "outputs": {
+            "account_id": {
+                "sensitive": false,
+                "value": "069137988389",
+                "name": "account_id",
+            },
+            "alias_arn": {
+                "sensitive": false,
+                "name": "alias_arn",
+            },
+            "alias_name": {
+                "sensitive": false,
+                "type": "string",
+                "value": "alias/dev-sign-security-maks-7",
+            },
+            "environment": {
+                "sensitive": false,
+                "type": "string",
+                "value": "dev",
+            },
+            "key_arn": {
+                "sensitive": false,
+            },
+            "key_id": {
+                "sensitive": false,
+            },
+        },
+        "root_module": {
+            "child_modules": [
+                {
+                    "resources": [
+                        {
+                            "address": "module.kms_keys.aws_kms_alias.key_alias",
+                            "mode": "managed",
+                            "type": "aws_kms_alias",
+                            "name": "key_alias",
+                            "provider_name": "registry.terraform.io/hashicorp/aws",
+                            "schema_version": 0,
+                            "values": {
+                                "name": "alias/dev-sign-security-maks-7",
+                            },
+                            "sensitive_values": {},
+                        },
+                        {
+                            "address": "module.kms_keys.aws_kms_key.kms_key",
+                            "mode": "managed",
+                            "type": "aws_kms_key",
+                            "name": "kms_key",
+                            "provider_name": "registry.terraform.io/hashicorp/aws",
+                            "schema_version": 0,
+                            "values": {
+                                "bypass_policy_lockout_safety_check": false,
+                                "custom_key_store_id": null,
+                                "customer_master_key_spec": "SYMMETRIC_DEFAULT",
+                                "deletion_window_in_days": 7,
+                                "description": "KMS key for signing",
+                                "enable_key_rotation": false,
+                                "is_enabled": true,
+                                "key_usage": "ENCRYPT_DECRYPT",
+                                "policy": "{\"Statement\":[{\"Action\":[\"kms:*\",\"kms:PutKeyPolicy\"],\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::069137988389:root\"},\"Resource\":\"*\",\"Sid\":\"AllowRootFullAccess\"},{\"Action\":\"kms:*\",\"Condition\":{\"StringNotEquals\":{\"aws:PrincipalAccount\":\"069137988389\"}},\"Effect\":\"Deny\",\"Principal\":\"*\",\"Resource\":\"*\",\"Sid\":\"DenyExternalAccounts\"},{\"Action\":[\"kms:Encrypt\",\"kms:Decrypt\",\"kms:ReEncrypt*\",\"kms:GenerateDataKey*\",\"kms:DescribeKey\"],\"Condition\":{\"StringEquals\":{\"aws:PrincipalOrgID\":\"o-gihnpgehpg\"}},\"Effect\":\"Allow\",\"Principal\":{\"Service\":[\"logs.amazonaws.com\",\"ssm.amazonaws.com\"]},\"Resource\":\"*\",\"Sid\":\"AllowCloudWatchAndSSM\"},{\"Action\":[\"kms:Encrypt\",\"kms:Decrypt\",\"kms:ReEncrypt*\",\"kms:GenerateDataKey*\",\"kms:DescribeKey\"],\"Condition\":{\"StringEquals\":{\"aws:PrincipalOrgID\":\"o-gihnpgehpg\"}},\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Resource\":\"*\",\"Sid\":\"AllowUseWithinOrg\"},{\"Action\":[\"kms:DescribeKey\",\"kms:GetKeyPolicy\",\"kms:Decrypt\",\"kms:Encrypt\",\"kms:GenerateDataKey\",\"kms:ReEncryptFrom\",\"kms:ReEncryptTo\"],\"Condition\":{\"Bool\":{\"aws:MultiFactorAuthPresent\":\"false\"}},\"Effect\":\"Deny\",\"Principal\":{\"AWS\":\"*\"},\"Resource\":\"*\",\"Sid\":\"DenyMFANotEnabled\"}],\"Version\":\"2012-10-17\"}",
+                                "tags": {
+                                    "data-classification": "internal",
+                                    "environment": "dev",
+                                    "owner": "Security Operations",
+                                },
+                                "tags_all": {
+                                    "data-classification": "internal",
+                                    "environment": "dev",
+                                    "owner": "Security Operations",
+                                },
+                                "timeouts": null,
+                                "xks_key_id": null,
+                            },
+                            "sensitive_values": {
+                                "tags": {},
+                                "tags_all": {},
+                            },
+                        },
+                    ],
+                    "address": "module.kms_keys",
+                },
+            ],
+        },
+    },
+    "resource_changes": [
+        {
+            "address": "module.kms_keys.aws_kms_alias.key_alias",
+            "module_address": "module.kms_keys",
+            "mode": "managed",
+            "type": "aws_kms_alias",
+            "name": "key_alias",
+            "provider_name": "registry.terraform.io/hashicorp/aws",
+            "change": {
+                "actions": [
+                    "create",
+                ],
+                "before": null,
+                "after": {
+                    "name": "alias/dev-sign-security-maks-7",
+                },
+                "after_unknown": {
+                    "arn": true,
+                    "id": true,
+                    "name_prefix": true,
+                    "target_key_arn": true,
+                    "target_key_id": true,
+                },
+                "before_sensitive": false,
+                "after_sensitive": {},
+            },
+        },
+        {
+            "address": "module.kms_keys.aws_kms_key.kms_key",
+            "module_address": "module.kms_keys",
+            "mode": "managed",
+            "type": "aws_kms_key",
+            "name": "kms_key",
+            "provider_name": "registry.terraform.io/hashicorp/aws",
+            "change": {
+                "actions": [
+                    "create",
+                ],
+                "before": null,
+                "after": {
+                    "bypass_policy_lockout_safety_check": false,
+                    "custom_key_store_id": null,
+                    "customer_master_key_spec": "SYMMETRIC_DEFAULT",
+                    "deletion_window_in_days": 7,
+                    "description": "KMS key for signing",
+                    "enable_key_rotation": false,
+                    "is_enabled": true,
+                    "key_usage": "ENCRYPT_DECRYPT",
+                    "policy": "{\"Statement\":[{\"Action\":[\"kms:*\",\"kms:PutKeyPolicy\"],\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::069137988389:root\"},\"Resource\":\"*\",\"Sid\":\"AllowRootFullAccess\"},{\"Action\":\"kms:*\",\"Condition\":{\"StringNotEquals\":{\"aws:PrincipalAccount\":\"069137988389\"}},\"Effect\":\"Deny\",\"Principal\":\"*\",\"Resource\":\"*\",\"Sid\":\"DenyExternalAccounts\"},{\"Action\":[\"kms:Encrypt\",\"kms:Decrypt\",\"kms:ReEncrypt*\",\"kms:GenerateDataKey*\",\"kms:DescribeKey\"],\"Condition\":{\"StringEquals\":{\"aws:PrincipalOrgID\":\"o-gihnpgehpg\"}},\"Effect\":\"Allow\",\"Principal\":{\"Service\":[\"logs.amazonaws.com\",\"ssm.amazonaws.com\"]},\"Resource\":\"*\",\"Sid\":\"AllowCloudWatchAndSSM\"},{\"Action\":[\"kms:Encrypt\",\"kms:Decrypt\",\"kms:ReEncrypt*\",\"kms:GenerateDataKey*\",\"kms:DescribeKey\"],\"Condition\":{\"StringEquals\":{\"aws:PrincipalOrgID\":\"o-gihnpgehpg\"}},\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Resource\":\"*\",\"Sid\":\"AllowUseWithinOrg\"},{\"Action\":[\"kms:DescribeKey\",\"kms:GetKeyPolicy\",\"kms:Decrypt\",\"kms:Encrypt\",\"kms:GenerateDataKey\",\"kms:ReEncryptFrom\",\"kms:ReEncryptTo\"],\"Condition\":{\"Bool\":{\"aws:MultiFactorAuthPresent\":\"false\"}},\"Effect\":\"Deny\",\"Principal\":{\"AWS\":\"*\"},\"Resource\":\"*\",\"Sid\":\"DenyMFANotEnabled\"}],\"Version\":\"2012-10-17\"}",
+                    "tags": {
+                        "data-classification": "internal",
+                        "environment": "dev",
+                        "owner": "Security Operations",
+                    },
+                    "tags_all": {
+                        "data-classification": "internal",
+                        "environment": "dev",
+                        "owner": "Security Operations",
+                    },
+                    "timeouts": null,
+                    "xks_key_id": null,
+                },
+                "after_unknown": {
+                    "arn": true,
+                    "id": true,
+                    "key_id": true,
+                    "multi_region": true,
+                    "rotation_period_in_days": true,
+                    "tags": {},
+                    "tags_all": {},
+                },
+                "before_sensitive": false,
+                "after_sensitive": {
+                    "tags": {},
+                    "tags_all": {},
+                },
+            },
+        },
+    ],
+    "output_changes": {
+        "account_id": {
+            "actions": [
+                "create",
+            ],
+            "before": null,
+            "after": "069137988389",
+            "after_unknown": false,
+            "before_sensitive": false,
+            "after_sensitive": false,
+        },
+        "alias_arn": {
+            "actions": [
+                "create",
+            ],
+            "before": null,
+            "after_unknown": true,
+            "before_sensitive": false,
+            "after_sensitive": false,
+        },
+        "alias_name": {
+            "actions": [
+                "create",
+            ],
+            "before": null,
+            "after": "alias/dev-sign-security-maks-7",
+            "after_unknown": false,
+            "before_sensitive": false,
+            "after_sensitive": false,
+        },
+        "environment": {
+            "actions": [
+                "create",
+            ],
+            "before": null,
+            "after": "dev",
+            "after_unknown": false,
+            "before_sensitive": false,
+            "after_sensitive": false,
+        },
+        "key_arn": {
+            "actions": [
+                "create",
+            ],
+            "before": null,
+            "after_unknown": true,
+            "before_sensitive": false,
+            "after_sensitive": false,
+        },
+        "key_id": {
+            "actions": [
+                "create",
+            ],
+            "before": null,
+            "after": {
+                "bypass_policy_lockout_safety_check": false,
+                "custom_key_store_id": null,
+                "customer_master_key_spec": "SYMMETRIC_DEFAULT",
+                "deletion_window_in_days": 7,
+                "description": "KMS key for signing",
+                "enable_key_rotation": false,
+                "is_enabled": true,
+                "key_usage": "ENCRYPT_DECRYPT",
+                "policy": "{\"Statement\":[{\"Action\":[\"kms:*\",\"kms:PutKeyPolicy\"],\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::069137988389:root\"},\"Resource\":\"*\",\"Sid\":\"AllowRootFullAccess\"},{\"Action\":\"kms:*\",\"Condition\":{\"StringNotEquals\":{\"aws:PrincipalAccount\":\"069137988389\"}},\"Effect\":\"Deny\",\"Principal\":\"*\",\"Resource\":\"*\",\"Sid\":\"DenyExternalAccounts\"},{\"Action\":[\"kms:Encrypt\",\"kms:Decrypt\",\"kms:ReEncrypt*\",\"kms:GenerateDataKey*\",\"kms:DescribeKey\"],\"Condition\":{\"StringEquals\":{\"aws:PrincipalOrgID\":\"o-gihnpgehpg\"}},\"Effect\":\"Allow\",\"Principal\":{\"Service\":[\"logs.amazonaws.com\",\"ssm.amazonaws.com\"]},\"Resource\":\"*\",\"Sid\":\"AllowCloudWatchAndSSM\"},{\"Action\":[\"kms:Encrypt\",\"kms:Decrypt\",\"kms:ReEncrypt*\",\"kms:GenerateDataKey*\",\"kms:DescribeKey\"],\"Condition\":{\"StringEquals\":{\"aws:PrincipalOrgID\":\"o-gihnpgehpg\"}},\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Resource\":\"*\",\"Sid\":\"AllowUseWithinOrg\"},{\"Action\":[\"kms:DescribeKey\",\"kms:GetKeyPolicy\",\"kms:Decrypt\",\"kms:Encrypt\",\"kms:GenerateDataKey\",\"kms:ReEncryptFrom\",\"kms:ReEncryptTo\"],\"Condition\":{\"Bool\":{\"aws:MultiFactorAuthPresent\":\"false\"}},\"Effect\":\"Deny\",\"Principal\":{\"AWS\":\"*\"},\"Resource\":\"*\",\"Sid\":\"DenyMFANotEnabled\"}],\"Version\":\"2012-10-17\"}",
+                "tags": {
+                    "data-classification": "internal",
+                    "environment": "dev",
+                    "owner": "Security Operations",
+                },
+                "tags_all": {
+                    "data-classification": "internal",
+                    "environment": "dev",
+                    "owner": "Security Operations",
+                },
+                "timeouts": null,
+                "xks_key_id": null,
+            },
+            "after_unknown": {
+                "arn": true,
+                "id": true,
+                "key_id": true,
+                "multi_region": true,
+                "rotation_period_in_days": true,
+                "tags": {},
+                "tags_all": {},
+            },
+            "before_sensitive": false,
+            "after_sensitive": false,
+        },
+    },
+    "prior_state": {
+        "format_version": "1.0",
+        "terraform_version": "1.11.4",
+        "values": {
+            "outputs": {
+                "account_id": {
+                    "sensitive": false,
+                    "value": "069137988389",
+                    "type": "string",
+                },
+                "alias_name": {
+                    "sensitive": false,
+                    "value": "alias/dev-sign-security-maks-7",
+                    "type": "string",
+                },
+                "environment": {
+                    "sensitive": false,
+                    "value": "dev",
+                    "type": "string",
+                },
+            },
+            "root_module": {
+                "resources": [
+                    {
+                        "address": "data.aws_caller_identity.current",
+                        "mode": "data",
+                        "type": "aws_caller_identity",
+                        "name": "current",
+                        "provider_name": "registry.terraform.io/hashicorp/aws",
+                        "schema_version": 0,
+                        "values": {
+                            "account_id": "069137988389",
+                            "arn": "arn:aws:iam::069137988389:user/admin.tf",
+                            "id": "069137988389",
+                            "user_id": "AIDARAGHR7MSR4WY36CSW",
+                        },
+                        "sensitive_values": {},
+                    },
+                ],
+                "child_modules": [
+                    {
+                        "resources": [
+                            {
+                                "address": "module.kms_keys.data.aws_caller_identity.current",
+                                "mode": "data",
+                                "type": "aws_caller_identity",
+                                "name": "current",
+                                "provider_name": "registry.terraform.io/hashicorp/aws",
+                                "schema_version": 0,
+                                "values": {
+                                    "account_id": "069137988389",
+                                    "arn": "arn:aws:iam::069137988389:user/admin.tf",
+                                    "id": "069137988389",
+                                    "user_id": "AIDARAGHR7MSR4WY36CSW",
+                                },
+                                "sensitive_values": {},
+                            },
+                        ],
+                        "address": "module.kms_keys",
+                    },
+                ],
+            },
+        },
+    },
+    "configuration": {
+        "provider_config": {
+            "aws": {
+                "name": "aws",
+                "full_name": "registry.terraform.io/hashicorp/aws",
+                "version_constraint": "~> 5.94",
+                "expressions": {
+                    "region": {
+                        "references": [
+                            "var.aws_region",
+                        ],
+                    },
+                },
+            },
+        },
+        "root_module": {
+            "outputs": {
+                "account_id": {
+                    "expression": {
+                        "references": [
+                            "data.aws_caller_identity.current.account_id",
+                            "data.aws_caller_identity.current",
+                        ],
+                    },
+                    "description": "The AWS account ID",
+                },
+                "alias_arn": {
+                    "expression": {
+                        "references": [
+                            "module.kms_keys.alias_arn",
+                            "module.kms_keys",
+                        ],
+                    },
+                    "description": "The ARN of the KMS alias",
+                },
+                "alias_name": {
+                    "expression": {
+                        "references": [
+                            "module.kms_keys.alias_name",
+                            "module.kms_keys",
+                        ],
+                    },
+                    "description": "The name of the KMS alias",
+                },
+                "environment": {
+                    "expression": {
+                        "references": [
+                            "var.environment_name",
+                        ],
+                    },
+                    "description": "The current environment",
+                },
+                "key_arn": {
+                    "expression": {
+                        "references": [
+                            "module.kms_keys.key_arn",
+                            "module.kms_keys",
+                        ],
+                    },
+                    "description": "The ARN of the KMS key",
+                },
+                "key_id": {
+                    "expression": {
+                        "references": [
+                            "module.kms_keys.key_id",
+                            "module.kms_keys",
+                        ],
+                    },
+                    "description": "The ID of the KMS key",
+                },
+            },
+            "resources": [
+                {
+                    "address": "data.aws_caller_identity.current",
+                    "mode": "data",
+                    "type": "aws_caller_identity",
+                    "name": "current",
+                    "provider_config_key": "aws",
+                    "schema_version": 0,
+                },
+            ],
+            "module_calls": {
+                "kms_keys": {
+                    "source": "../../modules/kms_key",
+                    "expressions": {
+                        "account_id": {
+                            "references": [
+                                "data.aws_caller_identity.current.id",
+                                "data.aws_caller_identity.current",
+                            ],
+                        },
+                        "custom_policy": {
+                            "references": [
+                                "var.custom_policy",
+                            ],
+                        },
+                        "description": {
+                            "references": [
+                                "var.description",
+                            ],
+                        },
+                        "environment_name": {
+                            "references": [
+                                "var.environment_name",
+                            ],
+                        },
+                        "key_function": {
+                            "references": [
+                                "var.key_function",
+                            ],
+                        },
+                        "key_purpose": {
+                            "references": [
+                                "var.key_purpose",
+                            ],
+                        },
+                        "key_team": {
+                            "references": [
+                                "var.key_team",
+                            ],
+                        },
+                        "tags": {
+                            "references": [
+                                "var.tags",
+                            ],
+                        },
+                    },
+                    "module": {
+                        "outputs": {
+                            "alias_arn": {
+                                "expression": {
+                                    "references": [
+                                        "aws_kms_alias.key_alias.arn",
+                                        "aws_kms_alias.key_alias",
+                                    ],
+                                },
+                                "description": "The ARN of the KMS alias",
+                            },
+                            "alias_name": {
+                                "expression": {
+                                    "references": [
+                                        "aws_kms_alias.key_alias.name",
+                                        "aws_kms_alias.key_alias",
+                                    ],
+                                },
+                                "description": "The name of the KMS alias",
+                            },
+                            "key_arn": {
+                                "expression": {
+                                    "references": [
+                                        "aws_kms_key.kms_key.arn",
+                                        "aws_kms_key.kms_key",
+                                    ],
+                                },
+                                "description": "The ARN of the KMS key",
+                            },
+                            "key_id": {
+                                "expression": {
+                                    "references": [
+                                        "aws_kms_key.kms_key",
+                                    ],
+                                },
+                                "description": "The ID of the KMS key",
+                            },
+                        },
+                        "resources": [
+                            {
+                                "address": "aws_kms_alias.key_alias",
+                                "mode": "managed",
+                                "type": "aws_kms_alias",
+                                "name": "key_alias",
+                                "provider_config_key": "aws",
+                                "expressions": {
+                                    "name": {
+                                        "references": [
+                                            "local.key_alias",
+                                        ],
+                                    },
+                                    "target_key_id": {
+                                        "references": [
+                                            "aws_kms_key.kms_key.key_id",
+                                            "aws_kms_key.kms_key",
+                                        ],
+                                    },
+                                },
+                                "schema_version": 0,
+                                "depends_on": [
+                                    "aws_kms_key.kms_key",
+                                ],
+                            },
+                            {
+                                "address": "aws_kms_key.kms_key",
+                                "mode": "managed",
+                                "type": "aws_kms_key",
+                                "name": "kms_key",
+                                "provider_config_key": "aws",
+                                "expressions": {
+                                    "bypass_policy_lockout_safety_check": {
+                                        "constant_value": false,
+                                    },
+                                    "deletion_window_in_days": {
+                                        "references": [
+                                            "var.deletion_window_in_days",
+                                        ],
+                                    },
+                                    "description": {
+                                        "references": [
+                                            "var.description",
+                                        ],
+                                    },
+                                    "enable_key_rotation": {
+                                        "references": [
+                                            "var.enable_key_rotation",
+                                        ],
+                                    },
+                                    "policy": {
+                                        "references": [
+                                            "local.custom_policy",
+                                        ],
+                                    },
+                                    "tags": {
+                                        "references": [
+                                            "var.tags",
+                                        ],
+                                    },
+                                },
+                                "schema_version": 0,
+                            },
+                            {
+                                "address": "data.aws_caller_identity.current",
+                                "mode": "data",
+                                "type": "aws_caller_identity",
+                                "name": "current",
+                                "provider_config_key": "aws",
+                                "schema_version": 0,
+                            },
+                        ],
+                        "variables": {
+                            "account_id": {
+                                "description": "ID of aws account",
+                            },
+                            "custom_policy": {
+                                "default": "",
+                                "description": "Custom policy file",
+                            },
+                            "deletion_window_in_days": {
+                                "default": 7,
+                                "description": "Duration in days after which the key is deleted after destruction of the resource",
+                            },
+                            "description": {
+                                "description": "Description of the KMS key",
+                            },
+                            "enable_key_rotation": {
+                                "default": true,
+                                "description": "Enable automatic key rotation",
+                            },
+                            "environment_name": {
+                                "description": "Environment name for deployment",
+                            },
+                            "key_function": {
+                                "default": "aws",
+                                "description": "Function of the KMS key (e.g., db, api)",
+                            },
+                            "key_purpose": {
+                                "default": "cmk",
+                                "description": "Purpose of the KMS key (e.g., encryption, tokenization)",
+                            },
+                            "key_team": {
+                                "default": "",
+                                "description": "Team responsible for the KMS key (e.g., payments, ml)",
+                            },
+                            "tags": {
+                                "default": {},
+                                "description": "The map of tags",
+                            },
+                        },
+                    },
+                },
+            },
+            "variables": {
+                "aws_region": {
+                    "default": "us-east-1",
+                    "description": "AWS region",
+                },
+                "custom_policy": {},
+                "deletion_window_in_days": {},
+                "description": {},
+                "enable_key_rotation": {},
+                "environment_name": {},
+                "key_function": {},
+                "key_purpose": {},
+                "key_team": {},
+                "tags": {},
+            },
+        },
+    },
+    "relevant_attributes": [
+        {
+            "resource": "data.aws_caller_identity.current",
+            "attribute": [
+                "id",
+            ],
+        },
+        {
+            "resource": "module.kms_keys.aws_kms_alias.key_alias",
+            "attribute": [
+                "arn",
+            ],
+        },
+        {
+            "resource": "data.aws_caller_identity.current",
+            "attribute": [
+                "account_id",
+            ],
+        },
+        {
+            "resource": "module.kms_keys.aws_kms_key.kms_key",
+            "attribute": [
+                "key_id",
+            ],
+        },
+        {
+            "resource": "module.kms_keys.aws_kms_alias.key_alias",
+            "attribute": [
+                "name",
+            ],
+        },
+        {
+            "resource": "module.kms_keys.aws_kms_key.kms_key",
+            "attribute": [
+                "arn",
+            ],
+        },
+        {
+            "resource": "module.kms_keys.aws_kms_key.kms_key",
+            "attribute": [],
+        },
+    ],
+    "checks": [
+        {
+            "address": {
+                "kind": "var",
+                "module": "module.kms_keys",
+                "name": "environment_name",
+                "to_display": "module.kms_keys.var.environment_name",
+            },
+            "status": "pass",
+            "instances": [
+                {
+                    "address": {
+                        "module": "module.kms_keys",
+                        "to_display": "module.kms_keys.var.environment_name",
+                    },
+                    "status": "pass",
+                },
+            ],
+        },
+        {
+            "address": {
+                "kind": "var",
+                "module": "module.kms_keys",
+                "name": "tags",
+                "to_display": "module.kms_keys.var.tags",
+            },
+            "status": "pass",
+            "instances": [
+                {
+                    "address": {
+                        "module": "module.kms_keys",
+                        "to_display": "module.kms_keys.var.tags",
+                    },
+                    "status": "pass",
+                },
+            ],
+        },
+    ],
+    "timestamp": "2025-05-06T12:42:48Z",
+    "applyable": true,
+    "complete": true,
+    "errored": false,
+}#

@@ -1,0 +1,3718 @@
+terraform_version = "1.11.4"
+
+planned_values = {
+	"outputs": {
+		"ou_map_list": {
+			"name":      "ou_map_list",
+			"sensitive": false,
+			"value": {
+				"dev": {
+					"arn":       "arn:aws:organizations::069137988389:ou/o-tmrcrnyq86/ou-8m2b-sxjqqszq",
+					"id":        "ou-8m2b-sxjqqszq",
+					"name":      "dev",
+					"parent_id": "r-8m2b",
+				},
+				"prod": {
+					"arn":       "arn:aws:organizations::069137988389:ou/o-tmrcrnyq86/ou-8m2b-bod6k7sy",
+					"id":        "ou-8m2b-bod6k7sy",
+					"name":      "prod",
+					"parent_id": "r-8m2b",
+				},
+			},
+		},
+		"policy_attachments": {
+			"name":      "policy_attachments",
+			"sensitive": false,
+			"value": {
+				"ou-8m2b-bod6k7sy": {
+					"resource_control_policies": [
+						"DenyAccidentalDeletionKMSKey",
+					],
+					"service_control_policies": [
+						"DenyProdKeyAccessExceptProdOU",
+						"DenyCreateKeyWithoutRequiredTags",
+						"DenyInvalidEnvironmentTagValue",
+						"DenyRemovalOfRequiredTags",
+						"DenyAccessWithExceptionRole",
+					],
+				},
+				"ou-8m2b-sxjqqszq": {
+					"resource_control_policies": [],
+					"service_control_policies": [
+						"DenyDevKeyAccessExceptDevOU",
+						"DenyCreateKeyWithoutRequiredTags",
+						"DenyInvalidEnvironmentTagValue",
+						"DenyRemovalOfRequiredTags",
+					],
+				},
+				"r-8m2b": {
+					"resource_control_policies": [
+						"RCPEnforceIdentityPerimeter",
+						"RCPEnforceConfusedDeputyProtection",
+					],
+					"service_control_policies": [
+						"RequireMFAForCriticalKMSActions",
+						"PreventDisablingKeyRotation",
+						"EnforceAutomaticKeyRotation",
+						"EnforceKMSKeyWaitingPeriod",
+					],
+				},
+			},
+		},
+		"policy_details": {
+			"name":      "policy_details",
+			"sensitive": false,
+			"value":     null,
+		},
+		"root_account_id": {
+			"name":      "root_account_id",
+			"sensitive": false,
+			"value":     "r-8m2b",
+		},
+	},
+	"resources": {
+		"module.rcps.aws_organizations_policy.this[\"policies/resource_control_policy/DenyAccidentalDeletionKMSKey.json\"]": {
+			"address":        "module.rcps.aws_organizations_policy.this[\"policies/resource_control_policy/DenyAccidentalDeletionKMSKey.json\"]",
+			"depends_on":     [],
+			"deposed_key":    "",
+			"index":          "policies/resource_control_policy/DenyAccidentalDeletionKMSKey.json",
+			"mode":           "managed",
+			"module_address": "module.rcps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"tainted":        false,
+			"type":           "aws_organizations_policy",
+			"values": {
+				"content":      "{\n\t\"Version\": \"2012-10-17\",\n\t\"Statement\": [\n\t\t{\n\t\t\t\"Sid\": \"DenyAccidentalDeletionKMSKey\",\n\t\t\t\"Effect\": \"Deny\",\n\t\t\t\"Principal\": \"*\",\n\t\t\t\"Action\": [\n\t\t\t\t\"kms:ScheduleKeyDeletion\",\n\t\t\t\t\"kms:DeleteAlias\",\n\t\t\t\t\"kms:DeleteCustomKeyStore\",\n\t\t\t\t\"kms:DeleteImportedKeyMaterial\"\n\t\t\t],\n\t\t\t\"Resource\": \"*\",\n\t\t\t\"Condition\": {\n\t\t\t\t\"ArnNotLike\": {\n\t\t\t\t\t\"aws:PrincipalArn\": \"arn:aws:iam::069137988389:role/principal_MFA_KMS_poweruser\"\n\t\t\t\t},\n\t\t\t\t\"BoolIfExists\": {\n\t\t\t\t\t\"aws:PrincipalIsAWSService\": \"false\"\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t]\n}\n",
+				"description":  null,
+				"name":         "policies/resource_control_policy/DenyAccidentalDeletionKMSKey",
+				"skip_destroy": null,
+				"tags":         null,
+				"type":         "RESOURCE_CONTROL_POLICY",
+			},
+		},
+		"module.rcps.aws_organizations_policy.this[\"policies/resource_control_policy/RCPEnforceConfusedDeputyProtection.json\"]": {
+			"address":        "module.rcps.aws_organizations_policy.this[\"policies/resource_control_policy/RCPEnforceConfusedDeputyProtection.json\"]",
+			"depends_on":     [],
+			"deposed_key":    "",
+			"index":          "policies/resource_control_policy/RCPEnforceConfusedDeputyProtection.json",
+			"mode":           "managed",
+			"module_address": "module.rcps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"tainted":        false,
+			"type":           "aws_organizations_policy",
+			"values": {
+				"content":      "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"RCPEnforceConfusedDeputyProtection\",\n      \"Effect\": \"Deny\",\n      \"Principal\": \"*\",\n      \"Action\": \"kms:*\",\n      \"Resource\": \"*\",\n      \"Condition\": {\n        \"StringNotEqualsIfExists\": {\n          \"aws:SourceOrgID\": \"o-tmrcrnyq86\"\n        },\n        \"Bool\": {\n          \"aws:PrincipalIsAWSService\": \"true\"\n        },\n        \"Null\": {\n          \"aws:SourceAccount\": \"false\"\n        }\n      }\n    }\n  ]\n}\n",
+				"description":  null,
+				"name":         "policies/resource_control_policy/RCPEnforceConfusedDeputyProtection",
+				"skip_destroy": null,
+				"tags":         null,
+				"type":         "RESOURCE_CONTROL_POLICY",
+			},
+		},
+		"module.rcps.aws_organizations_policy.this[\"policies/resource_control_policy/RCPEnforceIdentityPerimeter.json\"]": {
+			"address":        "module.rcps.aws_organizations_policy.this[\"policies/resource_control_policy/RCPEnforceIdentityPerimeter.json\"]",
+			"depends_on":     [],
+			"deposed_key":    "",
+			"index":          "policies/resource_control_policy/RCPEnforceIdentityPerimeter.json",
+			"mode":           "managed",
+			"module_address": "module.rcps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"tainted":        false,
+			"type":           "aws_organizations_policy",
+			"values": {
+				"content":      "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"RCPEnforceIdentityPerimeter\",\n      \"Effect\": \"Deny\",\n      \"Principal\": \"*\",\n      \"Action\": \"kms:*\",\n      \"Resource\": \"*\",\n      \"Condition\": {\n        \"StringNotEqualsIfExists\": {\n          \"aws:PrincipalOrgID\": \"r-8m2b\"\n        },\n        \"Bool\": {\n          \"aws:PrincipalIsAWSService\": \"false\"\n        }\n      }\n    }\n  ]\n}\n",
+				"description":  null,
+				"name":         "policies/resource_control_policy/RCPEnforceIdentityPerimeter",
+				"skip_destroy": null,
+				"tags":         null,
+				"type":         "RESOURCE_CONTROL_POLICY",
+			},
+		},
+		"module.rcps.aws_organizations_policy_attachment.this[\"ou-8m2b-bod6k7sy-DenyAccidentalDeletionKMSKey\"]": {
+			"address":        "module.rcps.aws_organizations_policy_attachment.this[\"ou-8m2b-bod6k7sy-DenyAccidentalDeletionKMSKey\"]",
+			"depends_on":     [],
+			"deposed_key":    "",
+			"index":          "ou-8m2b-bod6k7sy-DenyAccidentalDeletionKMSKey",
+			"mode":           "managed",
+			"module_address": "module.rcps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"tainted":        false,
+			"type":           "aws_organizations_policy_attachment",
+			"values": {
+				"skip_destroy": null,
+				"target_id":    "ou-8m2b-bod6k7sy",
+			},
+		},
+		"module.rcps.aws_organizations_policy_attachment.this[\"r-8m2b-RCPEnforceConfusedDeputyProtection\"]": {
+			"address":        "module.rcps.aws_organizations_policy_attachment.this[\"r-8m2b-RCPEnforceConfusedDeputyProtection\"]",
+			"depends_on":     [],
+			"deposed_key":    "",
+			"index":          "r-8m2b-RCPEnforceConfusedDeputyProtection",
+			"mode":           "managed",
+			"module_address": "module.rcps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"tainted":        false,
+			"type":           "aws_organizations_policy_attachment",
+			"values": {
+				"skip_destroy": null,
+				"target_id":    "r-8m2b",
+			},
+		},
+		"module.rcps.aws_organizations_policy_attachment.this[\"r-8m2b-RCPEnforceIdentityPerimeter\"]": {
+			"address":        "module.rcps.aws_organizations_policy_attachment.this[\"r-8m2b-RCPEnforceIdentityPerimeter\"]",
+			"depends_on":     [],
+			"deposed_key":    "",
+			"index":          "r-8m2b-RCPEnforceIdentityPerimeter",
+			"mode":           "managed",
+			"module_address": "module.rcps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"tainted":        false,
+			"type":           "aws_organizations_policy_attachment",
+			"values": {
+				"skip_destroy": null,
+				"target_id":    "r-8m2b",
+			},
+		},
+		"module.scps.aws_organizations_policy.this[\"policies/service_control_policy/DenyAccessWithExceptionRole.json\"]": {
+			"address":        "module.scps.aws_organizations_policy.this[\"policies/service_control_policy/DenyAccessWithExceptionRole.json\"]",
+			"depends_on":     [],
+			"deposed_key":    "",
+			"index":          "policies/service_control_policy/DenyAccessWithExceptionRole.json",
+			"mode":           "managed",
+			"module_address": "module.scps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"tainted":        false,
+			"type":           "aws_organizations_policy",
+			"values": {
+				"content":      "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"DenyAccessWithExceptionRole\",\n      \"Effect\": \"Deny\",\n      \"Action\": [\n        \"kms:Create*\",\n        \"kms:Enable*\",\n        \"kms:Disable*\",\n        \"kms:Delete*\",\n        \"kms:Import*\",\n        \"kms:Rotate*\"\n      ],\n      \"Resource\": \"*\",\n      \"Condition\": {\n        \"StringNotLike\": {\n          \"aws:PrincipalArn\": [\n            \"arn:aws:iam::069137988389:role/principal_MFA_KMS_poweruser\"\n          ]\n        }\n      }\n    }\n  ]\n}\n",
+				"description":  null,
+				"name":         "policies/service_control_policy/DenyAccessWithExceptionRole",
+				"skip_destroy": null,
+				"tags":         null,
+				"type":         "SERVICE_CONTROL_POLICY",
+			},
+		},
+		"module.scps.aws_organizations_policy.this[\"policies/service_control_policy/DenyCreateKeyWithoutRequiredTags.json\"]": {
+			"address":        "module.scps.aws_organizations_policy.this[\"policies/service_control_policy/DenyCreateKeyWithoutRequiredTags.json\"]",
+			"depends_on":     [],
+			"deposed_key":    "",
+			"index":          "policies/service_control_policy/DenyCreateKeyWithoutRequiredTags.json",
+			"mode":           "managed",
+			"module_address": "module.scps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"tainted":        false,
+			"type":           "aws_organizations_policy",
+			"values": {
+				"content":      "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"DenyCreateKeyWithoutRequiredTags\",\n      \"Effect\": \"Deny\",\n      \"Action\": [\n        \"kms:CreateKey\",\n        \"kms:CreateAlias\"\n      ],\n      \"Resource\": \"*\",\n      \"Condition\": {\n        \"Null\": {\n          \"aws:RequestTag/owner\": \"true\",\n          \"aws:RequestTag/environment\": \"true\",\n          \"aws:RequestTag/data-classification\": \"true\"\n        }\n      }\n    }\n  ]\n}\n",
+				"description":  null,
+				"name":         "policies/service_control_policy/DenyCreateKeyWithoutRequiredTags",
+				"skip_destroy": null,
+				"tags":         null,
+				"type":         "SERVICE_CONTROL_POLICY",
+			},
+		},
+		"module.scps.aws_organizations_policy.this[\"policies/service_control_policy/DenyDevKeyAccessExceptDevOU.json\"]": {
+			"address":        "module.scps.aws_organizations_policy.this[\"policies/service_control_policy/DenyDevKeyAccessExceptDevOU.json\"]",
+			"depends_on":     [],
+			"deposed_key":    "",
+			"index":          "policies/service_control_policy/DenyDevKeyAccessExceptDevOU.json",
+			"mode":           "managed",
+			"module_address": "module.scps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"tainted":        false,
+			"type":           "aws_organizations_policy",
+			"values": {
+				"content":      "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"DenyDevKeyAccessExceptDevOU\",\n      \"Effect\": \"Deny\",\n      \"Action\": [\n        \"kms:*\"\n      ],\n      \"Resource\": \"*\",\n      \"Condition\": {\n        \"StringEquals\": {\n          \"aws:ResourceTag/environment\": \"dev\"\n        },\n        \"ForAnyValue:StringNotLike\": {\n          \"aws:PrincipalOrgPaths\": \"/root/dev/*\"\n        }\n      }\n    }\n  ]\n}\n",
+				"description":  null,
+				"name":         "policies/service_control_policy/DenyDevKeyAccessExceptDevOU",
+				"skip_destroy": null,
+				"tags":         null,
+				"type":         "SERVICE_CONTROL_POLICY",
+			},
+		},
+		"module.scps.aws_organizations_policy.this[\"policies/service_control_policy/DenyInvalidEnvironmentTagValue.json\"]": {
+			"address":        "module.scps.aws_organizations_policy.this[\"policies/service_control_policy/DenyInvalidEnvironmentTagValue.json\"]",
+			"depends_on":     [],
+			"deposed_key":    "",
+			"index":          "policies/service_control_policy/DenyInvalidEnvironmentTagValue.json",
+			"mode":           "managed",
+			"module_address": "module.scps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"tainted":        false,
+			"type":           "aws_organizations_policy",
+			"values": {
+				"content":      "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"DenyInvalidEnvironmentTagValue\",\n      \"Effect\": \"Deny\",\n      \"Action\": [\n        \"kms:CreateKey\",\n        \"kms:CreateAlias\",\n        \"kms:CreateCustomKeyStore\",\n        \"kms:TagResource\"\n      ],\n      \"Resource\": \"*\",\n      \"Condition\": {\n        \"ForAnyValue:StringNotLike\": {\n          \"aws:RequestTag/environment\": [\n            \"dev\",\n            \"prod\"\n          ],\n          \"aws:ResourceTag/data-classification\": [\n            \"confidential\",\n            \"internal\",\n            \"public\"\n          ]\n        }\n      }\n    }\n  ]\n}\n",
+				"description":  null,
+				"name":         "policies/service_control_policy/DenyInvalidEnvironmentTagValue",
+				"skip_destroy": null,
+				"tags":         null,
+				"type":         "SERVICE_CONTROL_POLICY",
+			},
+		},
+		"module.scps.aws_organizations_policy.this[\"policies/service_control_policy/DenyProdKeyAccessExceptProdOU.json\"]": {
+			"address":        "module.scps.aws_organizations_policy.this[\"policies/service_control_policy/DenyProdKeyAccessExceptProdOU.json\"]",
+			"depends_on":     [],
+			"deposed_key":    "",
+			"index":          "policies/service_control_policy/DenyProdKeyAccessExceptProdOU.json",
+			"mode":           "managed",
+			"module_address": "module.scps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"tainted":        false,
+			"type":           "aws_organizations_policy",
+			"values": {
+				"content":      "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"DenyProdKeyAccessExceptProdOU\",\n      \"Effect\": \"Deny\",\n      \"Action\": [\n        \"kms:*\"\n      ],\n      \"Resource\": \"*\",\n      \"Condition\": {\n        \"StringEquals\": {\n          \"aws:ResourceTag/environment\": \"prod\"\n        },\n        \"ForAnyValue:StringNotLike\": {\n          \"aws:PrincipalOrgPaths\": \"/root/prod/*\"\n        }\n      }\n    }\n  ]\n}\n",
+				"description":  null,
+				"name":         "policies/service_control_policy/DenyProdKeyAccessExceptProdOU",
+				"skip_destroy": null,
+				"tags":         null,
+				"type":         "SERVICE_CONTROL_POLICY",
+			},
+		},
+		"module.scps.aws_organizations_policy.this[\"policies/service_control_policy/DenyRemovalOfRequiredTags.json\"]": {
+			"address":        "module.scps.aws_organizations_policy.this[\"policies/service_control_policy/DenyRemovalOfRequiredTags.json\"]",
+			"depends_on":     [],
+			"deposed_key":    "",
+			"index":          "policies/service_control_policy/DenyRemovalOfRequiredTags.json",
+			"mode":           "managed",
+			"module_address": "module.scps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"tainted":        false,
+			"type":           "aws_organizations_policy",
+			"values": {
+				"content":      "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"DenyRemovalOfRequiredTags\",\n      \"Effect\": \"Deny\",\n      \"Action\": [\n        \"kms:UntagResource\"\n      ],\n      \"Resource\": \"*\",\n      \"Condition\": {\n        \"StringEquals\": {\n          \"aws:TagKeys\": [\n            \"owner\",\n            \"environment\",\n            \"data-classification\"\n          ]\n        }\n      }\n    }\n  ]\n}\n",
+				"description":  null,
+				"name":         "policies/service_control_policy/DenyRemovalOfRequiredTags",
+				"skip_destroy": null,
+				"tags":         null,
+				"type":         "SERVICE_CONTROL_POLICY",
+			},
+		},
+		"module.scps.aws_organizations_policy.this[\"policies/service_control_policy/EnforceAutomaticKeyRotation.json\"]": {
+			"address":        "module.scps.aws_organizations_policy.this[\"policies/service_control_policy/EnforceAutomaticKeyRotation.json\"]",
+			"depends_on":     [],
+			"deposed_key":    "",
+			"index":          "policies/service_control_policy/EnforceAutomaticKeyRotation.json",
+			"mode":           "managed",
+			"module_address": "module.scps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"tainted":        false,
+			"type":           "aws_organizations_policy",
+			"values": {
+				"content":      "{\n    \"Version\": \"2012-10-17\",\n    \"Statement\": [\n        {\n            \"Sid\": \"EnforceAutomaticKeyRotation\",\n            \"Effect\": \"Deny\",\n            \"Action\": [\n                \"kms:CreateKey\"\n            ],\n            \"Resource\": \"*\",\n            \"Condition\": {\n                \"Bool\": {\n                    \"kms:BypassPolicyLockoutSafetyCheck\": \"false\"\n                },\n                \"Null\": {\n                    \"kms:RotationPeriodInDays\": []\n                }\n            }\n        }\n    ]\n}\n",
+				"description":  null,
+				"name":         "policies/service_control_policy/EnforceAutomaticKeyRotation",
+				"skip_destroy": null,
+				"tags":         null,
+				"type":         "SERVICE_CONTROL_POLICY",
+			},
+		},
+		"module.scps.aws_organizations_policy.this[\"policies/service_control_policy/EnforceKMSKeyWaitingPeriod.json\"]": {
+			"address":        "module.scps.aws_organizations_policy.this[\"policies/service_control_policy/EnforceKMSKeyWaitingPeriod.json\"]",
+			"depends_on":     [],
+			"deposed_key":    "",
+			"index":          "policies/service_control_policy/EnforceKMSKeyWaitingPeriod.json",
+			"mode":           "managed",
+			"module_address": "module.scps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"tainted":        false,
+			"type":           "aws_organizations_policy",
+			"values": {
+				"content":      "{\n\t\"Version\": \"2012-10-17\",\n\t\"Statement\": [\n\t\t{\n\t\t\t\"Sid\": \"EnforceKMSKeyWaitingPeriod\",\n\t\t\t\"Effect\": \"Deny\",\n\t\t\t\"Action\": [\n\t\t\t\t\"kms:ScheduleKeyDeletion\"\n\t\t\t],\n\t\t\t\"Resource\": \"*\",\n\t\t\t\"Condition\": {\n\t\t\t\t\"NumericLessThan\": {\n\t\t\t\t\t\"kms:ScheduleKeyDeletionPendingWindowInDays\": \"30\"\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t]\n}\n",
+				"description":  null,
+				"name":         "policies/service_control_policy/EnforceKMSKeyWaitingPeriod",
+				"skip_destroy": null,
+				"tags":         null,
+				"type":         "SERVICE_CONTROL_POLICY",
+			},
+		},
+		"module.scps.aws_organizations_policy.this[\"policies/service_control_policy/PreventDisablingKeyRotation.json\"]": {
+			"address":        "module.scps.aws_organizations_policy.this[\"policies/service_control_policy/PreventDisablingKeyRotation.json\"]",
+			"depends_on":     [],
+			"deposed_key":    "",
+			"index":          "policies/service_control_policy/PreventDisablingKeyRotation.json",
+			"mode":           "managed",
+			"module_address": "module.scps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"tainted":        false,
+			"type":           "aws_organizations_policy",
+			"values": {
+				"content":      "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"PreventDisablingKeyRotation\",\n      \"Effect\": \"Deny\",\n      \"Action\": [\n          \"kms:DisableKeyRotation\"\n      ],\n      \"Resource\": \"*\"\n  }\n  ]\n}\n",
+				"description":  null,
+				"name":         "policies/service_control_policy/PreventDisablingKeyRotation",
+				"skip_destroy": null,
+				"tags":         null,
+				"type":         "SERVICE_CONTROL_POLICY",
+			},
+		},
+		"module.scps.aws_organizations_policy.this[\"policies/service_control_policy/RequireMFAForCriticalKMSActions.json\"]": {
+			"address":        "module.scps.aws_organizations_policy.this[\"policies/service_control_policy/RequireMFAForCriticalKMSActions.json\"]",
+			"depends_on":     [],
+			"deposed_key":    "",
+			"index":          "policies/service_control_policy/RequireMFAForCriticalKMSActions.json",
+			"mode":           "managed",
+			"module_address": "module.scps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"tainted":        false,
+			"type":           "aws_organizations_policy",
+			"values": {
+				"content":      "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"RequireMFAForCriticalKMSActions\",\n      \"Effect\": \"Deny\",\n      \"Action\": [\n        \"kms:ScheduleKeyDeletion\",\n        \"kms:DeleteImportedKeyMaterial\",\n        \"kms:DisableKey\",\n        \"kms:UpdateKeyDescription\",\n        \"kms:ImportKeyMaterial\",\n        \"kms:CreateKey\",\n        \"kms:DeleteCustomKeyStore\",\n        \"kms:UpdateCustomKeyStore\",\n        \"kms:CreateCustomKeyStore\",\n        \"kms:EnableKey\",\n        \"kms:PutKeyPolicy\",\n        \"kms:UpdateAlias\",\n        \"kms:CreateAlias\",\n        \"kms:DeleteAlias\",\n        \"kms:ConnectCustomKeyStore\",\n        \"kms:DisconnectCustomKeyStore\"\n      ],\n      \"Resource\": \"*\",\n      \"Condition\": {\n        \"BoolIfExists\": {\n          \"aws:MultiFactorAuthPresent\": \"false\"\n        }\n      }\n    }\n  ]\n}\n",
+				"description":  null,
+				"name":         "policies/service_control_policy/RequireMFAForCriticalKMSActions",
+				"skip_destroy": null,
+				"tags":         null,
+				"type":         "SERVICE_CONTROL_POLICY",
+			},
+		},
+		"module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-bod6k7sy-DenyAccessWithExceptionRole\"]": {
+			"address":        "module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-bod6k7sy-DenyAccessWithExceptionRole\"]",
+			"depends_on":     [],
+			"deposed_key":    "",
+			"index":          "ou-8m2b-bod6k7sy-DenyAccessWithExceptionRole",
+			"mode":           "managed",
+			"module_address": "module.scps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"tainted":        false,
+			"type":           "aws_organizations_policy_attachment",
+			"values": {
+				"skip_destroy": null,
+				"target_id":    "ou-8m2b-bod6k7sy",
+			},
+		},
+		"module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-bod6k7sy-DenyCreateKeyWithoutRequiredTags\"]": {
+			"address":        "module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-bod6k7sy-DenyCreateKeyWithoutRequiredTags\"]",
+			"depends_on":     [],
+			"deposed_key":    "",
+			"index":          "ou-8m2b-bod6k7sy-DenyCreateKeyWithoutRequiredTags",
+			"mode":           "managed",
+			"module_address": "module.scps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"tainted":        false,
+			"type":           "aws_organizations_policy_attachment",
+			"values": {
+				"skip_destroy": null,
+				"target_id":    "ou-8m2b-bod6k7sy",
+			},
+		},
+		"module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-bod6k7sy-DenyInvalidEnvironmentTagValue\"]": {
+			"address":        "module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-bod6k7sy-DenyInvalidEnvironmentTagValue\"]",
+			"depends_on":     [],
+			"deposed_key":    "",
+			"index":          "ou-8m2b-bod6k7sy-DenyInvalidEnvironmentTagValue",
+			"mode":           "managed",
+			"module_address": "module.scps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"tainted":        false,
+			"type":           "aws_organizations_policy_attachment",
+			"values": {
+				"skip_destroy": null,
+				"target_id":    "ou-8m2b-bod6k7sy",
+			},
+		},
+		"module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-bod6k7sy-DenyProdKeyAccessExceptProdOU\"]": {
+			"address":        "module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-bod6k7sy-DenyProdKeyAccessExceptProdOU\"]",
+			"depends_on":     [],
+			"deposed_key":    "",
+			"index":          "ou-8m2b-bod6k7sy-DenyProdKeyAccessExceptProdOU",
+			"mode":           "managed",
+			"module_address": "module.scps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"tainted":        false,
+			"type":           "aws_organizations_policy_attachment",
+			"values": {
+				"skip_destroy": null,
+				"target_id":    "ou-8m2b-bod6k7sy",
+			},
+		},
+		"module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-bod6k7sy-DenyRemovalOfRequiredTags\"]": {
+			"address":        "module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-bod6k7sy-DenyRemovalOfRequiredTags\"]",
+			"depends_on":     [],
+			"deposed_key":    "",
+			"index":          "ou-8m2b-bod6k7sy-DenyRemovalOfRequiredTags",
+			"mode":           "managed",
+			"module_address": "module.scps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"tainted":        false,
+			"type":           "aws_organizations_policy_attachment",
+			"values": {
+				"skip_destroy": null,
+				"target_id":    "ou-8m2b-bod6k7sy",
+			},
+		},
+		"module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-sxjqqszq-DenyCreateKeyWithoutRequiredTags\"]": {
+			"address":        "module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-sxjqqszq-DenyCreateKeyWithoutRequiredTags\"]",
+			"depends_on":     [],
+			"deposed_key":    "",
+			"index":          "ou-8m2b-sxjqqszq-DenyCreateKeyWithoutRequiredTags",
+			"mode":           "managed",
+			"module_address": "module.scps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"tainted":        false,
+			"type":           "aws_organizations_policy_attachment",
+			"values": {
+				"skip_destroy": null,
+				"target_id":    "ou-8m2b-sxjqqszq",
+			},
+		},
+		"module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-sxjqqszq-DenyDevKeyAccessExceptDevOU\"]": {
+			"address":        "module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-sxjqqszq-DenyDevKeyAccessExceptDevOU\"]",
+			"depends_on":     [],
+			"deposed_key":    "",
+			"index":          "ou-8m2b-sxjqqszq-DenyDevKeyAccessExceptDevOU",
+			"mode":           "managed",
+			"module_address": "module.scps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"tainted":        false,
+			"type":           "aws_organizations_policy_attachment",
+			"values": {
+				"skip_destroy": null,
+				"target_id":    "ou-8m2b-sxjqqszq",
+			},
+		},
+		"module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-sxjqqszq-DenyInvalidEnvironmentTagValue\"]": {
+			"address":        "module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-sxjqqszq-DenyInvalidEnvironmentTagValue\"]",
+			"depends_on":     [],
+			"deposed_key":    "",
+			"index":          "ou-8m2b-sxjqqszq-DenyInvalidEnvironmentTagValue",
+			"mode":           "managed",
+			"module_address": "module.scps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"tainted":        false,
+			"type":           "aws_organizations_policy_attachment",
+			"values": {
+				"skip_destroy": null,
+				"target_id":    "ou-8m2b-sxjqqszq",
+			},
+		},
+		"module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-sxjqqszq-DenyRemovalOfRequiredTags\"]": {
+			"address":        "module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-sxjqqszq-DenyRemovalOfRequiredTags\"]",
+			"depends_on":     [],
+			"deposed_key":    "",
+			"index":          "ou-8m2b-sxjqqszq-DenyRemovalOfRequiredTags",
+			"mode":           "managed",
+			"module_address": "module.scps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"tainted":        false,
+			"type":           "aws_organizations_policy_attachment",
+			"values": {
+				"skip_destroy": null,
+				"target_id":    "ou-8m2b-sxjqqszq",
+			},
+		},
+		"module.scps.aws_organizations_policy_attachment.this[\"r-8m2b-EnforceAutomaticKeyRotation\"]": {
+			"address":        "module.scps.aws_organizations_policy_attachment.this[\"r-8m2b-EnforceAutomaticKeyRotation\"]",
+			"depends_on":     [],
+			"deposed_key":    "",
+			"index":          "r-8m2b-EnforceAutomaticKeyRotation",
+			"mode":           "managed",
+			"module_address": "module.scps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"tainted":        false,
+			"type":           "aws_organizations_policy_attachment",
+			"values": {
+				"skip_destroy": null,
+				"target_id":    "r-8m2b",
+			},
+		},
+		"module.scps.aws_organizations_policy_attachment.this[\"r-8m2b-EnforceKMSKeyWaitingPeriod\"]": {
+			"address":        "module.scps.aws_organizations_policy_attachment.this[\"r-8m2b-EnforceKMSKeyWaitingPeriod\"]",
+			"depends_on":     [],
+			"deposed_key":    "",
+			"index":          "r-8m2b-EnforceKMSKeyWaitingPeriod",
+			"mode":           "managed",
+			"module_address": "module.scps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"tainted":        false,
+			"type":           "aws_organizations_policy_attachment",
+			"values": {
+				"skip_destroy": null,
+				"target_id":    "r-8m2b",
+			},
+		},
+		"module.scps.aws_organizations_policy_attachment.this[\"r-8m2b-PreventDisablingKeyRotation\"]": {
+			"address":        "module.scps.aws_organizations_policy_attachment.this[\"r-8m2b-PreventDisablingKeyRotation\"]",
+			"depends_on":     [],
+			"deposed_key":    "",
+			"index":          "r-8m2b-PreventDisablingKeyRotation",
+			"mode":           "managed",
+			"module_address": "module.scps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"tainted":        false,
+			"type":           "aws_organizations_policy_attachment",
+			"values": {
+				"skip_destroy": null,
+				"target_id":    "r-8m2b",
+			},
+		},
+		"module.scps.aws_organizations_policy_attachment.this[\"r-8m2b-RequireMFAForCriticalKMSActions\"]": {
+			"address":        "module.scps.aws_organizations_policy_attachment.this[\"r-8m2b-RequireMFAForCriticalKMSActions\"]",
+			"depends_on":     [],
+			"deposed_key":    "",
+			"index":          "r-8m2b-RequireMFAForCriticalKMSActions",
+			"mode":           "managed",
+			"module_address": "module.scps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"tainted":        false,
+			"type":           "aws_organizations_policy_attachment",
+			"values": {
+				"skip_destroy": null,
+				"target_id":    "r-8m2b",
+			},
+		},
+	},
+}
+
+variables = {
+	"aws_access_key_id": {
+		"name":  "aws_access_key_id",
+		"value": "REDACTED_SENSITIVE",
+	},
+	"aws_region": {
+		"name":  "aws_region",
+		"value": "eu-central-1",
+	},
+	"aws_secret_access_key": {
+		"name":  "aws_secret_access_key",
+		"value": "REDACTED_SENSITIVE",
+	},
+	"ou_map": {
+		"name": "ou_map",
+		"value": {
+			"dev": [
+				"root",
+			],
+			"prod": [
+				"root",
+			],
+		},
+	},
+	"policy_type": {
+		"name":  "policy_type",
+		"value": "SERVICE_CONTROL_POLICY",
+	},
+}
+
+resource_changes = {
+	"module.rcps.aws_organizations_policy.this[\"policies/resource_control_policy/DenyAccidentalDeletionKMSKey.json\"]": {
+		"address": "module.rcps.aws_organizations_policy.this[\"policies/resource_control_policy/DenyAccidentalDeletionKMSKey.json\"]",
+		"change": {
+			"actions": [
+				"create",
+			],
+			"after": {
+				"content":      "{\n\t\"Version\": \"2012-10-17\",\n\t\"Statement\": [\n\t\t{\n\t\t\t\"Sid\": \"DenyAccidentalDeletionKMSKey\",\n\t\t\t\"Effect\": \"Deny\",\n\t\t\t\"Principal\": \"*\",\n\t\t\t\"Action\": [\n\t\t\t\t\"kms:ScheduleKeyDeletion\",\n\t\t\t\t\"kms:DeleteAlias\",\n\t\t\t\t\"kms:DeleteCustomKeyStore\",\n\t\t\t\t\"kms:DeleteImportedKeyMaterial\"\n\t\t\t],\n\t\t\t\"Resource\": \"*\",\n\t\t\t\"Condition\": {\n\t\t\t\t\"ArnNotLike\": {\n\t\t\t\t\t\"aws:PrincipalArn\": \"arn:aws:iam::069137988389:role/principal_MFA_KMS_poweruser\"\n\t\t\t\t},\n\t\t\t\t\"BoolIfExists\": {\n\t\t\t\t\t\"aws:PrincipalIsAWSService\": \"false\"\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t]\n}\n",
+				"description":  null,
+				"name":         "policies/resource_control_policy/DenyAccidentalDeletionKMSKey",
+				"skip_destroy": null,
+				"tags":         null,
+				"type":         "RESOURCE_CONTROL_POLICY",
+			},
+			"after_unknown": {
+				"arn":      true,
+				"id":       true,
+				"tags_all": true,
+			},
+			"before": null,
+		},
+		"deposed":        "",
+		"index":          "policies/resource_control_policy/DenyAccidentalDeletionKMSKey.json",
+		"mode":           "managed",
+		"module_address": "module.rcps",
+		"name":           "this",
+		"provider_name":  "registry.terraform.io/hashicorp/aws",
+		"type":           "aws_organizations_policy",
+	},
+	"module.rcps.aws_organizations_policy.this[\"policies/resource_control_policy/RCPEnforceConfusedDeputyProtection.json\"]": {
+		"address": "module.rcps.aws_organizations_policy.this[\"policies/resource_control_policy/RCPEnforceConfusedDeputyProtection.json\"]",
+		"change": {
+			"actions": [
+				"create",
+			],
+			"after": {
+				"content":      "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"RCPEnforceConfusedDeputyProtection\",\n      \"Effect\": \"Deny\",\n      \"Principal\": \"*\",\n      \"Action\": \"kms:*\",\n      \"Resource\": \"*\",\n      \"Condition\": {\n        \"StringNotEqualsIfExists\": {\n          \"aws:SourceOrgID\": \"o-tmrcrnyq86\"\n        },\n        \"Bool\": {\n          \"aws:PrincipalIsAWSService\": \"true\"\n        },\n        \"Null\": {\n          \"aws:SourceAccount\": \"false\"\n        }\n      }\n    }\n  ]\n}\n",
+				"description":  null,
+				"name":         "policies/resource_control_policy/RCPEnforceConfusedDeputyProtection",
+				"skip_destroy": null,
+				"tags":         null,
+				"type":         "RESOURCE_CONTROL_POLICY",
+			},
+			"after_unknown": {
+				"arn":      true,
+				"id":       true,
+				"tags_all": true,
+			},
+			"before": null,
+		},
+		"deposed":        "",
+		"index":          "policies/resource_control_policy/RCPEnforceConfusedDeputyProtection.json",
+		"mode":           "managed",
+		"module_address": "module.rcps",
+		"name":           "this",
+		"provider_name":  "registry.terraform.io/hashicorp/aws",
+		"type":           "aws_organizations_policy",
+	},
+	"module.rcps.aws_organizations_policy.this[\"policies/resource_control_policy/RCPEnforceIdentityPerimeter.json\"]": {
+		"address": "module.rcps.aws_organizations_policy.this[\"policies/resource_control_policy/RCPEnforceIdentityPerimeter.json\"]",
+		"change": {
+			"actions": [
+				"create",
+			],
+			"after": {
+				"content":      "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"RCPEnforceIdentityPerimeter\",\n      \"Effect\": \"Deny\",\n      \"Principal\": \"*\",\n      \"Action\": \"kms:*\",\n      \"Resource\": \"*\",\n      \"Condition\": {\n        \"StringNotEqualsIfExists\": {\n          \"aws:PrincipalOrgID\": \"r-8m2b\"\n        },\n        \"Bool\": {\n          \"aws:PrincipalIsAWSService\": \"false\"\n        }\n      }\n    }\n  ]\n}\n",
+				"description":  null,
+				"name":         "policies/resource_control_policy/RCPEnforceIdentityPerimeter",
+				"skip_destroy": null,
+				"tags":         null,
+				"type":         "RESOURCE_CONTROL_POLICY",
+			},
+			"after_unknown": {
+				"arn":      true,
+				"id":       true,
+				"tags_all": true,
+			},
+			"before": null,
+		},
+		"deposed":        "",
+		"index":          "policies/resource_control_policy/RCPEnforceIdentityPerimeter.json",
+		"mode":           "managed",
+		"module_address": "module.rcps",
+		"name":           "this",
+		"provider_name":  "registry.terraform.io/hashicorp/aws",
+		"type":           "aws_organizations_policy",
+	},
+	"module.rcps.aws_organizations_policy_attachment.this[\"ou-8m2b-bod6k7sy-DenyAccidentalDeletionKMSKey\"]": {
+		"address": "module.rcps.aws_organizations_policy_attachment.this[\"ou-8m2b-bod6k7sy-DenyAccidentalDeletionKMSKey\"]",
+		"change": {
+			"actions": [
+				"create",
+			],
+			"after": {
+				"skip_destroy": null,
+				"target_id":    "ou-8m2b-bod6k7sy",
+			},
+			"after_unknown": {
+				"id":        true,
+				"policy_id": true,
+			},
+			"before": null,
+		},
+		"deposed":        "",
+		"index":          "ou-8m2b-bod6k7sy-DenyAccidentalDeletionKMSKey",
+		"mode":           "managed",
+		"module_address": "module.rcps",
+		"name":           "this",
+		"provider_name":  "registry.terraform.io/hashicorp/aws",
+		"type":           "aws_organizations_policy_attachment",
+	},
+	"module.rcps.aws_organizations_policy_attachment.this[\"r-8m2b-RCPEnforceConfusedDeputyProtection\"]": {
+		"address": "module.rcps.aws_organizations_policy_attachment.this[\"r-8m2b-RCPEnforceConfusedDeputyProtection\"]",
+		"change": {
+			"actions": [
+				"create",
+			],
+			"after": {
+				"skip_destroy": null,
+				"target_id":    "r-8m2b",
+			},
+			"after_unknown": {
+				"id":        true,
+				"policy_id": true,
+			},
+			"before": null,
+		},
+		"deposed":        "",
+		"index":          "r-8m2b-RCPEnforceConfusedDeputyProtection",
+		"mode":           "managed",
+		"module_address": "module.rcps",
+		"name":           "this",
+		"provider_name":  "registry.terraform.io/hashicorp/aws",
+		"type":           "aws_organizations_policy_attachment",
+	},
+	"module.rcps.aws_organizations_policy_attachment.this[\"r-8m2b-RCPEnforceIdentityPerimeter\"]": {
+		"address": "module.rcps.aws_organizations_policy_attachment.this[\"r-8m2b-RCPEnforceIdentityPerimeter\"]",
+		"change": {
+			"actions": [
+				"create",
+			],
+			"after": {
+				"skip_destroy": null,
+				"target_id":    "r-8m2b",
+			},
+			"after_unknown": {
+				"id":        true,
+				"policy_id": true,
+			},
+			"before": null,
+		},
+		"deposed":        "",
+		"index":          "r-8m2b-RCPEnforceIdentityPerimeter",
+		"mode":           "managed",
+		"module_address": "module.rcps",
+		"name":           "this",
+		"provider_name":  "registry.terraform.io/hashicorp/aws",
+		"type":           "aws_organizations_policy_attachment",
+	},
+	"module.scps.aws_organizations_policy.this[\"policies/service_control_policy/DenyAccessWithExceptionRole.json\"]": {
+		"address": "module.scps.aws_organizations_policy.this[\"policies/service_control_policy/DenyAccessWithExceptionRole.json\"]",
+		"change": {
+			"actions": [
+				"create",
+			],
+			"after": {
+				"content":      "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"DenyAccessWithExceptionRole\",\n      \"Effect\": \"Deny\",\n      \"Action\": [\n        \"kms:Create*\",\n        \"kms:Enable*\",\n        \"kms:Disable*\",\n        \"kms:Delete*\",\n        \"kms:Import*\",\n        \"kms:Rotate*\"\n      ],\n      \"Resource\": \"*\",\n      \"Condition\": {\n        \"StringNotLike\": {\n          \"aws:PrincipalArn\": [\n            \"arn:aws:iam::069137988389:role/principal_MFA_KMS_poweruser\"\n          ]\n        }\n      }\n    }\n  ]\n}\n",
+				"description":  null,
+				"name":         "policies/service_control_policy/DenyAccessWithExceptionRole",
+				"skip_destroy": null,
+				"tags":         null,
+				"type":         "SERVICE_CONTROL_POLICY",
+			},
+			"after_unknown": {
+				"arn":      true,
+				"id":       true,
+				"tags_all": true,
+			},
+			"before": null,
+		},
+		"deposed":        "",
+		"index":          "policies/service_control_policy/DenyAccessWithExceptionRole.json",
+		"mode":           "managed",
+		"module_address": "module.scps",
+		"name":           "this",
+		"provider_name":  "registry.terraform.io/hashicorp/aws",
+		"type":           "aws_organizations_policy",
+	},
+	"module.scps.aws_organizations_policy.this[\"policies/service_control_policy/DenyCreateKeyWithoutRequiredTags.json\"]": {
+		"address": "module.scps.aws_organizations_policy.this[\"policies/service_control_policy/DenyCreateKeyWithoutRequiredTags.json\"]",
+		"change": {
+			"actions": [
+				"create",
+			],
+			"after": {
+				"content":      "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"DenyCreateKeyWithoutRequiredTags\",\n      \"Effect\": \"Deny\",\n      \"Action\": [\n        \"kms:CreateKey\",\n        \"kms:CreateAlias\"\n      ],\n      \"Resource\": \"*\",\n      \"Condition\": {\n        \"Null\": {\n          \"aws:RequestTag/owner\": \"true\",\n          \"aws:RequestTag/environment\": \"true\",\n          \"aws:RequestTag/data-classification\": \"true\"\n        }\n      }\n    }\n  ]\n}\n",
+				"description":  null,
+				"name":         "policies/service_control_policy/DenyCreateKeyWithoutRequiredTags",
+				"skip_destroy": null,
+				"tags":         null,
+				"type":         "SERVICE_CONTROL_POLICY",
+			},
+			"after_unknown": {
+				"arn":      true,
+				"id":       true,
+				"tags_all": true,
+			},
+			"before": null,
+		},
+		"deposed":        "",
+		"index":          "policies/service_control_policy/DenyCreateKeyWithoutRequiredTags.json",
+		"mode":           "managed",
+		"module_address": "module.scps",
+		"name":           "this",
+		"provider_name":  "registry.terraform.io/hashicorp/aws",
+		"type":           "aws_organizations_policy",
+	},
+	"module.scps.aws_organizations_policy.this[\"policies/service_control_policy/DenyDevKeyAccessExceptDevOU.json\"]": {
+		"address": "module.scps.aws_organizations_policy.this[\"policies/service_control_policy/DenyDevKeyAccessExceptDevOU.json\"]",
+		"change": {
+			"actions": [
+				"create",
+			],
+			"after": {
+				"content":      "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"DenyDevKeyAccessExceptDevOU\",\n      \"Effect\": \"Deny\",\n      \"Action\": [\n        \"kms:*\"\n      ],\n      \"Resource\": \"*\",\n      \"Condition\": {\n        \"StringEquals\": {\n          \"aws:ResourceTag/environment\": \"dev\"\n        },\n        \"ForAnyValue:StringNotLike\": {\n          \"aws:PrincipalOrgPaths\": \"/root/dev/*\"\n        }\n      }\n    }\n  ]\n}\n",
+				"description":  null,
+				"name":         "policies/service_control_policy/DenyDevKeyAccessExceptDevOU",
+				"skip_destroy": null,
+				"tags":         null,
+				"type":         "SERVICE_CONTROL_POLICY",
+			},
+			"after_unknown": {
+				"arn":      true,
+				"id":       true,
+				"tags_all": true,
+			},
+			"before": null,
+		},
+		"deposed":        "",
+		"index":          "policies/service_control_policy/DenyDevKeyAccessExceptDevOU.json",
+		"mode":           "managed",
+		"module_address": "module.scps",
+		"name":           "this",
+		"provider_name":  "registry.terraform.io/hashicorp/aws",
+		"type":           "aws_organizations_policy",
+	},
+	"module.scps.aws_organizations_policy.this[\"policies/service_control_policy/DenyInvalidEnvironmentTagValue.json\"]": {
+		"address": "module.scps.aws_organizations_policy.this[\"policies/service_control_policy/DenyInvalidEnvironmentTagValue.json\"]",
+		"change": {
+			"actions": [
+				"create",
+			],
+			"after": {
+				"content":      "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"DenyInvalidEnvironmentTagValue\",\n      \"Effect\": \"Deny\",\n      \"Action\": [\n        \"kms:CreateKey\",\n        \"kms:CreateAlias\",\n        \"kms:CreateCustomKeyStore\",\n        \"kms:TagResource\"\n      ],\n      \"Resource\": \"*\",\n      \"Condition\": {\n        \"ForAnyValue:StringNotLike\": {\n          \"aws:RequestTag/environment\": [\n            \"dev\",\n            \"prod\"\n          ],\n          \"aws:ResourceTag/data-classification\": [\n            \"confidential\",\n            \"internal\",\n            \"public\"\n          ]\n        }\n      }\n    }\n  ]\n}\n",
+				"description":  null,
+				"name":         "policies/service_control_policy/DenyInvalidEnvironmentTagValue",
+				"skip_destroy": null,
+				"tags":         null,
+				"type":         "SERVICE_CONTROL_POLICY",
+			},
+			"after_unknown": {
+				"arn":      true,
+				"id":       true,
+				"tags_all": true,
+			},
+			"before": null,
+		},
+		"deposed":        "",
+		"index":          "policies/service_control_policy/DenyInvalidEnvironmentTagValue.json",
+		"mode":           "managed",
+		"module_address": "module.scps",
+		"name":           "this",
+		"provider_name":  "registry.terraform.io/hashicorp/aws",
+		"type":           "aws_organizations_policy",
+	},
+	"module.scps.aws_organizations_policy.this[\"policies/service_control_policy/DenyProdKeyAccessExceptProdOU.json\"]": {
+		"address": "module.scps.aws_organizations_policy.this[\"policies/service_control_policy/DenyProdKeyAccessExceptProdOU.json\"]",
+		"change": {
+			"actions": [
+				"create",
+			],
+			"after": {
+				"content":      "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"DenyProdKeyAccessExceptProdOU\",\n      \"Effect\": \"Deny\",\n      \"Action\": [\n        \"kms:*\"\n      ],\n      \"Resource\": \"*\",\n      \"Condition\": {\n        \"StringEquals\": {\n          \"aws:ResourceTag/environment\": \"prod\"\n        },\n        \"ForAnyValue:StringNotLike\": {\n          \"aws:PrincipalOrgPaths\": \"/root/prod/*\"\n        }\n      }\n    }\n  ]\n}\n",
+				"description":  null,
+				"name":         "policies/service_control_policy/DenyProdKeyAccessExceptProdOU",
+				"skip_destroy": null,
+				"tags":         null,
+				"type":         "SERVICE_CONTROL_POLICY",
+			},
+			"after_unknown": {
+				"arn":      true,
+				"id":       true,
+				"tags_all": true,
+			},
+			"before": null,
+		},
+		"deposed":        "",
+		"index":          "policies/service_control_policy/DenyProdKeyAccessExceptProdOU.json",
+		"mode":           "managed",
+		"module_address": "module.scps",
+		"name":           "this",
+		"provider_name":  "registry.terraform.io/hashicorp/aws",
+		"type":           "aws_organizations_policy",
+	},
+	"module.scps.aws_organizations_policy.this[\"policies/service_control_policy/DenyRemovalOfRequiredTags.json\"]": {
+		"address": "module.scps.aws_organizations_policy.this[\"policies/service_control_policy/DenyRemovalOfRequiredTags.json\"]",
+		"change": {
+			"actions": [
+				"create",
+			],
+			"after": {
+				"content":      "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"DenyRemovalOfRequiredTags\",\n      \"Effect\": \"Deny\",\n      \"Action\": [\n        \"kms:UntagResource\"\n      ],\n      \"Resource\": \"*\",\n      \"Condition\": {\n        \"StringEquals\": {\n          \"aws:TagKeys\": [\n            \"owner\",\n            \"environment\",\n            \"data-classification\"\n          ]\n        }\n      }\n    }\n  ]\n}\n",
+				"description":  null,
+				"name":         "policies/service_control_policy/DenyRemovalOfRequiredTags",
+				"skip_destroy": null,
+				"tags":         null,
+				"type":         "SERVICE_CONTROL_POLICY",
+			},
+			"after_unknown": {
+				"arn":      true,
+				"id":       true,
+				"tags_all": true,
+			},
+			"before": null,
+		},
+		"deposed":        "",
+		"index":          "policies/service_control_policy/DenyRemovalOfRequiredTags.json",
+		"mode":           "managed",
+		"module_address": "module.scps",
+		"name":           "this",
+		"provider_name":  "registry.terraform.io/hashicorp/aws",
+		"type":           "aws_organizations_policy",
+	},
+	"module.scps.aws_organizations_policy.this[\"policies/service_control_policy/EnforceAutomaticKeyRotation.json\"]": {
+		"address": "module.scps.aws_organizations_policy.this[\"policies/service_control_policy/EnforceAutomaticKeyRotation.json\"]",
+		"change": {
+			"actions": [
+				"create",
+			],
+			"after": {
+				"content":      "{\n    \"Version\": \"2012-10-17\",\n    \"Statement\": [\n        {\n            \"Sid\": \"EnforceAutomaticKeyRotation\",\n            \"Effect\": \"Deny\",\n            \"Action\": [\n                \"kms:CreateKey\"\n            ],\n            \"Resource\": \"*\",\n            \"Condition\": {\n                \"Bool\": {\n                    \"kms:BypassPolicyLockoutSafetyCheck\": \"false\"\n                },\n                \"Null\": {\n                    \"kms:RotationPeriodInDays\": []\n                }\n            }\n        }\n    ]\n}\n",
+				"description":  null,
+				"name":         "policies/service_control_policy/EnforceAutomaticKeyRotation",
+				"skip_destroy": null,
+				"tags":         null,
+				"type":         "SERVICE_CONTROL_POLICY",
+			},
+			"after_unknown": {
+				"arn":      true,
+				"id":       true,
+				"tags_all": true,
+			},
+			"before": null,
+		},
+		"deposed":        "",
+		"index":          "policies/service_control_policy/EnforceAutomaticKeyRotation.json",
+		"mode":           "managed",
+		"module_address": "module.scps",
+		"name":           "this",
+		"provider_name":  "registry.terraform.io/hashicorp/aws",
+		"type":           "aws_organizations_policy",
+	},
+	"module.scps.aws_organizations_policy.this[\"policies/service_control_policy/EnforceKMSKeyWaitingPeriod.json\"]": {
+		"address": "module.scps.aws_organizations_policy.this[\"policies/service_control_policy/EnforceKMSKeyWaitingPeriod.json\"]",
+		"change": {
+			"actions": [
+				"create",
+			],
+			"after": {
+				"content":      "{\n\t\"Version\": \"2012-10-17\",\n\t\"Statement\": [\n\t\t{\n\t\t\t\"Sid\": \"EnforceKMSKeyWaitingPeriod\",\n\t\t\t\"Effect\": \"Deny\",\n\t\t\t\"Action\": [\n\t\t\t\t\"kms:ScheduleKeyDeletion\"\n\t\t\t],\n\t\t\t\"Resource\": \"*\",\n\t\t\t\"Condition\": {\n\t\t\t\t\"NumericLessThan\": {\n\t\t\t\t\t\"kms:ScheduleKeyDeletionPendingWindowInDays\": \"30\"\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t]\n}\n",
+				"description":  null,
+				"name":         "policies/service_control_policy/EnforceKMSKeyWaitingPeriod",
+				"skip_destroy": null,
+				"tags":         null,
+				"type":         "SERVICE_CONTROL_POLICY",
+			},
+			"after_unknown": {
+				"arn":      true,
+				"id":       true,
+				"tags_all": true,
+			},
+			"before": null,
+		},
+		"deposed":        "",
+		"index":          "policies/service_control_policy/EnforceKMSKeyWaitingPeriod.json",
+		"mode":           "managed",
+		"module_address": "module.scps",
+		"name":           "this",
+		"provider_name":  "registry.terraform.io/hashicorp/aws",
+		"type":           "aws_organizations_policy",
+	},
+	"module.scps.aws_organizations_policy.this[\"policies/service_control_policy/PreventDisablingKeyRotation.json\"]": {
+		"address": "module.scps.aws_organizations_policy.this[\"policies/service_control_policy/PreventDisablingKeyRotation.json\"]",
+		"change": {
+			"actions": [
+				"create",
+			],
+			"after": {
+				"content":      "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"PreventDisablingKeyRotation\",\n      \"Effect\": \"Deny\",\n      \"Action\": [\n          \"kms:DisableKeyRotation\"\n      ],\n      \"Resource\": \"*\"\n  }\n  ]\n}\n",
+				"description":  null,
+				"name":         "policies/service_control_policy/PreventDisablingKeyRotation",
+				"skip_destroy": null,
+				"tags":         null,
+				"type":         "SERVICE_CONTROL_POLICY",
+			},
+			"after_unknown": {
+				"arn":      true,
+				"id":       true,
+				"tags_all": true,
+			},
+			"before": null,
+		},
+		"deposed":        "",
+		"index":          "policies/service_control_policy/PreventDisablingKeyRotation.json",
+		"mode":           "managed",
+		"module_address": "module.scps",
+		"name":           "this",
+		"provider_name":  "registry.terraform.io/hashicorp/aws",
+		"type":           "aws_organizations_policy",
+	},
+	"module.scps.aws_organizations_policy.this[\"policies/service_control_policy/RequireMFAForCriticalKMSActions.json\"]": {
+		"address": "module.scps.aws_organizations_policy.this[\"policies/service_control_policy/RequireMFAForCriticalKMSActions.json\"]",
+		"change": {
+			"actions": [
+				"create",
+			],
+			"after": {
+				"content":      "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"RequireMFAForCriticalKMSActions\",\n      \"Effect\": \"Deny\",\n      \"Action\": [\n        \"kms:ScheduleKeyDeletion\",\n        \"kms:DeleteImportedKeyMaterial\",\n        \"kms:DisableKey\",\n        \"kms:UpdateKeyDescription\",\n        \"kms:ImportKeyMaterial\",\n        \"kms:CreateKey\",\n        \"kms:DeleteCustomKeyStore\",\n        \"kms:UpdateCustomKeyStore\",\n        \"kms:CreateCustomKeyStore\",\n        \"kms:EnableKey\",\n        \"kms:PutKeyPolicy\",\n        \"kms:UpdateAlias\",\n        \"kms:CreateAlias\",\n        \"kms:DeleteAlias\",\n        \"kms:ConnectCustomKeyStore\",\n        \"kms:DisconnectCustomKeyStore\"\n      ],\n      \"Resource\": \"*\",\n      \"Condition\": {\n        \"BoolIfExists\": {\n          \"aws:MultiFactorAuthPresent\": \"false\"\n        }\n      }\n    }\n  ]\n}\n",
+				"description":  null,
+				"name":         "policies/service_control_policy/RequireMFAForCriticalKMSActions",
+				"skip_destroy": null,
+				"tags":         null,
+				"type":         "SERVICE_CONTROL_POLICY",
+			},
+			"after_unknown": {
+				"arn":      true,
+				"id":       true,
+				"tags_all": true,
+			},
+			"before": null,
+		},
+		"deposed":        "",
+		"index":          "policies/service_control_policy/RequireMFAForCriticalKMSActions.json",
+		"mode":           "managed",
+		"module_address": "module.scps",
+		"name":           "this",
+		"provider_name":  "registry.terraform.io/hashicorp/aws",
+		"type":           "aws_organizations_policy",
+	},
+	"module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-bod6k7sy-DenyAccessWithExceptionRole\"]": {
+		"address": "module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-bod6k7sy-DenyAccessWithExceptionRole\"]",
+		"change": {
+			"actions": [
+				"create",
+			],
+			"after": {
+				"skip_destroy": null,
+				"target_id":    "ou-8m2b-bod6k7sy",
+			},
+			"after_unknown": {
+				"id":        true,
+				"policy_id": true,
+			},
+			"before": null,
+		},
+		"deposed":        "",
+		"index":          "ou-8m2b-bod6k7sy-DenyAccessWithExceptionRole",
+		"mode":           "managed",
+		"module_address": "module.scps",
+		"name":           "this",
+		"provider_name":  "registry.terraform.io/hashicorp/aws",
+		"type":           "aws_organizations_policy_attachment",
+	},
+	"module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-bod6k7sy-DenyCreateKeyWithoutRequiredTags\"]": {
+		"address": "module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-bod6k7sy-DenyCreateKeyWithoutRequiredTags\"]",
+		"change": {
+			"actions": [
+				"create",
+			],
+			"after": {
+				"skip_destroy": null,
+				"target_id":    "ou-8m2b-bod6k7sy",
+			},
+			"after_unknown": {
+				"id":        true,
+				"policy_id": true,
+			},
+			"before": null,
+		},
+		"deposed":        "",
+		"index":          "ou-8m2b-bod6k7sy-DenyCreateKeyWithoutRequiredTags",
+		"mode":           "managed",
+		"module_address": "module.scps",
+		"name":           "this",
+		"provider_name":  "registry.terraform.io/hashicorp/aws",
+		"type":           "aws_organizations_policy_attachment",
+	},
+	"module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-bod6k7sy-DenyInvalidEnvironmentTagValue\"]": {
+		"address": "module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-bod6k7sy-DenyInvalidEnvironmentTagValue\"]",
+		"change": {
+			"actions": [
+				"create",
+			],
+			"after": {
+				"skip_destroy": null,
+				"target_id":    "ou-8m2b-bod6k7sy",
+			},
+			"after_unknown": {
+				"id":        true,
+				"policy_id": true,
+			},
+			"before": null,
+		},
+		"deposed":        "",
+		"index":          "ou-8m2b-bod6k7sy-DenyInvalidEnvironmentTagValue",
+		"mode":           "managed",
+		"module_address": "module.scps",
+		"name":           "this",
+		"provider_name":  "registry.terraform.io/hashicorp/aws",
+		"type":           "aws_organizations_policy_attachment",
+	},
+	"module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-bod6k7sy-DenyProdKeyAccessExceptProdOU\"]": {
+		"address": "module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-bod6k7sy-DenyProdKeyAccessExceptProdOU\"]",
+		"change": {
+			"actions": [
+				"create",
+			],
+			"after": {
+				"skip_destroy": null,
+				"target_id":    "ou-8m2b-bod6k7sy",
+			},
+			"after_unknown": {
+				"id":        true,
+				"policy_id": true,
+			},
+			"before": null,
+		},
+		"deposed":        "",
+		"index":          "ou-8m2b-bod6k7sy-DenyProdKeyAccessExceptProdOU",
+		"mode":           "managed",
+		"module_address": "module.scps",
+		"name":           "this",
+		"provider_name":  "registry.terraform.io/hashicorp/aws",
+		"type":           "aws_organizations_policy_attachment",
+	},
+	"module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-bod6k7sy-DenyRemovalOfRequiredTags\"]": {
+		"address": "module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-bod6k7sy-DenyRemovalOfRequiredTags\"]",
+		"change": {
+			"actions": [
+				"create",
+			],
+			"after": {
+				"skip_destroy": null,
+				"target_id":    "ou-8m2b-bod6k7sy",
+			},
+			"after_unknown": {
+				"id":        true,
+				"policy_id": true,
+			},
+			"before": null,
+		},
+		"deposed":        "",
+		"index":          "ou-8m2b-bod6k7sy-DenyRemovalOfRequiredTags",
+		"mode":           "managed",
+		"module_address": "module.scps",
+		"name":           "this",
+		"provider_name":  "registry.terraform.io/hashicorp/aws",
+		"type":           "aws_organizations_policy_attachment",
+	},
+	"module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-sxjqqszq-DenyCreateKeyWithoutRequiredTags\"]": {
+		"address": "module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-sxjqqszq-DenyCreateKeyWithoutRequiredTags\"]",
+		"change": {
+			"actions": [
+				"create",
+			],
+			"after": {
+				"skip_destroy": null,
+				"target_id":    "ou-8m2b-sxjqqszq",
+			},
+			"after_unknown": {
+				"id":        true,
+				"policy_id": true,
+			},
+			"before": null,
+		},
+		"deposed":        "",
+		"index":          "ou-8m2b-sxjqqszq-DenyCreateKeyWithoutRequiredTags",
+		"mode":           "managed",
+		"module_address": "module.scps",
+		"name":           "this",
+		"provider_name":  "registry.terraform.io/hashicorp/aws",
+		"type":           "aws_organizations_policy_attachment",
+	},
+	"module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-sxjqqszq-DenyDevKeyAccessExceptDevOU\"]": {
+		"address": "module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-sxjqqszq-DenyDevKeyAccessExceptDevOU\"]",
+		"change": {
+			"actions": [
+				"create",
+			],
+			"after": {
+				"skip_destroy": null,
+				"target_id":    "ou-8m2b-sxjqqszq",
+			},
+			"after_unknown": {
+				"id":        true,
+				"policy_id": true,
+			},
+			"before": null,
+		},
+		"deposed":        "",
+		"index":          "ou-8m2b-sxjqqszq-DenyDevKeyAccessExceptDevOU",
+		"mode":           "managed",
+		"module_address": "module.scps",
+		"name":           "this",
+		"provider_name":  "registry.terraform.io/hashicorp/aws",
+		"type":           "aws_organizations_policy_attachment",
+	},
+	"module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-sxjqqszq-DenyInvalidEnvironmentTagValue\"]": {
+		"address": "module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-sxjqqszq-DenyInvalidEnvironmentTagValue\"]",
+		"change": {
+			"actions": [
+				"create",
+			],
+			"after": {
+				"skip_destroy": null,
+				"target_id":    "ou-8m2b-sxjqqszq",
+			},
+			"after_unknown": {
+				"id":        true,
+				"policy_id": true,
+			},
+			"before": null,
+		},
+		"deposed":        "",
+		"index":          "ou-8m2b-sxjqqszq-DenyInvalidEnvironmentTagValue",
+		"mode":           "managed",
+		"module_address": "module.scps",
+		"name":           "this",
+		"provider_name":  "registry.terraform.io/hashicorp/aws",
+		"type":           "aws_organizations_policy_attachment",
+	},
+	"module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-sxjqqszq-DenyRemovalOfRequiredTags\"]": {
+		"address": "module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-sxjqqszq-DenyRemovalOfRequiredTags\"]",
+		"change": {
+			"actions": [
+				"create",
+			],
+			"after": {
+				"skip_destroy": null,
+				"target_id":    "ou-8m2b-sxjqqszq",
+			},
+			"after_unknown": {
+				"id":        true,
+				"policy_id": true,
+			},
+			"before": null,
+		},
+		"deposed":        "",
+		"index":          "ou-8m2b-sxjqqszq-DenyRemovalOfRequiredTags",
+		"mode":           "managed",
+		"module_address": "module.scps",
+		"name":           "this",
+		"provider_name":  "registry.terraform.io/hashicorp/aws",
+		"type":           "aws_organizations_policy_attachment",
+	},
+	"module.scps.aws_organizations_policy_attachment.this[\"r-8m2b-EnforceAutomaticKeyRotation\"]": {
+		"address": "module.scps.aws_organizations_policy_attachment.this[\"r-8m2b-EnforceAutomaticKeyRotation\"]",
+		"change": {
+			"actions": [
+				"create",
+			],
+			"after": {
+				"skip_destroy": null,
+				"target_id":    "r-8m2b",
+			},
+			"after_unknown": {
+				"id":        true,
+				"policy_id": true,
+			},
+			"before": null,
+		},
+		"deposed":        "",
+		"index":          "r-8m2b-EnforceAutomaticKeyRotation",
+		"mode":           "managed",
+		"module_address": "module.scps",
+		"name":           "this",
+		"provider_name":  "registry.terraform.io/hashicorp/aws",
+		"type":           "aws_organizations_policy_attachment",
+	},
+	"module.scps.aws_organizations_policy_attachment.this[\"r-8m2b-EnforceKMSKeyWaitingPeriod\"]": {
+		"address": "module.scps.aws_organizations_policy_attachment.this[\"r-8m2b-EnforceKMSKeyWaitingPeriod\"]",
+		"change": {
+			"actions": [
+				"create",
+			],
+			"after": {
+				"skip_destroy": null,
+				"target_id":    "r-8m2b",
+			},
+			"after_unknown": {
+				"id":        true,
+				"policy_id": true,
+			},
+			"before": null,
+		},
+		"deposed":        "",
+		"index":          "r-8m2b-EnforceKMSKeyWaitingPeriod",
+		"mode":           "managed",
+		"module_address": "module.scps",
+		"name":           "this",
+		"provider_name":  "registry.terraform.io/hashicorp/aws",
+		"type":           "aws_organizations_policy_attachment",
+	},
+	"module.scps.aws_organizations_policy_attachment.this[\"r-8m2b-PreventDisablingKeyRotation\"]": {
+		"address": "module.scps.aws_organizations_policy_attachment.this[\"r-8m2b-PreventDisablingKeyRotation\"]",
+		"change": {
+			"actions": [
+				"create",
+			],
+			"after": {
+				"skip_destroy": null,
+				"target_id":    "r-8m2b",
+			},
+			"after_unknown": {
+				"id":        true,
+				"policy_id": true,
+			},
+			"before": null,
+		},
+		"deposed":        "",
+		"index":          "r-8m2b-PreventDisablingKeyRotation",
+		"mode":           "managed",
+		"module_address": "module.scps",
+		"name":           "this",
+		"provider_name":  "registry.terraform.io/hashicorp/aws",
+		"type":           "aws_organizations_policy_attachment",
+	},
+	"module.scps.aws_organizations_policy_attachment.this[\"r-8m2b-RequireMFAForCriticalKMSActions\"]": {
+		"address": "module.scps.aws_organizations_policy_attachment.this[\"r-8m2b-RequireMFAForCriticalKMSActions\"]",
+		"change": {
+			"actions": [
+				"create",
+			],
+			"after": {
+				"skip_destroy": null,
+				"target_id":    "r-8m2b",
+			},
+			"after_unknown": {
+				"id":        true,
+				"policy_id": true,
+			},
+			"before": null,
+		},
+		"deposed":        "",
+		"index":          "r-8m2b-RequireMFAForCriticalKMSActions",
+		"mode":           "managed",
+		"module_address": "module.scps",
+		"name":           "this",
+		"provider_name":  "registry.terraform.io/hashicorp/aws",
+		"type":           "aws_organizations_policy_attachment",
+	},
+}
+
+resource_drift = {}
+
+output_changes = {
+	"ou_map_list": {
+		"change": {
+			"actions": [
+				"create",
+			],
+			"after": {
+				"dev": {
+					"arn":       "arn:aws:organizations::069137988389:ou/o-tmrcrnyq86/ou-8m2b-sxjqqszq",
+					"id":        "ou-8m2b-sxjqqszq",
+					"name":      "dev",
+					"parent_id": "r-8m2b",
+				},
+				"prod": {
+					"arn":       "arn:aws:organizations::069137988389:ou/o-tmrcrnyq86/ou-8m2b-bod6k7sy",
+					"id":        "ou-8m2b-bod6k7sy",
+					"name":      "prod",
+					"parent_id": "r-8m2b",
+				},
+			},
+			"after_unknown": false,
+			"before":        null,
+		},
+		"name": "ou_map_list",
+	},
+	"policy_attachments": {
+		"change": {
+			"actions": [
+				"create",
+			],
+			"after": {
+				"ou-8m2b-bod6k7sy": {
+					"resource_control_policies": [
+						"DenyAccidentalDeletionKMSKey",
+					],
+					"service_control_policies": [
+						"DenyProdKeyAccessExceptProdOU",
+						"DenyCreateKeyWithoutRequiredTags",
+						"DenyInvalidEnvironmentTagValue",
+						"DenyRemovalOfRequiredTags",
+						"DenyAccessWithExceptionRole",
+					],
+				},
+				"ou-8m2b-sxjqqszq": {
+					"resource_control_policies": [],
+					"service_control_policies": [
+						"DenyDevKeyAccessExceptDevOU",
+						"DenyCreateKeyWithoutRequiredTags",
+						"DenyInvalidEnvironmentTagValue",
+						"DenyRemovalOfRequiredTags",
+					],
+				},
+				"r-8m2b": {
+					"resource_control_policies": [
+						"RCPEnforceIdentityPerimeter",
+						"RCPEnforceConfusedDeputyProtection",
+					],
+					"service_control_policies": [
+						"RequireMFAForCriticalKMSActions",
+						"PreventDisablingKeyRotation",
+						"EnforceAutomaticKeyRotation",
+						"EnforceKMSKeyWaitingPeriod",
+					],
+				},
+			},
+			"after_unknown": false,
+			"before":        null,
+		},
+		"name": "policy_attachments",
+	},
+	"policy_details": {
+		"change": {
+			"actions": [
+				"create",
+			],
+			"after": {
+				"resource_control_policies": {},
+				"service_control_policies":  {},
+			},
+			"after_unknown": {
+				"resource_control_policies": {
+					"DenyAccidentalDeletionKMSKey":       true,
+					"RCPEnforceConfusedDeputyProtection": true,
+					"RCPEnforceIdentityPerimeter":        true,
+				},
+				"service_control_policies": {
+					"DenyAccessWithExceptionRole":      true,
+					"DenyCreateKeyWithoutRequiredTags": true,
+					"DenyDevKeyAccessExceptDevOU":      true,
+					"DenyInvalidEnvironmentTagValue":   true,
+					"DenyProdKeyAccessExceptProdOU":    true,
+					"DenyRemovalOfRequiredTags":        true,
+					"EnforceAutomaticKeyRotation":      true,
+					"EnforceKMSKeyWaitingPeriod":       true,
+					"PreventDisablingKeyRotation":      true,
+					"RequireMFAForCriticalKMSActions":  true,
+				},
+			},
+			"before": null,
+		},
+		"name": "policy_details",
+	},
+	"root_account_id": {
+		"change": {
+			"actions": [
+				"create",
+			],
+			"after":         "r-8m2b",
+			"after_unknown": false,
+			"before":        null,
+		},
+		"name": "root_account_id",
+	},
+}
+
+raw = {
+	"checks": [
+		{
+			"address": {
+				"kind":       "var",
+				"module":     "module.rcps",
+				"name":       "policy_type",
+				"to_display": "module.rcps.var.policy_type",
+			},
+			"instances": [
+				{
+					"address": {
+						"module":     "module.rcps",
+						"to_display": "module.rcps.var.policy_type",
+					},
+					"status": "pass",
+				},
+			],
+			"status": "pass",
+		},
+		{
+			"address": {
+				"kind":       "var",
+				"module":     "module.scps",
+				"name":       "policy_type",
+				"to_display": "module.scps.var.policy_type",
+			},
+			"instances": [
+				{
+					"address": {
+						"module":     "module.scps",
+						"to_display": "module.scps.var.policy_type",
+					},
+					"status": "pass",
+				},
+			],
+			"status": "pass",
+		},
+		{
+			"address": {
+				"kind":       "var",
+				"name":       "policy_type",
+				"to_display": "var.policy_type",
+			},
+			"instances": [
+				{
+					"address": {
+						"to_display": "var.policy_type",
+					},
+					"status": "pass",
+				},
+			],
+			"status": "pass",
+		},
+	],
+	"configuration": {
+		"provider_config": {
+			"aws": {
+				"expressions": {
+					"region": {
+						"references": [
+							"var.aws_region",
+						],
+					},
+				},
+				"full_name":          "registry.terraform.io/hashicorp/aws",
+				"name":               "aws",
+				"version_constraint": "~> 5.94",
+			},
+		},
+		"root_module": {
+			"module_calls": {
+				"rcps": {
+					"expressions": {
+						"ou_map": {
+							"references": [
+								"local.root_id",
+								"local.prod_id",
+							],
+						},
+						"policies_directory": {
+							"constant_value": "./policies/resource_control_policy",
+						},
+						"policy_type": {
+							"constant_value": "RESOURCE_CONTROL_POLICY",
+						},
+					},
+					"module": {
+						"outputs": {
+							"attachment_debug": {
+								"description": "Debug info for attachments",
+								"expression": {
+									"references": [
+										"local.policy_attachments",
+									],
+								},
+							},
+							"ou_map": {
+								"description": "Output of the input OU map",
+								"expression": {
+									"references": [
+										"var.ou_map",
+									],
+								},
+							},
+							"policies_directory": {
+								"description": "Get the policies directory",
+								"expression": {
+									"references": [
+										"local.policies_directory",
+									],
+								},
+							},
+							"policy_ids_debug": {
+								"description": "Debug policy IDs map",
+								"expression": {
+									"references": [
+										"local.policy_ids",
+									],
+								},
+							},
+							"policy_keys": {
+								"description": "Keys in the policy_ids map",
+								"expression": {
+									"references": [
+										"local.policy_keys",
+									],
+								},
+							},
+						},
+						"resources": [
+							{
+								"address": "aws_organizations_policy.this",
+								"expressions": {
+									"content": {
+										"references": [
+											"each.value",
+										],
+									},
+									"name": {
+										"references": [
+											"each.value",
+											"local.policies_directory",
+										],
+									},
+									"type": {
+										"references": [
+											"var.policy_type",
+										],
+									},
+								},
+								"for_each_expression": {
+									"references": [
+										"path.root",
+										"local.policies_directory",
+									],
+								},
+								"mode":                "managed",
+								"name":                "this",
+								"provider_config_key": "aws",
+								"schema_version":      0,
+								"type":                "aws_organizations_policy",
+							},
+							{
+								"address": "aws_organizations_policy_attachment.this",
+								"depends_on": [
+									"aws_organizations_policy.this",
+								],
+								"expressions": {
+									"policy_id": {
+										"references": [
+											"local.policy_ids",
+											"each.value.policy",
+											"each.value",
+										],
+									},
+									"target_id": {
+										"references": [
+											"each.value.ou",
+											"each.value",
+										],
+									},
+								},
+								"for_each_expression": {
+									"references": [
+										"local.policy_attachments",
+									],
+								},
+								"mode":                "managed",
+								"name":                "this",
+								"provider_config_key": "aws",
+								"schema_version":      0,
+								"type":                "aws_organizations_policy_attachment",
+							},
+						],
+						"variables": {
+							"ou_map": {
+								"description": "Map of OUs",
+							},
+							"policies_directory": {
+								"description": "Policies directory path",
+							},
+							"policy_type": {
+								"default":     "SERVICE_CONTROL_POLICY",
+								"description": "Policy type",
+							},
+						},
+					},
+					"source": "./modules/org_policies",
+				},
+				"scps": {
+					"expressions": {
+						"ou_map": {
+							"references": [
+								"local.root_id",
+								"local.dev_id",
+								"local.prod_id",
+							],
+						},
+						"policies_directory": {
+							"constant_value": "./policies/service_control_policy",
+						},
+						"policy_type": {
+							"constant_value": "SERVICE_CONTROL_POLICY",
+						},
+					},
+					"module": {
+						"outputs": {
+							"attachment_debug": {
+								"description": "Debug info for attachments",
+								"expression": {
+									"references": [
+										"local.policy_attachments",
+									],
+								},
+							},
+							"ou_map": {
+								"description": "Output of the input OU map",
+								"expression": {
+									"references": [
+										"var.ou_map",
+									],
+								},
+							},
+							"policies_directory": {
+								"description": "Get the policies directory",
+								"expression": {
+									"references": [
+										"local.policies_directory",
+									],
+								},
+							},
+							"policy_ids_debug": {
+								"description": "Debug policy IDs map",
+								"expression": {
+									"references": [
+										"local.policy_ids",
+									],
+								},
+							},
+							"policy_keys": {
+								"description": "Keys in the policy_ids map",
+								"expression": {
+									"references": [
+										"local.policy_keys",
+									],
+								},
+							},
+						},
+						"resources": [
+							{
+								"address": "aws_organizations_policy.this",
+								"expressions": {
+									"content": {
+										"references": [
+											"each.value",
+										],
+									},
+									"name": {
+										"references": [
+											"each.value",
+											"local.policies_directory",
+										],
+									},
+									"type": {
+										"references": [
+											"var.policy_type",
+										],
+									},
+								},
+								"for_each_expression": {
+									"references": [
+										"path.root",
+										"local.policies_directory",
+									],
+								},
+								"mode":                "managed",
+								"name":                "this",
+								"provider_config_key": "aws",
+								"schema_version":      0,
+								"type":                "aws_organizations_policy",
+							},
+							{
+								"address": "aws_organizations_policy_attachment.this",
+								"depends_on": [
+									"aws_organizations_policy.this",
+								],
+								"expressions": {
+									"policy_id": {
+										"references": [
+											"local.policy_ids",
+											"each.value.policy",
+											"each.value",
+										],
+									},
+									"target_id": {
+										"references": [
+											"each.value.ou",
+											"each.value",
+										],
+									},
+								},
+								"for_each_expression": {
+									"references": [
+										"local.policy_attachments",
+									],
+								},
+								"mode":                "managed",
+								"name":                "this",
+								"provider_config_key": "aws",
+								"schema_version":      0,
+								"type":                "aws_organizations_policy_attachment",
+							},
+						],
+						"variables": {
+							"ou_map": {
+								"description": "Map of OUs",
+							},
+							"policies_directory": {
+								"description": "Policies directory path",
+							},
+							"policy_type": {
+								"default":     "SERVICE_CONTROL_POLICY",
+								"description": "Policy type",
+							},
+						},
+					},
+					"source": "./modules/org_policies",
+				},
+			},
+			"outputs": {
+				"ou_map_list": {
+					"description": "Get the ou map list",
+					"expression": {
+						"references": [
+							"data.aws_organizations_organizational_unit.list",
+						],
+					},
+				},
+				"policy_attachments": {
+					"description": "Map of OUs/accounts with their attached policies",
+					"expression": {
+						"references": [
+							"module.scps.ou_map",
+							"module.scps",
+							"module.rcps.ou_map",
+							"module.rcps",
+							"module.scps.ou_map",
+							"module.scps",
+							"module.rcps.ou_map",
+							"module.rcps",
+						],
+					},
+				},
+				"policy_details": {
+					"description": "Details of created policies",
+					"expression": {
+						"references": [
+							"module.scps.policy_ids_debug",
+							"module.scps",
+							"module.rcps.policy_ids_debug",
+							"module.rcps",
+						],
+					},
+				},
+				"root_account_id": {
+					"description": "Get the root account ID",
+					"expression": {
+						"references": [
+							"data.aws_organizations_organization.org.roots[0].id",
+							"data.aws_organizations_organization.org.roots[0]",
+							"data.aws_organizations_organization.org.roots",
+							"data.aws_organizations_organization.org",
+						],
+					},
+				},
+			},
+			"resources": [
+				{
+					"address":             "data.aws_organizations_organization.org",
+					"mode":                "data",
+					"name":                "org",
+					"provider_config_key": "aws",
+					"schema_version":      0,
+					"type":                "aws_organizations_organization",
+				},
+				{
+					"address": "data.aws_organizations_organizational_unit.list",
+					"expressions": {
+						"name": {
+							"references": [
+								"each.key",
+							],
+						},
+						"parent_id": {
+							"references": [
+								"data.aws_organizations_organization.org.roots[0].id",
+								"data.aws_organizations_organization.org.roots[0]",
+								"data.aws_organizations_organization.org.roots",
+								"data.aws_organizations_organization.org",
+							],
+						},
+					},
+					"for_each_expression": {
+						"references": [
+							"var.ou_map",
+						],
+					},
+					"mode":                "data",
+					"name":                "list",
+					"provider_config_key": "aws",
+					"schema_version":      0,
+					"type":                "aws_organizations_organizational_unit",
+				},
+			],
+			"variables": {
+				"aws_access_key_id": {
+					"description": "AWS access key ID",
+					"sensitive":   true,
+				},
+				"aws_region": {
+					"default":     "us-east-1",
+					"description": "AWS region",
+				},
+				"aws_secret_access_key": {
+					"description": "AWS secret access key",
+					"sensitive":   true,
+				},
+				"ou_map": {
+					"default": {
+						"dev": [
+							"root",
+						],
+						"prod": [
+							"root",
+						],
+					},
+					"description": "Map of OUs",
+				},
+				"policy_type": {
+					"default":     "SERVICE_CONTROL_POLICY",
+					"description": "Policy type with validation",
+				},
+			},
+		},
+	},
+	"format_version": "1.2",
+	"output_changes": {
+		"ou_map_list": {
+			"actions": [
+				"create",
+			],
+			"after": {
+				"dev": {
+					"arn":       "arn:aws:organizations::069137988389:ou/o-tmrcrnyq86/ou-8m2b-sxjqqszq",
+					"id":        "ou-8m2b-sxjqqszq",
+					"name":      "dev",
+					"parent_id": "r-8m2b",
+				},
+				"prod": {
+					"arn":       "arn:aws:organizations::069137988389:ou/o-tmrcrnyq86/ou-8m2b-bod6k7sy",
+					"id":        "ou-8m2b-bod6k7sy",
+					"name":      "prod",
+					"parent_id": "r-8m2b",
+				},
+			},
+			"after_sensitive":  false,
+			"after_unknown":    false,
+			"before":           null,
+			"before_sensitive": false,
+		},
+		"policy_attachments": {
+			"actions": [
+				"create",
+			],
+			"after": {
+				"ou-8m2b-bod6k7sy": {
+					"resource_control_policies": [
+						"DenyAccidentalDeletionKMSKey",
+					],
+					"service_control_policies": [
+						"DenyProdKeyAccessExceptProdOU",
+						"DenyCreateKeyWithoutRequiredTags",
+						"DenyInvalidEnvironmentTagValue",
+						"DenyRemovalOfRequiredTags",
+						"DenyAccessWithExceptionRole",
+					],
+				},
+				"ou-8m2b-sxjqqszq": {
+					"resource_control_policies": [],
+					"service_control_policies": [
+						"DenyDevKeyAccessExceptDevOU",
+						"DenyCreateKeyWithoutRequiredTags",
+						"DenyInvalidEnvironmentTagValue",
+						"DenyRemovalOfRequiredTags",
+					],
+				},
+				"r-8m2b": {
+					"resource_control_policies": [
+						"RCPEnforceIdentityPerimeter",
+						"RCPEnforceConfusedDeputyProtection",
+					],
+					"service_control_policies": [
+						"RequireMFAForCriticalKMSActions",
+						"PreventDisablingKeyRotation",
+						"EnforceAutomaticKeyRotation",
+						"EnforceKMSKeyWaitingPeriod",
+					],
+				},
+			},
+			"after_sensitive":  false,
+			"after_unknown":    false,
+			"before":           null,
+			"before_sensitive": false,
+		},
+		"policy_details": {
+			"actions": [
+				"create",
+			],
+			"after": {
+				"resource_control_policies": {},
+				"service_control_policies":  {},
+			},
+			"after_sensitive": false,
+			"after_unknown": {
+				"resource_control_policies": {
+					"DenyAccidentalDeletionKMSKey":       true,
+					"RCPEnforceConfusedDeputyProtection": true,
+					"RCPEnforceIdentityPerimeter":        true,
+				},
+				"service_control_policies": {
+					"DenyAccessWithExceptionRole":      true,
+					"DenyCreateKeyWithoutRequiredTags": true,
+					"DenyDevKeyAccessExceptDevOU":      true,
+					"DenyInvalidEnvironmentTagValue":   true,
+					"DenyProdKeyAccessExceptProdOU":    true,
+					"DenyRemovalOfRequiredTags":        true,
+					"EnforceAutomaticKeyRotation":      true,
+					"EnforceKMSKeyWaitingPeriod":       true,
+					"PreventDisablingKeyRotation":      true,
+					"RequireMFAForCriticalKMSActions":  true,
+				},
+			},
+			"before":           null,
+			"before_sensitive": false,
+		},
+		"root_account_id": {
+			"actions": [
+				"create",
+			],
+			"after":            "r-8m2b",
+			"after_sensitive":  false,
+			"after_unknown":    false,
+			"before":           null,
+			"before_sensitive": false,
+		},
+	},
+	"planned_values": {
+		"outputs": {
+			"ou_map_list": {
+				"sensitive": false,
+				"value": {
+					"dev": {
+						"arn":       "arn:aws:organizations::069137988389:ou/o-tmrcrnyq86/ou-8m2b-sxjqqszq",
+						"id":        "ou-8m2b-sxjqqszq",
+						"name":      "dev",
+						"parent_id": "r-8m2b",
+					},
+					"prod": {
+						"arn":       "arn:aws:organizations::069137988389:ou/o-tmrcrnyq86/ou-8m2b-bod6k7sy",
+						"id":        "ou-8m2b-bod6k7sy",
+						"name":      "prod",
+						"parent_id": "r-8m2b",
+					},
+				},
+			},
+			"policy_attachments": {
+				"sensitive": false,
+				"value": {
+					"ou-8m2b-bod6k7sy": {
+						"resource_control_policies": [
+							"DenyAccidentalDeletionKMSKey",
+						],
+						"service_control_policies": [
+							"DenyProdKeyAccessExceptProdOU",
+							"DenyCreateKeyWithoutRequiredTags",
+							"DenyInvalidEnvironmentTagValue",
+							"DenyRemovalOfRequiredTags",
+							"DenyAccessWithExceptionRole",
+						],
+					},
+					"ou-8m2b-sxjqqszq": {
+						"resource_control_policies": [],
+						"service_control_policies": [
+							"DenyDevKeyAccessExceptDevOU",
+							"DenyCreateKeyWithoutRequiredTags",
+							"DenyInvalidEnvironmentTagValue",
+							"DenyRemovalOfRequiredTags",
+						],
+					},
+					"r-8m2b": {
+						"resource_control_policies": [
+							"RCPEnforceIdentityPerimeter",
+							"RCPEnforceConfusedDeputyProtection",
+						],
+						"service_control_policies": [
+							"RequireMFAForCriticalKMSActions",
+							"PreventDisablingKeyRotation",
+							"EnforceAutomaticKeyRotation",
+							"EnforceKMSKeyWaitingPeriod",
+						],
+					},
+				},
+			},
+			"policy_details": {
+				"sensitive": false,
+			},
+			"root_account_id": {
+				"sensitive": false,
+				"value":     "r-8m2b",
+			},
+		},
+		"root_module": {
+			"child_modules": [
+				{
+					"address": "module.rcps",
+					"resources": [
+						{
+							"address":        "module.rcps.aws_organizations_policy.this[\"policies/resource_control_policy/DenyAccidentalDeletionKMSKey.json\"]",
+							"index":          "policies/resource_control_policy/DenyAccidentalDeletionKMSKey.json",
+							"mode":           "managed",
+							"name":           "this",
+							"provider_name":  "registry.terraform.io/hashicorp/aws",
+							"schema_version": 0,
+							"sensitive_values": {
+								"tags_all": {},
+							},
+							"type": "aws_organizations_policy",
+							"values": {
+								"content":      "{\n\t\"Version\": \"2012-10-17\",\n\t\"Statement\": [\n\t\t{\n\t\t\t\"Sid\": \"DenyAccidentalDeletionKMSKey\",\n\t\t\t\"Effect\": \"Deny\",\n\t\t\t\"Principal\": \"*\",\n\t\t\t\"Action\": [\n\t\t\t\t\"kms:ScheduleKeyDeletion\",\n\t\t\t\t\"kms:DeleteAlias\",\n\t\t\t\t\"kms:DeleteCustomKeyStore\",\n\t\t\t\t\"kms:DeleteImportedKeyMaterial\"\n\t\t\t],\n\t\t\t\"Resource\": \"*\",\n\t\t\t\"Condition\": {\n\t\t\t\t\"ArnNotLike\": {\n\t\t\t\t\t\"aws:PrincipalArn\": \"arn:aws:iam::069137988389:role/principal_MFA_KMS_poweruser\"\n\t\t\t\t},\n\t\t\t\t\"BoolIfExists\": {\n\t\t\t\t\t\"aws:PrincipalIsAWSService\": \"false\"\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t]\n}\n",
+								"description":  null,
+								"name":         "policies/resource_control_policy/DenyAccidentalDeletionKMSKey",
+								"skip_destroy": null,
+								"tags":         null,
+								"type":         "RESOURCE_CONTROL_POLICY",
+							},
+						},
+						{
+							"address":        "module.rcps.aws_organizations_policy.this[\"policies/resource_control_policy/RCPEnforceConfusedDeputyProtection.json\"]",
+							"index":          "policies/resource_control_policy/RCPEnforceConfusedDeputyProtection.json",
+							"mode":           "managed",
+							"name":           "this",
+							"provider_name":  "registry.terraform.io/hashicorp/aws",
+							"schema_version": 0,
+							"sensitive_values": {
+								"tags_all": {},
+							},
+							"type": "aws_organizations_policy",
+							"values": {
+								"content":      "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"RCPEnforceConfusedDeputyProtection\",\n      \"Effect\": \"Deny\",\n      \"Principal\": \"*\",\n      \"Action\": \"kms:*\",\n      \"Resource\": \"*\",\n      \"Condition\": {\n        \"StringNotEqualsIfExists\": {\n          \"aws:SourceOrgID\": \"o-tmrcrnyq86\"\n        },\n        \"Bool\": {\n          \"aws:PrincipalIsAWSService\": \"true\"\n        },\n        \"Null\": {\n          \"aws:SourceAccount\": \"false\"\n        }\n      }\n    }\n  ]\n}\n",
+								"description":  null,
+								"name":         "policies/resource_control_policy/RCPEnforceConfusedDeputyProtection",
+								"skip_destroy": null,
+								"tags":         null,
+								"type":         "RESOURCE_CONTROL_POLICY",
+							},
+						},
+						{
+							"address":        "module.rcps.aws_organizations_policy.this[\"policies/resource_control_policy/RCPEnforceIdentityPerimeter.json\"]",
+							"index":          "policies/resource_control_policy/RCPEnforceIdentityPerimeter.json",
+							"mode":           "managed",
+							"name":           "this",
+							"provider_name":  "registry.terraform.io/hashicorp/aws",
+							"schema_version": 0,
+							"sensitive_values": {
+								"tags_all": {},
+							},
+							"type": "aws_organizations_policy",
+							"values": {
+								"content":      "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"RCPEnforceIdentityPerimeter\",\n      \"Effect\": \"Deny\",\n      \"Principal\": \"*\",\n      \"Action\": \"kms:*\",\n      \"Resource\": \"*\",\n      \"Condition\": {\n        \"StringNotEqualsIfExists\": {\n          \"aws:PrincipalOrgID\": \"r-8m2b\"\n        },\n        \"Bool\": {\n          \"aws:PrincipalIsAWSService\": \"false\"\n        }\n      }\n    }\n  ]\n}\n",
+								"description":  null,
+								"name":         "policies/resource_control_policy/RCPEnforceIdentityPerimeter",
+								"skip_destroy": null,
+								"tags":         null,
+								"type":         "RESOURCE_CONTROL_POLICY",
+							},
+						},
+						{
+							"address":          "module.rcps.aws_organizations_policy_attachment.this[\"ou-8m2b-bod6k7sy-DenyAccidentalDeletionKMSKey\"]",
+							"index":            "ou-8m2b-bod6k7sy-DenyAccidentalDeletionKMSKey",
+							"mode":             "managed",
+							"name":             "this",
+							"provider_name":    "registry.terraform.io/hashicorp/aws",
+							"schema_version":   0,
+							"sensitive_values": {},
+							"type":             "aws_organizations_policy_attachment",
+							"values": {
+								"skip_destroy": null,
+								"target_id":    "ou-8m2b-bod6k7sy",
+							},
+						},
+						{
+							"address":          "module.rcps.aws_organizations_policy_attachment.this[\"r-8m2b-RCPEnforceConfusedDeputyProtection\"]",
+							"index":            "r-8m2b-RCPEnforceConfusedDeputyProtection",
+							"mode":             "managed",
+							"name":             "this",
+							"provider_name":    "registry.terraform.io/hashicorp/aws",
+							"schema_version":   0,
+							"sensitive_values": {},
+							"type":             "aws_organizations_policy_attachment",
+							"values": {
+								"skip_destroy": null,
+								"target_id":    "r-8m2b",
+							},
+						},
+						{
+							"address":          "module.rcps.aws_organizations_policy_attachment.this[\"r-8m2b-RCPEnforceIdentityPerimeter\"]",
+							"index":            "r-8m2b-RCPEnforceIdentityPerimeter",
+							"mode":             "managed",
+							"name":             "this",
+							"provider_name":    "registry.terraform.io/hashicorp/aws",
+							"schema_version":   0,
+							"sensitive_values": {},
+							"type":             "aws_organizations_policy_attachment",
+							"values": {
+								"skip_destroy": null,
+								"target_id":    "r-8m2b",
+							},
+						},
+					],
+				},
+				{
+					"address": "module.scps",
+					"resources": [
+						{
+							"address":        "module.scps.aws_organizations_policy.this[\"policies/service_control_policy/DenyAccessWithExceptionRole.json\"]",
+							"index":          "policies/service_control_policy/DenyAccessWithExceptionRole.json",
+							"mode":           "managed",
+							"name":           "this",
+							"provider_name":  "registry.terraform.io/hashicorp/aws",
+							"schema_version": 0,
+							"sensitive_values": {
+								"tags_all": {},
+							},
+							"type": "aws_organizations_policy",
+							"values": {
+								"content":      "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"DenyAccessWithExceptionRole\",\n      \"Effect\": \"Deny\",\n      \"Action\": [\n        \"kms:Create*\",\n        \"kms:Enable*\",\n        \"kms:Disable*\",\n        \"kms:Delete*\",\n        \"kms:Import*\",\n        \"kms:Rotate*\"\n      ],\n      \"Resource\": \"*\",\n      \"Condition\": {\n        \"StringNotLike\": {\n          \"aws:PrincipalArn\": [\n            \"arn:aws:iam::069137988389:role/principal_MFA_KMS_poweruser\"\n          ]\n        }\n      }\n    }\n  ]\n}\n",
+								"description":  null,
+								"name":         "policies/service_control_policy/DenyAccessWithExceptionRole",
+								"skip_destroy": null,
+								"tags":         null,
+								"type":         "SERVICE_CONTROL_POLICY",
+							},
+						},
+						{
+							"address":        "module.scps.aws_organizations_policy.this[\"policies/service_control_policy/DenyCreateKeyWithoutRequiredTags.json\"]",
+							"index":          "policies/service_control_policy/DenyCreateKeyWithoutRequiredTags.json",
+							"mode":           "managed",
+							"name":           "this",
+							"provider_name":  "registry.terraform.io/hashicorp/aws",
+							"schema_version": 0,
+							"sensitive_values": {
+								"tags_all": {},
+							},
+							"type": "aws_organizations_policy",
+							"values": {
+								"content":      "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"DenyCreateKeyWithoutRequiredTags\",\n      \"Effect\": \"Deny\",\n      \"Action\": [\n        \"kms:CreateKey\",\n        \"kms:CreateAlias\"\n      ],\n      \"Resource\": \"*\",\n      \"Condition\": {\n        \"Null\": {\n          \"aws:RequestTag/owner\": \"true\",\n          \"aws:RequestTag/environment\": \"true\",\n          \"aws:RequestTag/data-classification\": \"true\"\n        }\n      }\n    }\n  ]\n}\n",
+								"description":  null,
+								"name":         "policies/service_control_policy/DenyCreateKeyWithoutRequiredTags",
+								"skip_destroy": null,
+								"tags":         null,
+								"type":         "SERVICE_CONTROL_POLICY",
+							},
+						},
+						{
+							"address":        "module.scps.aws_organizations_policy.this[\"policies/service_control_policy/DenyDevKeyAccessExceptDevOU.json\"]",
+							"index":          "policies/service_control_policy/DenyDevKeyAccessExceptDevOU.json",
+							"mode":           "managed",
+							"name":           "this",
+							"provider_name":  "registry.terraform.io/hashicorp/aws",
+							"schema_version": 0,
+							"sensitive_values": {
+								"tags_all": {},
+							},
+							"type": "aws_organizations_policy",
+							"values": {
+								"content":      "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"DenyDevKeyAccessExceptDevOU\",\n      \"Effect\": \"Deny\",\n      \"Action\": [\n        \"kms:*\"\n      ],\n      \"Resource\": \"*\",\n      \"Condition\": {\n        \"StringEquals\": {\n          \"aws:ResourceTag/environment\": \"dev\"\n        },\n        \"ForAnyValue:StringNotLike\": {\n          \"aws:PrincipalOrgPaths\": \"/root/dev/*\"\n        }\n      }\n    }\n  ]\n}\n",
+								"description":  null,
+								"name":         "policies/service_control_policy/DenyDevKeyAccessExceptDevOU",
+								"skip_destroy": null,
+								"tags":         null,
+								"type":         "SERVICE_CONTROL_POLICY",
+							},
+						},
+						{
+							"address":        "module.scps.aws_organizations_policy.this[\"policies/service_control_policy/DenyInvalidEnvironmentTagValue.json\"]",
+							"index":          "policies/service_control_policy/DenyInvalidEnvironmentTagValue.json",
+							"mode":           "managed",
+							"name":           "this",
+							"provider_name":  "registry.terraform.io/hashicorp/aws",
+							"schema_version": 0,
+							"sensitive_values": {
+								"tags_all": {},
+							},
+							"type": "aws_organizations_policy",
+							"values": {
+								"content":      "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"DenyInvalidEnvironmentTagValue\",\n      \"Effect\": \"Deny\",\n      \"Action\": [\n        \"kms:CreateKey\",\n        \"kms:CreateAlias\",\n        \"kms:CreateCustomKeyStore\",\n        \"kms:TagResource\"\n      ],\n      \"Resource\": \"*\",\n      \"Condition\": {\n        \"ForAnyValue:StringNotLike\": {\n          \"aws:RequestTag/environment\": [\n            \"dev\",\n            \"prod\"\n          ],\n          \"aws:ResourceTag/data-classification\": [\n            \"confidential\",\n            \"internal\",\n            \"public\"\n          ]\n        }\n      }\n    }\n  ]\n}\n",
+								"description":  null,
+								"name":         "policies/service_control_policy/DenyInvalidEnvironmentTagValue",
+								"skip_destroy": null,
+								"tags":         null,
+								"type":         "SERVICE_CONTROL_POLICY",
+							},
+						},
+						{
+							"address":        "module.scps.aws_organizations_policy.this[\"policies/service_control_policy/DenyProdKeyAccessExceptProdOU.json\"]",
+							"index":          "policies/service_control_policy/DenyProdKeyAccessExceptProdOU.json",
+							"mode":           "managed",
+							"name":           "this",
+							"provider_name":  "registry.terraform.io/hashicorp/aws",
+							"schema_version": 0,
+							"sensitive_values": {
+								"tags_all": {},
+							},
+							"type": "aws_organizations_policy",
+							"values": {
+								"content":      "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"DenyProdKeyAccessExceptProdOU\",\n      \"Effect\": \"Deny\",\n      \"Action\": [\n        \"kms:*\"\n      ],\n      \"Resource\": \"*\",\n      \"Condition\": {\n        \"StringEquals\": {\n          \"aws:ResourceTag/environment\": \"prod\"\n        },\n        \"ForAnyValue:StringNotLike\": {\n          \"aws:PrincipalOrgPaths\": \"/root/prod/*\"\n        }\n      }\n    }\n  ]\n}\n",
+								"description":  null,
+								"name":         "policies/service_control_policy/DenyProdKeyAccessExceptProdOU",
+								"skip_destroy": null,
+								"tags":         null,
+								"type":         "SERVICE_CONTROL_POLICY",
+							},
+						},
+						{
+							"address":        "module.scps.aws_organizations_policy.this[\"policies/service_control_policy/DenyRemovalOfRequiredTags.json\"]",
+							"index":          "policies/service_control_policy/DenyRemovalOfRequiredTags.json",
+							"mode":           "managed",
+							"name":           "this",
+							"provider_name":  "registry.terraform.io/hashicorp/aws",
+							"schema_version": 0,
+							"sensitive_values": {
+								"tags_all": {},
+							},
+							"type": "aws_organizations_policy",
+							"values": {
+								"content":      "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"DenyRemovalOfRequiredTags\",\n      \"Effect\": \"Deny\",\n      \"Action\": [\n        \"kms:UntagResource\"\n      ],\n      \"Resource\": \"*\",\n      \"Condition\": {\n        \"StringEquals\": {\n          \"aws:TagKeys\": [\n            \"owner\",\n            \"environment\",\n            \"data-classification\"\n          ]\n        }\n      }\n    }\n  ]\n}\n",
+								"description":  null,
+								"name":         "policies/service_control_policy/DenyRemovalOfRequiredTags",
+								"skip_destroy": null,
+								"tags":         null,
+								"type":         "SERVICE_CONTROL_POLICY",
+							},
+						},
+						{
+							"address":        "module.scps.aws_organizations_policy.this[\"policies/service_control_policy/EnforceAutomaticKeyRotation.json\"]",
+							"index":          "policies/service_control_policy/EnforceAutomaticKeyRotation.json",
+							"mode":           "managed",
+							"name":           "this",
+							"provider_name":  "registry.terraform.io/hashicorp/aws",
+							"schema_version": 0,
+							"sensitive_values": {
+								"tags_all": {},
+							},
+							"type": "aws_organizations_policy",
+							"values": {
+								"content":      "{\n    \"Version\": \"2012-10-17\",\n    \"Statement\": [\n        {\n            \"Sid\": \"EnforceAutomaticKeyRotation\",\n            \"Effect\": \"Deny\",\n            \"Action\": [\n                \"kms:CreateKey\"\n            ],\n            \"Resource\": \"*\",\n            \"Condition\": {\n                \"Bool\": {\n                    \"kms:BypassPolicyLockoutSafetyCheck\": \"false\"\n                },\n                \"Null\": {\n                    \"kms:RotationPeriodInDays\": []\n                }\n            }\n        }\n    ]\n}\n",
+								"description":  null,
+								"name":         "policies/service_control_policy/EnforceAutomaticKeyRotation",
+								"skip_destroy": null,
+								"tags":         null,
+								"type":         "SERVICE_CONTROL_POLICY",
+							},
+						},
+						{
+							"address":        "module.scps.aws_organizations_policy.this[\"policies/service_control_policy/EnforceKMSKeyWaitingPeriod.json\"]",
+							"index":          "policies/service_control_policy/EnforceKMSKeyWaitingPeriod.json",
+							"mode":           "managed",
+							"name":           "this",
+							"provider_name":  "registry.terraform.io/hashicorp/aws",
+							"schema_version": 0,
+							"sensitive_values": {
+								"tags_all": {},
+							},
+							"type": "aws_organizations_policy",
+							"values": {
+								"content":      "{\n\t\"Version\": \"2012-10-17\",\n\t\"Statement\": [\n\t\t{\n\t\t\t\"Sid\": \"EnforceKMSKeyWaitingPeriod\",\n\t\t\t\"Effect\": \"Deny\",\n\t\t\t\"Action\": [\n\t\t\t\t\"kms:ScheduleKeyDeletion\"\n\t\t\t],\n\t\t\t\"Resource\": \"*\",\n\t\t\t\"Condition\": {\n\t\t\t\t\"NumericLessThan\": {\n\t\t\t\t\t\"kms:ScheduleKeyDeletionPendingWindowInDays\": \"30\"\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t]\n}\n",
+								"description":  null,
+								"name":         "policies/service_control_policy/EnforceKMSKeyWaitingPeriod",
+								"skip_destroy": null,
+								"tags":         null,
+								"type":         "SERVICE_CONTROL_POLICY",
+							},
+						},
+						{
+							"address":        "module.scps.aws_organizations_policy.this[\"policies/service_control_policy/PreventDisablingKeyRotation.json\"]",
+							"index":          "policies/service_control_policy/PreventDisablingKeyRotation.json",
+							"mode":           "managed",
+							"name":           "this",
+							"provider_name":  "registry.terraform.io/hashicorp/aws",
+							"schema_version": 0,
+							"sensitive_values": {
+								"tags_all": {},
+							},
+							"type": "aws_organizations_policy",
+							"values": {
+								"content":      "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"PreventDisablingKeyRotation\",\n      \"Effect\": \"Deny\",\n      \"Action\": [\n          \"kms:DisableKeyRotation\"\n      ],\n      \"Resource\": \"*\"\n  }\n  ]\n}\n",
+								"description":  null,
+								"name":         "policies/service_control_policy/PreventDisablingKeyRotation",
+								"skip_destroy": null,
+								"tags":         null,
+								"type":         "SERVICE_CONTROL_POLICY",
+							},
+						},
+						{
+							"address":        "module.scps.aws_organizations_policy.this[\"policies/service_control_policy/RequireMFAForCriticalKMSActions.json\"]",
+							"index":          "policies/service_control_policy/RequireMFAForCriticalKMSActions.json",
+							"mode":           "managed",
+							"name":           "this",
+							"provider_name":  "registry.terraform.io/hashicorp/aws",
+							"schema_version": 0,
+							"sensitive_values": {
+								"tags_all": {},
+							},
+							"type": "aws_organizations_policy",
+							"values": {
+								"content":      "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"RequireMFAForCriticalKMSActions\",\n      \"Effect\": \"Deny\",\n      \"Action\": [\n        \"kms:ScheduleKeyDeletion\",\n        \"kms:DeleteImportedKeyMaterial\",\n        \"kms:DisableKey\",\n        \"kms:UpdateKeyDescription\",\n        \"kms:ImportKeyMaterial\",\n        \"kms:CreateKey\",\n        \"kms:DeleteCustomKeyStore\",\n        \"kms:UpdateCustomKeyStore\",\n        \"kms:CreateCustomKeyStore\",\n        \"kms:EnableKey\",\n        \"kms:PutKeyPolicy\",\n        \"kms:UpdateAlias\",\n        \"kms:CreateAlias\",\n        \"kms:DeleteAlias\",\n        \"kms:ConnectCustomKeyStore\",\n        \"kms:DisconnectCustomKeyStore\"\n      ],\n      \"Resource\": \"*\",\n      \"Condition\": {\n        \"BoolIfExists\": {\n          \"aws:MultiFactorAuthPresent\": \"false\"\n        }\n      }\n    }\n  ]\n}\n",
+								"description":  null,
+								"name":         "policies/service_control_policy/RequireMFAForCriticalKMSActions",
+								"skip_destroy": null,
+								"tags":         null,
+								"type":         "SERVICE_CONTROL_POLICY",
+							},
+						},
+						{
+							"address":          "module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-bod6k7sy-DenyAccessWithExceptionRole\"]",
+							"index":            "ou-8m2b-bod6k7sy-DenyAccessWithExceptionRole",
+							"mode":             "managed",
+							"name":             "this",
+							"provider_name":    "registry.terraform.io/hashicorp/aws",
+							"schema_version":   0,
+							"sensitive_values": {},
+							"type":             "aws_organizations_policy_attachment",
+							"values": {
+								"skip_destroy": null,
+								"target_id":    "ou-8m2b-bod6k7sy",
+							},
+						},
+						{
+							"address":          "module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-bod6k7sy-DenyCreateKeyWithoutRequiredTags\"]",
+							"index":            "ou-8m2b-bod6k7sy-DenyCreateKeyWithoutRequiredTags",
+							"mode":             "managed",
+							"name":             "this",
+							"provider_name":    "registry.terraform.io/hashicorp/aws",
+							"schema_version":   0,
+							"sensitive_values": {},
+							"type":             "aws_organizations_policy_attachment",
+							"values": {
+								"skip_destroy": null,
+								"target_id":    "ou-8m2b-bod6k7sy",
+							},
+						},
+						{
+							"address":          "module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-bod6k7sy-DenyInvalidEnvironmentTagValue\"]",
+							"index":            "ou-8m2b-bod6k7sy-DenyInvalidEnvironmentTagValue",
+							"mode":             "managed",
+							"name":             "this",
+							"provider_name":    "registry.terraform.io/hashicorp/aws",
+							"schema_version":   0,
+							"sensitive_values": {},
+							"type":             "aws_organizations_policy_attachment",
+							"values": {
+								"skip_destroy": null,
+								"target_id":    "ou-8m2b-bod6k7sy",
+							},
+						},
+						{
+							"address":          "module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-bod6k7sy-DenyProdKeyAccessExceptProdOU\"]",
+							"index":            "ou-8m2b-bod6k7sy-DenyProdKeyAccessExceptProdOU",
+							"mode":             "managed",
+							"name":             "this",
+							"provider_name":    "registry.terraform.io/hashicorp/aws",
+							"schema_version":   0,
+							"sensitive_values": {},
+							"type":             "aws_organizations_policy_attachment",
+							"values": {
+								"skip_destroy": null,
+								"target_id":    "ou-8m2b-bod6k7sy",
+							},
+						},
+						{
+							"address":          "module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-bod6k7sy-DenyRemovalOfRequiredTags\"]",
+							"index":            "ou-8m2b-bod6k7sy-DenyRemovalOfRequiredTags",
+							"mode":             "managed",
+							"name":             "this",
+							"provider_name":    "registry.terraform.io/hashicorp/aws",
+							"schema_version":   0,
+							"sensitive_values": {},
+							"type":             "aws_organizations_policy_attachment",
+							"values": {
+								"skip_destroy": null,
+								"target_id":    "ou-8m2b-bod6k7sy",
+							},
+						},
+						{
+							"address":          "module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-sxjqqszq-DenyCreateKeyWithoutRequiredTags\"]",
+							"index":            "ou-8m2b-sxjqqszq-DenyCreateKeyWithoutRequiredTags",
+							"mode":             "managed",
+							"name":             "this",
+							"provider_name":    "registry.terraform.io/hashicorp/aws",
+							"schema_version":   0,
+							"sensitive_values": {},
+							"type":             "aws_organizations_policy_attachment",
+							"values": {
+								"skip_destroy": null,
+								"target_id":    "ou-8m2b-sxjqqszq",
+							},
+						},
+						{
+							"address":          "module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-sxjqqszq-DenyDevKeyAccessExceptDevOU\"]",
+							"index":            "ou-8m2b-sxjqqszq-DenyDevKeyAccessExceptDevOU",
+							"mode":             "managed",
+							"name":             "this",
+							"provider_name":    "registry.terraform.io/hashicorp/aws",
+							"schema_version":   0,
+							"sensitive_values": {},
+							"type":             "aws_organizations_policy_attachment",
+							"values": {
+								"skip_destroy": null,
+								"target_id":    "ou-8m2b-sxjqqszq",
+							},
+						},
+						{
+							"address":          "module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-sxjqqszq-DenyInvalidEnvironmentTagValue\"]",
+							"index":            "ou-8m2b-sxjqqszq-DenyInvalidEnvironmentTagValue",
+							"mode":             "managed",
+							"name":             "this",
+							"provider_name":    "registry.terraform.io/hashicorp/aws",
+							"schema_version":   0,
+							"sensitive_values": {},
+							"type":             "aws_organizations_policy_attachment",
+							"values": {
+								"skip_destroy": null,
+								"target_id":    "ou-8m2b-sxjqqszq",
+							},
+						},
+						{
+							"address":          "module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-sxjqqszq-DenyRemovalOfRequiredTags\"]",
+							"index":            "ou-8m2b-sxjqqszq-DenyRemovalOfRequiredTags",
+							"mode":             "managed",
+							"name":             "this",
+							"provider_name":    "registry.terraform.io/hashicorp/aws",
+							"schema_version":   0,
+							"sensitive_values": {},
+							"type":             "aws_organizations_policy_attachment",
+							"values": {
+								"skip_destroy": null,
+								"target_id":    "ou-8m2b-sxjqqszq",
+							},
+						},
+						{
+							"address":          "module.scps.aws_organizations_policy_attachment.this[\"r-8m2b-EnforceAutomaticKeyRotation\"]",
+							"index":            "r-8m2b-EnforceAutomaticKeyRotation",
+							"mode":             "managed",
+							"name":             "this",
+							"provider_name":    "registry.terraform.io/hashicorp/aws",
+							"schema_version":   0,
+							"sensitive_values": {},
+							"type":             "aws_organizations_policy_attachment",
+							"values": {
+								"skip_destroy": null,
+								"target_id":    "r-8m2b",
+							},
+						},
+						{
+							"address":          "module.scps.aws_organizations_policy_attachment.this[\"r-8m2b-EnforceKMSKeyWaitingPeriod\"]",
+							"index":            "r-8m2b-EnforceKMSKeyWaitingPeriod",
+							"mode":             "managed",
+							"name":             "this",
+							"provider_name":    "registry.terraform.io/hashicorp/aws",
+							"schema_version":   0,
+							"sensitive_values": {},
+							"type":             "aws_organizations_policy_attachment",
+							"values": {
+								"skip_destroy": null,
+								"target_id":    "r-8m2b",
+							},
+						},
+						{
+							"address":          "module.scps.aws_organizations_policy_attachment.this[\"r-8m2b-PreventDisablingKeyRotation\"]",
+							"index":            "r-8m2b-PreventDisablingKeyRotation",
+							"mode":             "managed",
+							"name":             "this",
+							"provider_name":    "registry.terraform.io/hashicorp/aws",
+							"schema_version":   0,
+							"sensitive_values": {},
+							"type":             "aws_organizations_policy_attachment",
+							"values": {
+								"skip_destroy": null,
+								"target_id":    "r-8m2b",
+							},
+						},
+						{
+							"address":          "module.scps.aws_organizations_policy_attachment.this[\"r-8m2b-RequireMFAForCriticalKMSActions\"]",
+							"index":            "r-8m2b-RequireMFAForCriticalKMSActions",
+							"mode":             "managed",
+							"name":             "this",
+							"provider_name":    "registry.terraform.io/hashicorp/aws",
+							"schema_version":   0,
+							"sensitive_values": {},
+							"type":             "aws_organizations_policy_attachment",
+							"values": {
+								"skip_destroy": null,
+								"target_id":    "r-8m2b",
+							},
+						},
+					],
+				},
+			],
+		},
+	},
+	"prior_state": {
+		"format_version":    "1.0",
+		"terraform_version": "1.11.4",
+		"values": {
+			"outputs": {
+				"ou_map_list": {
+					"sensitive": false,
+					"value": {
+						"dev": {
+							"arn":       "arn:aws:organizations::069137988389:ou/o-tmrcrnyq86/ou-8m2b-sxjqqszq",
+							"id":        "ou-8m2b-sxjqqszq",
+							"name":      "dev",
+							"parent_id": "r-8m2b",
+						},
+						"prod": {
+							"arn":       "arn:aws:organizations::069137988389:ou/o-tmrcrnyq86/ou-8m2b-bod6k7sy",
+							"id":        "ou-8m2b-bod6k7sy",
+							"name":      "prod",
+							"parent_id": "r-8m2b",
+						},
+					},
+				},
+				"policy_attachments": {
+					"sensitive": false,
+					"value": {
+						"ou-8m2b-bod6k7sy": {
+							"resource_control_policies": [
+								"DenyAccidentalDeletionKMSKey",
+							],
+							"service_control_policies": [
+								"DenyProdKeyAccessExceptProdOU",
+								"DenyCreateKeyWithoutRequiredTags",
+								"DenyInvalidEnvironmentTagValue",
+								"DenyRemovalOfRequiredTags",
+								"DenyAccessWithExceptionRole",
+							],
+						},
+						"ou-8m2b-sxjqqszq": {
+							"resource_control_policies": [],
+							"service_control_policies": [
+								"DenyDevKeyAccessExceptDevOU",
+								"DenyCreateKeyWithoutRequiredTags",
+								"DenyInvalidEnvironmentTagValue",
+								"DenyRemovalOfRequiredTags",
+							],
+						},
+						"r-8m2b": {
+							"resource_control_policies": [
+								"RCPEnforceIdentityPerimeter",
+								"RCPEnforceConfusedDeputyProtection",
+							],
+							"service_control_policies": [
+								"RequireMFAForCriticalKMSActions",
+								"PreventDisablingKeyRotation",
+								"EnforceAutomaticKeyRotation",
+								"EnforceKMSKeyWaitingPeriod",
+							],
+						},
+					},
+				},
+				"root_account_id": {
+					"sensitive": false,
+					"value":     "r-8m2b",
+				},
+			},
+			"root_module": {
+				"resources": [
+					{
+						"address":        "data.aws_organizations_organization.org",
+						"mode":           "data",
+						"name":           "org",
+						"provider_name":  "registry.terraform.io/hashicorp/aws",
+						"schema_version": 0,
+						"sensitive_values": {
+							"accounts": [
+								{},
+								{},
+							],
+							"aws_service_access_principals": [
+								false,
+								false,
+							],
+							"enabled_policy_types": [
+								false,
+								false,
+							],
+							"non_master_accounts": [
+								{},
+							],
+							"roots": [
+								{
+									"policy_types": [
+										{},
+										{},
+									],
+								},
+							],
+						},
+						"type": "aws_organizations_organization",
+						"values": {
+							"accounts": [
+								{
+									"arn":    "arn:aws:organizations::069137988389:account/o-tmrcrnyq86/069137988389",
+									"email":  "browbeat-cut-arise@duck.com",
+									"id":     "069137988389",
+									"name":   "browbeat",
+									"status": "ACTIVE",
+								},
+								{
+									"arn":    "arn:aws:organizations::069137988389:account/o-tmrcrnyq86/160074121212",
+									"email":  "sappy-cursive-onto@duck.com",
+									"id":     "160074121212",
+									"name":   "prod",
+									"status": "ACTIVE",
+								},
+							],
+							"arn": "arn:aws:organizations::069137988389:organization/o-tmrcrnyq86",
+							"aws_service_access_principals": [
+								"compute-optimizer.amazonaws.com",
+								"cost-optimization-hub.bcm.amazonaws.com",
+							],
+							"enabled_policy_types": [
+								"RESOURCE_CONTROL_POLICY",
+								"SERVICE_CONTROL_POLICY",
+							],
+							"feature_set":          "ALL",
+							"id":                   "o-tmrcrnyq86",
+							"master_account_arn":   "arn:aws:organizations::069137988389:account/o-tmrcrnyq86/069137988389",
+							"master_account_email": "browbeat-cut-arise@duck.com",
+							"master_account_id":    "069137988389",
+							"master_account_name":  "browbeat",
+							"non_master_accounts": [
+								{
+									"arn":    "arn:aws:organizations::069137988389:account/o-tmrcrnyq86/160074121212",
+									"email":  "sappy-cursive-onto@duck.com",
+									"id":     "160074121212",
+									"name":   "prod",
+									"status": "ACTIVE",
+								},
+							],
+							"roots": [
+								{
+									"arn":  "arn:aws:organizations::069137988389:root/o-tmrcrnyq86/r-8m2b",
+									"id":   "r-8m2b",
+									"name": "Root",
+									"policy_types": [
+										{
+											"status": "ENABLED",
+											"type":   "RESOURCE_CONTROL_POLICY",
+										},
+										{
+											"status": "ENABLED",
+											"type":   "SERVICE_CONTROL_POLICY",
+										},
+									],
+								},
+							],
+						},
+					},
+					{
+						"address":          "data.aws_organizations_organizational_unit.list[\"dev\"]",
+						"index":            "dev",
+						"mode":             "data",
+						"name":             "list",
+						"provider_name":    "registry.terraform.io/hashicorp/aws",
+						"schema_version":   0,
+						"sensitive_values": {},
+						"type":             "aws_organizations_organizational_unit",
+						"values": {
+							"arn":       "arn:aws:organizations::069137988389:ou/o-tmrcrnyq86/ou-8m2b-sxjqqszq",
+							"id":        "ou-8m2b-sxjqqszq",
+							"name":      "dev",
+							"parent_id": "r-8m2b",
+						},
+					},
+					{
+						"address":          "data.aws_organizations_organizational_unit.list[\"prod\"]",
+						"index":            "prod",
+						"mode":             "data",
+						"name":             "list",
+						"provider_name":    "registry.terraform.io/hashicorp/aws",
+						"schema_version":   0,
+						"sensitive_values": {},
+						"type":             "aws_organizations_organizational_unit",
+						"values": {
+							"arn":       "arn:aws:organizations::069137988389:ou/o-tmrcrnyq86/ou-8m2b-bod6k7sy",
+							"id":        "ou-8m2b-bod6k7sy",
+							"name":      "prod",
+							"parent_id": "r-8m2b",
+						},
+					},
+				],
+			},
+		},
+	},
+	"relevant_attributes": [
+		{
+			"attribute": [],
+			"resource":  "data.aws_organizations_organizational_unit.list",
+		},
+		{
+			"attribute": [
+				"id",
+			],
+			"resource": "data.aws_organizations_organizational_unit.list[\"dev\"]",
+		},
+		{
+			"attribute": [],
+			"resource":  "module.rcps.aws_organizations_policy.this",
+		},
+		{
+			"attribute": [],
+			"resource":  "module.scps.aws_organizations_policy.this",
+		},
+		{
+			"attribute": [
+				"roots",
+				0,
+				"id",
+			],
+			"resource": "data.aws_organizations_organization.org",
+		},
+		{
+			"attribute": [
+				"id",
+			],
+			"resource": "data.aws_organizations_organizational_unit.list[\"prod\"]",
+		},
+	],
+	"resource_changes": [
+		{
+			"address": "module.rcps.aws_organizations_policy.this[\"policies/resource_control_policy/DenyAccidentalDeletionKMSKey.json\"]",
+			"change": {
+				"actions": [
+					"create",
+				],
+				"after": {
+					"content":      "{\n\t\"Version\": \"2012-10-17\",\n\t\"Statement\": [\n\t\t{\n\t\t\t\"Sid\": \"DenyAccidentalDeletionKMSKey\",\n\t\t\t\"Effect\": \"Deny\",\n\t\t\t\"Principal\": \"*\",\n\t\t\t\"Action\": [\n\t\t\t\t\"kms:ScheduleKeyDeletion\",\n\t\t\t\t\"kms:DeleteAlias\",\n\t\t\t\t\"kms:DeleteCustomKeyStore\",\n\t\t\t\t\"kms:DeleteImportedKeyMaterial\"\n\t\t\t],\n\t\t\t\"Resource\": \"*\",\n\t\t\t\"Condition\": {\n\t\t\t\t\"ArnNotLike\": {\n\t\t\t\t\t\"aws:PrincipalArn\": \"arn:aws:iam::069137988389:role/principal_MFA_KMS_poweruser\"\n\t\t\t\t},\n\t\t\t\t\"BoolIfExists\": {\n\t\t\t\t\t\"aws:PrincipalIsAWSService\": \"false\"\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t]\n}\n",
+					"description":  null,
+					"name":         "policies/resource_control_policy/DenyAccidentalDeletionKMSKey",
+					"skip_destroy": null,
+					"tags":         null,
+					"type":         "RESOURCE_CONTROL_POLICY",
+				},
+				"after_sensitive": {
+					"tags_all": {},
+				},
+				"after_unknown": {
+					"arn":      true,
+					"id":       true,
+					"tags_all": true,
+				},
+				"before":           null,
+				"before_sensitive": false,
+			},
+			"index":          "policies/resource_control_policy/DenyAccidentalDeletionKMSKey.json",
+			"mode":           "managed",
+			"module_address": "module.rcps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"type":           "aws_organizations_policy",
+		},
+		{
+			"address": "module.rcps.aws_organizations_policy.this[\"policies/resource_control_policy/RCPEnforceConfusedDeputyProtection.json\"]",
+			"change": {
+				"actions": [
+					"create",
+				],
+				"after": {
+					"content":      "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"RCPEnforceConfusedDeputyProtection\",\n      \"Effect\": \"Deny\",\n      \"Principal\": \"*\",\n      \"Action\": \"kms:*\",\n      \"Resource\": \"*\",\n      \"Condition\": {\n        \"StringNotEqualsIfExists\": {\n          \"aws:SourceOrgID\": \"o-tmrcrnyq86\"\n        },\n        \"Bool\": {\n          \"aws:PrincipalIsAWSService\": \"true\"\n        },\n        \"Null\": {\n          \"aws:SourceAccount\": \"false\"\n        }\n      }\n    }\n  ]\n}\n",
+					"description":  null,
+					"name":         "policies/resource_control_policy/RCPEnforceConfusedDeputyProtection",
+					"skip_destroy": null,
+					"tags":         null,
+					"type":         "RESOURCE_CONTROL_POLICY",
+				},
+				"after_sensitive": {
+					"tags_all": {},
+				},
+				"after_unknown": {
+					"arn":      true,
+					"id":       true,
+					"tags_all": true,
+				},
+				"before":           null,
+				"before_sensitive": false,
+			},
+			"index":          "policies/resource_control_policy/RCPEnforceConfusedDeputyProtection.json",
+			"mode":           "managed",
+			"module_address": "module.rcps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"type":           "aws_organizations_policy",
+		},
+		{
+			"address": "module.rcps.aws_organizations_policy.this[\"policies/resource_control_policy/RCPEnforceIdentityPerimeter.json\"]",
+			"change": {
+				"actions": [
+					"create",
+				],
+				"after": {
+					"content":      "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"RCPEnforceIdentityPerimeter\",\n      \"Effect\": \"Deny\",\n      \"Principal\": \"*\",\n      \"Action\": \"kms:*\",\n      \"Resource\": \"*\",\n      \"Condition\": {\n        \"StringNotEqualsIfExists\": {\n          \"aws:PrincipalOrgID\": \"r-8m2b\"\n        },\n        \"Bool\": {\n          \"aws:PrincipalIsAWSService\": \"false\"\n        }\n      }\n    }\n  ]\n}\n",
+					"description":  null,
+					"name":         "policies/resource_control_policy/RCPEnforceIdentityPerimeter",
+					"skip_destroy": null,
+					"tags":         null,
+					"type":         "RESOURCE_CONTROL_POLICY",
+				},
+				"after_sensitive": {
+					"tags_all": {},
+				},
+				"after_unknown": {
+					"arn":      true,
+					"id":       true,
+					"tags_all": true,
+				},
+				"before":           null,
+				"before_sensitive": false,
+			},
+			"index":          "policies/resource_control_policy/RCPEnforceIdentityPerimeter.json",
+			"mode":           "managed",
+			"module_address": "module.rcps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"type":           "aws_organizations_policy",
+		},
+		{
+			"address": "module.rcps.aws_organizations_policy_attachment.this[\"ou-8m2b-bod6k7sy-DenyAccidentalDeletionKMSKey\"]",
+			"change": {
+				"actions": [
+					"create",
+				],
+				"after": {
+					"skip_destroy": null,
+					"target_id":    "ou-8m2b-bod6k7sy",
+				},
+				"after_sensitive": {},
+				"after_unknown": {
+					"id":        true,
+					"policy_id": true,
+				},
+				"before":           null,
+				"before_sensitive": false,
+			},
+			"index":          "ou-8m2b-bod6k7sy-DenyAccidentalDeletionKMSKey",
+			"mode":           "managed",
+			"module_address": "module.rcps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"type":           "aws_organizations_policy_attachment",
+		},
+		{
+			"address": "module.rcps.aws_organizations_policy_attachment.this[\"r-8m2b-RCPEnforceConfusedDeputyProtection\"]",
+			"change": {
+				"actions": [
+					"create",
+				],
+				"after": {
+					"skip_destroy": null,
+					"target_id":    "r-8m2b",
+				},
+				"after_sensitive": {},
+				"after_unknown": {
+					"id":        true,
+					"policy_id": true,
+				},
+				"before":           null,
+				"before_sensitive": false,
+			},
+			"index":          "r-8m2b-RCPEnforceConfusedDeputyProtection",
+			"mode":           "managed",
+			"module_address": "module.rcps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"type":           "aws_organizations_policy_attachment",
+		},
+		{
+			"address": "module.rcps.aws_organizations_policy_attachment.this[\"r-8m2b-RCPEnforceIdentityPerimeter\"]",
+			"change": {
+				"actions": [
+					"create",
+				],
+				"after": {
+					"skip_destroy": null,
+					"target_id":    "r-8m2b",
+				},
+				"after_sensitive": {},
+				"after_unknown": {
+					"id":        true,
+					"policy_id": true,
+				},
+				"before":           null,
+				"before_sensitive": false,
+			},
+			"index":          "r-8m2b-RCPEnforceIdentityPerimeter",
+			"mode":           "managed",
+			"module_address": "module.rcps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"type":           "aws_organizations_policy_attachment",
+		},
+		{
+			"address": "module.scps.aws_organizations_policy.this[\"policies/service_control_policy/DenyAccessWithExceptionRole.json\"]",
+			"change": {
+				"actions": [
+					"create",
+				],
+				"after": {
+					"content":      "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"DenyAccessWithExceptionRole\",\n      \"Effect\": \"Deny\",\n      \"Action\": [\n        \"kms:Create*\",\n        \"kms:Enable*\",\n        \"kms:Disable*\",\n        \"kms:Delete*\",\n        \"kms:Import*\",\n        \"kms:Rotate*\"\n      ],\n      \"Resource\": \"*\",\n      \"Condition\": {\n        \"StringNotLike\": {\n          \"aws:PrincipalArn\": [\n            \"arn:aws:iam::069137988389:role/principal_MFA_KMS_poweruser\"\n          ]\n        }\n      }\n    }\n  ]\n}\n",
+					"description":  null,
+					"name":         "policies/service_control_policy/DenyAccessWithExceptionRole",
+					"skip_destroy": null,
+					"tags":         null,
+					"type":         "SERVICE_CONTROL_POLICY",
+				},
+				"after_sensitive": {
+					"tags_all": {},
+				},
+				"after_unknown": {
+					"arn":      true,
+					"id":       true,
+					"tags_all": true,
+				},
+				"before":           null,
+				"before_sensitive": false,
+			},
+			"index":          "policies/service_control_policy/DenyAccessWithExceptionRole.json",
+			"mode":           "managed",
+			"module_address": "module.scps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"type":           "aws_organizations_policy",
+		},
+		{
+			"address": "module.scps.aws_organizations_policy.this[\"policies/service_control_policy/DenyCreateKeyWithoutRequiredTags.json\"]",
+			"change": {
+				"actions": [
+					"create",
+				],
+				"after": {
+					"content":      "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"DenyCreateKeyWithoutRequiredTags\",\n      \"Effect\": \"Deny\",\n      \"Action\": [\n        \"kms:CreateKey\",\n        \"kms:CreateAlias\"\n      ],\n      \"Resource\": \"*\",\n      \"Condition\": {\n        \"Null\": {\n          \"aws:RequestTag/owner\": \"true\",\n          \"aws:RequestTag/environment\": \"true\",\n          \"aws:RequestTag/data-classification\": \"true\"\n        }\n      }\n    }\n  ]\n}\n",
+					"description":  null,
+					"name":         "policies/service_control_policy/DenyCreateKeyWithoutRequiredTags",
+					"skip_destroy": null,
+					"tags":         null,
+					"type":         "SERVICE_CONTROL_POLICY",
+				},
+				"after_sensitive": {
+					"tags_all": {},
+				},
+				"after_unknown": {
+					"arn":      true,
+					"id":       true,
+					"tags_all": true,
+				},
+				"before":           null,
+				"before_sensitive": false,
+			},
+			"index":          "policies/service_control_policy/DenyCreateKeyWithoutRequiredTags.json",
+			"mode":           "managed",
+			"module_address": "module.scps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"type":           "aws_organizations_policy",
+		},
+		{
+			"address": "module.scps.aws_organizations_policy.this[\"policies/service_control_policy/DenyDevKeyAccessExceptDevOU.json\"]",
+			"change": {
+				"actions": [
+					"create",
+				],
+				"after": {
+					"content":      "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"DenyDevKeyAccessExceptDevOU\",\n      \"Effect\": \"Deny\",\n      \"Action\": [\n        \"kms:*\"\n      ],\n      \"Resource\": \"*\",\n      \"Condition\": {\n        \"StringEquals\": {\n          \"aws:ResourceTag/environment\": \"dev\"\n        },\n        \"ForAnyValue:StringNotLike\": {\n          \"aws:PrincipalOrgPaths\": \"/root/dev/*\"\n        }\n      }\n    }\n  ]\n}\n",
+					"description":  null,
+					"name":         "policies/service_control_policy/DenyDevKeyAccessExceptDevOU",
+					"skip_destroy": null,
+					"tags":         null,
+					"type":         "SERVICE_CONTROL_POLICY",
+				},
+				"after_sensitive": {
+					"tags_all": {},
+				},
+				"after_unknown": {
+					"arn":      true,
+					"id":       true,
+					"tags_all": true,
+				},
+				"before":           null,
+				"before_sensitive": false,
+			},
+			"index":          "policies/service_control_policy/DenyDevKeyAccessExceptDevOU.json",
+			"mode":           "managed",
+			"module_address": "module.scps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"type":           "aws_organizations_policy",
+		},
+		{
+			"address": "module.scps.aws_organizations_policy.this[\"policies/service_control_policy/DenyInvalidEnvironmentTagValue.json\"]",
+			"change": {
+				"actions": [
+					"create",
+				],
+				"after": {
+					"content":      "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"DenyInvalidEnvironmentTagValue\",\n      \"Effect\": \"Deny\",\n      \"Action\": [\n        \"kms:CreateKey\",\n        \"kms:CreateAlias\",\n        \"kms:CreateCustomKeyStore\",\n        \"kms:TagResource\"\n      ],\n      \"Resource\": \"*\",\n      \"Condition\": {\n        \"ForAnyValue:StringNotLike\": {\n          \"aws:RequestTag/environment\": [\n            \"dev\",\n            \"prod\"\n          ],\n          \"aws:ResourceTag/data-classification\": [\n            \"confidential\",\n            \"internal\",\n            \"public\"\n          ]\n        }\n      }\n    }\n  ]\n}\n",
+					"description":  null,
+					"name":         "policies/service_control_policy/DenyInvalidEnvironmentTagValue",
+					"skip_destroy": null,
+					"tags":         null,
+					"type":         "SERVICE_CONTROL_POLICY",
+				},
+				"after_sensitive": {
+					"tags_all": {},
+				},
+				"after_unknown": {
+					"arn":      true,
+					"id":       true,
+					"tags_all": true,
+				},
+				"before":           null,
+				"before_sensitive": false,
+			},
+			"index":          "policies/service_control_policy/DenyInvalidEnvironmentTagValue.json",
+			"mode":           "managed",
+			"module_address": "module.scps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"type":           "aws_organizations_policy",
+		},
+		{
+			"address": "module.scps.aws_organizations_policy.this[\"policies/service_control_policy/DenyProdKeyAccessExceptProdOU.json\"]",
+			"change": {
+				"actions": [
+					"create",
+				],
+				"after": {
+					"content":      "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"DenyProdKeyAccessExceptProdOU\",\n      \"Effect\": \"Deny\",\n      \"Action\": [\n        \"kms:*\"\n      ],\n      \"Resource\": \"*\",\n      \"Condition\": {\n        \"StringEquals\": {\n          \"aws:ResourceTag/environment\": \"prod\"\n        },\n        \"ForAnyValue:StringNotLike\": {\n          \"aws:PrincipalOrgPaths\": \"/root/prod/*\"\n        }\n      }\n    }\n  ]\n}\n",
+					"description":  null,
+					"name":         "policies/service_control_policy/DenyProdKeyAccessExceptProdOU",
+					"skip_destroy": null,
+					"tags":         null,
+					"type":         "SERVICE_CONTROL_POLICY",
+				},
+				"after_sensitive": {
+					"tags_all": {},
+				},
+				"after_unknown": {
+					"arn":      true,
+					"id":       true,
+					"tags_all": true,
+				},
+				"before":           null,
+				"before_sensitive": false,
+			},
+			"index":          "policies/service_control_policy/DenyProdKeyAccessExceptProdOU.json",
+			"mode":           "managed",
+			"module_address": "module.scps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"type":           "aws_organizations_policy",
+		},
+		{
+			"address": "module.scps.aws_organizations_policy.this[\"policies/service_control_policy/DenyRemovalOfRequiredTags.json\"]",
+			"change": {
+				"actions": [
+					"create",
+				],
+				"after": {
+					"content":      "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"DenyRemovalOfRequiredTags\",\n      \"Effect\": \"Deny\",\n      \"Action\": [\n        \"kms:UntagResource\"\n      ],\n      \"Resource\": \"*\",\n      \"Condition\": {\n        \"StringEquals\": {\n          \"aws:TagKeys\": [\n            \"owner\",\n            \"environment\",\n            \"data-classification\"\n          ]\n        }\n      }\n    }\n  ]\n}\n",
+					"description":  null,
+					"name":         "policies/service_control_policy/DenyRemovalOfRequiredTags",
+					"skip_destroy": null,
+					"tags":         null,
+					"type":         "SERVICE_CONTROL_POLICY",
+				},
+				"after_sensitive": {
+					"tags_all": {},
+				},
+				"after_unknown": {
+					"arn":      true,
+					"id":       true,
+					"tags_all": true,
+				},
+				"before":           null,
+				"before_sensitive": false,
+			},
+			"index":          "policies/service_control_policy/DenyRemovalOfRequiredTags.json",
+			"mode":           "managed",
+			"module_address": "module.scps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"type":           "aws_organizations_policy",
+		},
+		{
+			"address": "module.scps.aws_organizations_policy.this[\"policies/service_control_policy/EnforceAutomaticKeyRotation.json\"]",
+			"change": {
+				"actions": [
+					"create",
+				],
+				"after": {
+					"content":      "{\n    \"Version\": \"2012-10-17\",\n    \"Statement\": [\n        {\n            \"Sid\": \"EnforceAutomaticKeyRotation\",\n            \"Effect\": \"Deny\",\n            \"Action\": [\n                \"kms:CreateKey\"\n            ],\n            \"Resource\": \"*\",\n            \"Condition\": {\n                \"Bool\": {\n                    \"kms:BypassPolicyLockoutSafetyCheck\": \"false\"\n                },\n                \"Null\": {\n                    \"kms:RotationPeriodInDays\": []\n                }\n            }\n        }\n    ]\n}\n",
+					"description":  null,
+					"name":         "policies/service_control_policy/EnforceAutomaticKeyRotation",
+					"skip_destroy": null,
+					"tags":         null,
+					"type":         "SERVICE_CONTROL_POLICY",
+				},
+				"after_sensitive": {
+					"tags_all": {},
+				},
+				"after_unknown": {
+					"arn":      true,
+					"id":       true,
+					"tags_all": true,
+				},
+				"before":           null,
+				"before_sensitive": false,
+			},
+			"index":          "policies/service_control_policy/EnforceAutomaticKeyRotation.json",
+			"mode":           "managed",
+			"module_address": "module.scps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"type":           "aws_organizations_policy",
+		},
+		{
+			"address": "module.scps.aws_organizations_policy.this[\"policies/service_control_policy/EnforceKMSKeyWaitingPeriod.json\"]",
+			"change": {
+				"actions": [
+					"create",
+				],
+				"after": {
+					"content":      "{\n\t\"Version\": \"2012-10-17\",\n\t\"Statement\": [\n\t\t{\n\t\t\t\"Sid\": \"EnforceKMSKeyWaitingPeriod\",\n\t\t\t\"Effect\": \"Deny\",\n\t\t\t\"Action\": [\n\t\t\t\t\"kms:ScheduleKeyDeletion\"\n\t\t\t],\n\t\t\t\"Resource\": \"*\",\n\t\t\t\"Condition\": {\n\t\t\t\t\"NumericLessThan\": {\n\t\t\t\t\t\"kms:ScheduleKeyDeletionPendingWindowInDays\": \"30\"\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t]\n}\n",
+					"description":  null,
+					"name":         "policies/service_control_policy/EnforceKMSKeyWaitingPeriod",
+					"skip_destroy": null,
+					"tags":         null,
+					"type":         "SERVICE_CONTROL_POLICY",
+				},
+				"after_sensitive": {
+					"tags_all": {},
+				},
+				"after_unknown": {
+					"arn":      true,
+					"id":       true,
+					"tags_all": true,
+				},
+				"before":           null,
+				"before_sensitive": false,
+			},
+			"index":          "policies/service_control_policy/EnforceKMSKeyWaitingPeriod.json",
+			"mode":           "managed",
+			"module_address": "module.scps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"type":           "aws_organizations_policy",
+		},
+		{
+			"address": "module.scps.aws_organizations_policy.this[\"policies/service_control_policy/PreventDisablingKeyRotation.json\"]",
+			"change": {
+				"actions": [
+					"create",
+				],
+				"after": {
+					"content":      "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"PreventDisablingKeyRotation\",\n      \"Effect\": \"Deny\",\n      \"Action\": [\n          \"kms:DisableKeyRotation\"\n      ],\n      \"Resource\": \"*\"\n  }\n  ]\n}\n",
+					"description":  null,
+					"name":         "policies/service_control_policy/PreventDisablingKeyRotation",
+					"skip_destroy": null,
+					"tags":         null,
+					"type":         "SERVICE_CONTROL_POLICY",
+				},
+				"after_sensitive": {
+					"tags_all": {},
+				},
+				"after_unknown": {
+					"arn":      true,
+					"id":       true,
+					"tags_all": true,
+				},
+				"before":           null,
+				"before_sensitive": false,
+			},
+			"index":          "policies/service_control_policy/PreventDisablingKeyRotation.json",
+			"mode":           "managed",
+			"module_address": "module.scps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"type":           "aws_organizations_policy",
+		},
+		{
+			"address": "module.scps.aws_organizations_policy.this[\"policies/service_control_policy/RequireMFAForCriticalKMSActions.json\"]",
+			"change": {
+				"actions": [
+					"create",
+				],
+				"after": {
+					"content":      "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"RequireMFAForCriticalKMSActions\",\n      \"Effect\": \"Deny\",\n      \"Action\": [\n        \"kms:ScheduleKeyDeletion\",\n        \"kms:DeleteImportedKeyMaterial\",\n        \"kms:DisableKey\",\n        \"kms:UpdateKeyDescription\",\n        \"kms:ImportKeyMaterial\",\n        \"kms:CreateKey\",\n        \"kms:DeleteCustomKeyStore\",\n        \"kms:UpdateCustomKeyStore\",\n        \"kms:CreateCustomKeyStore\",\n        \"kms:EnableKey\",\n        \"kms:PutKeyPolicy\",\n        \"kms:UpdateAlias\",\n        \"kms:CreateAlias\",\n        \"kms:DeleteAlias\",\n        \"kms:ConnectCustomKeyStore\",\n        \"kms:DisconnectCustomKeyStore\"\n      ],\n      \"Resource\": \"*\",\n      \"Condition\": {\n        \"BoolIfExists\": {\n          \"aws:MultiFactorAuthPresent\": \"false\"\n        }\n      }\n    }\n  ]\n}\n",
+					"description":  null,
+					"name":         "policies/service_control_policy/RequireMFAForCriticalKMSActions",
+					"skip_destroy": null,
+					"tags":         null,
+					"type":         "SERVICE_CONTROL_POLICY",
+				},
+				"after_sensitive": {
+					"tags_all": {},
+				},
+				"after_unknown": {
+					"arn":      true,
+					"id":       true,
+					"tags_all": true,
+				},
+				"before":           null,
+				"before_sensitive": false,
+			},
+			"index":          "policies/service_control_policy/RequireMFAForCriticalKMSActions.json",
+			"mode":           "managed",
+			"module_address": "module.scps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"type":           "aws_organizations_policy",
+		},
+		{
+			"address": "module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-bod6k7sy-DenyAccessWithExceptionRole\"]",
+			"change": {
+				"actions": [
+					"create",
+				],
+				"after": {
+					"skip_destroy": null,
+					"target_id":    "ou-8m2b-bod6k7sy",
+				},
+				"after_sensitive": {},
+				"after_unknown": {
+					"id":        true,
+					"policy_id": true,
+				},
+				"before":           null,
+				"before_sensitive": false,
+			},
+			"index":          "ou-8m2b-bod6k7sy-DenyAccessWithExceptionRole",
+			"mode":           "managed",
+			"module_address": "module.scps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"type":           "aws_organizations_policy_attachment",
+		},
+		{
+			"address": "module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-bod6k7sy-DenyCreateKeyWithoutRequiredTags\"]",
+			"change": {
+				"actions": [
+					"create",
+				],
+				"after": {
+					"skip_destroy": null,
+					"target_id":    "ou-8m2b-bod6k7sy",
+				},
+				"after_sensitive": {},
+				"after_unknown": {
+					"id":        true,
+					"policy_id": true,
+				},
+				"before":           null,
+				"before_sensitive": false,
+			},
+			"index":          "ou-8m2b-bod6k7sy-DenyCreateKeyWithoutRequiredTags",
+			"mode":           "managed",
+			"module_address": "module.scps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"type":           "aws_organizations_policy_attachment",
+		},
+		{
+			"address": "module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-bod6k7sy-DenyInvalidEnvironmentTagValue\"]",
+			"change": {
+				"actions": [
+					"create",
+				],
+				"after": {
+					"skip_destroy": null,
+					"target_id":    "ou-8m2b-bod6k7sy",
+				},
+				"after_sensitive": {},
+				"after_unknown": {
+					"id":        true,
+					"policy_id": true,
+				},
+				"before":           null,
+				"before_sensitive": false,
+			},
+			"index":          "ou-8m2b-bod6k7sy-DenyInvalidEnvironmentTagValue",
+			"mode":           "managed",
+			"module_address": "module.scps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"type":           "aws_organizations_policy_attachment",
+		},
+		{
+			"address": "module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-bod6k7sy-DenyProdKeyAccessExceptProdOU\"]",
+			"change": {
+				"actions": [
+					"create",
+				],
+				"after": {
+					"skip_destroy": null,
+					"target_id":    "ou-8m2b-bod6k7sy",
+				},
+				"after_sensitive": {},
+				"after_unknown": {
+					"id":        true,
+					"policy_id": true,
+				},
+				"before":           null,
+				"before_sensitive": false,
+			},
+			"index":          "ou-8m2b-bod6k7sy-DenyProdKeyAccessExceptProdOU",
+			"mode":           "managed",
+			"module_address": "module.scps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"type":           "aws_organizations_policy_attachment",
+		},
+		{
+			"address": "module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-bod6k7sy-DenyRemovalOfRequiredTags\"]",
+			"change": {
+				"actions": [
+					"create",
+				],
+				"after": {
+					"skip_destroy": null,
+					"target_id":    "ou-8m2b-bod6k7sy",
+				},
+				"after_sensitive": {},
+				"after_unknown": {
+					"id":        true,
+					"policy_id": true,
+				},
+				"before":           null,
+				"before_sensitive": false,
+			},
+			"index":          "ou-8m2b-bod6k7sy-DenyRemovalOfRequiredTags",
+			"mode":           "managed",
+			"module_address": "module.scps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"type":           "aws_organizations_policy_attachment",
+		},
+		{
+			"address": "module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-sxjqqszq-DenyCreateKeyWithoutRequiredTags\"]",
+			"change": {
+				"actions": [
+					"create",
+				],
+				"after": {
+					"skip_destroy": null,
+					"target_id":    "ou-8m2b-sxjqqszq",
+				},
+				"after_sensitive": {},
+				"after_unknown": {
+					"id":        true,
+					"policy_id": true,
+				},
+				"before":           null,
+				"before_sensitive": false,
+			},
+			"index":          "ou-8m2b-sxjqqszq-DenyCreateKeyWithoutRequiredTags",
+			"mode":           "managed",
+			"module_address": "module.scps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"type":           "aws_organizations_policy_attachment",
+		},
+		{
+			"address": "module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-sxjqqszq-DenyDevKeyAccessExceptDevOU\"]",
+			"change": {
+				"actions": [
+					"create",
+				],
+				"after": {
+					"skip_destroy": null,
+					"target_id":    "ou-8m2b-sxjqqszq",
+				},
+				"after_sensitive": {},
+				"after_unknown": {
+					"id":        true,
+					"policy_id": true,
+				},
+				"before":           null,
+				"before_sensitive": false,
+			},
+			"index":          "ou-8m2b-sxjqqszq-DenyDevKeyAccessExceptDevOU",
+			"mode":           "managed",
+			"module_address": "module.scps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"type":           "aws_organizations_policy_attachment",
+		},
+		{
+			"address": "module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-sxjqqszq-DenyInvalidEnvironmentTagValue\"]",
+			"change": {
+				"actions": [
+					"create",
+				],
+				"after": {
+					"skip_destroy": null,
+					"target_id":    "ou-8m2b-sxjqqszq",
+				},
+				"after_sensitive": {},
+				"after_unknown": {
+					"id":        true,
+					"policy_id": true,
+				},
+				"before":           null,
+				"before_sensitive": false,
+			},
+			"index":          "ou-8m2b-sxjqqszq-DenyInvalidEnvironmentTagValue",
+			"mode":           "managed",
+			"module_address": "module.scps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"type":           "aws_organizations_policy_attachment",
+		},
+		{
+			"address": "module.scps.aws_organizations_policy_attachment.this[\"ou-8m2b-sxjqqszq-DenyRemovalOfRequiredTags\"]",
+			"change": {
+				"actions": [
+					"create",
+				],
+				"after": {
+					"skip_destroy": null,
+					"target_id":    "ou-8m2b-sxjqqszq",
+				},
+				"after_sensitive": {},
+				"after_unknown": {
+					"id":        true,
+					"policy_id": true,
+				},
+				"before":           null,
+				"before_sensitive": false,
+			},
+			"index":          "ou-8m2b-sxjqqszq-DenyRemovalOfRequiredTags",
+			"mode":           "managed",
+			"module_address": "module.scps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"type":           "aws_organizations_policy_attachment",
+		},
+		{
+			"address": "module.scps.aws_organizations_policy_attachment.this[\"r-8m2b-EnforceAutomaticKeyRotation\"]",
+			"change": {
+				"actions": [
+					"create",
+				],
+				"after": {
+					"skip_destroy": null,
+					"target_id":    "r-8m2b",
+				},
+				"after_sensitive": {},
+				"after_unknown": {
+					"id":        true,
+					"policy_id": true,
+				},
+				"before":           null,
+				"before_sensitive": false,
+			},
+			"index":          "r-8m2b-EnforceAutomaticKeyRotation",
+			"mode":           "managed",
+			"module_address": "module.scps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"type":           "aws_organizations_policy_attachment",
+		},
+		{
+			"address": "module.scps.aws_organizations_policy_attachment.this[\"r-8m2b-EnforceKMSKeyWaitingPeriod\"]",
+			"change": {
+				"actions": [
+					"create",
+				],
+				"after": {
+					"skip_destroy": null,
+					"target_id":    "r-8m2b",
+				},
+				"after_sensitive": {},
+				"after_unknown": {
+					"id":        true,
+					"policy_id": true,
+				},
+				"before":           null,
+				"before_sensitive": false,
+			},
+			"index":          "r-8m2b-EnforceKMSKeyWaitingPeriod",
+			"mode":           "managed",
+			"module_address": "module.scps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"type":           "aws_organizations_policy_attachment",
+		},
+		{
+			"address": "module.scps.aws_organizations_policy_attachment.this[\"r-8m2b-PreventDisablingKeyRotation\"]",
+			"change": {
+				"actions": [
+					"create",
+				],
+				"after": {
+					"skip_destroy": null,
+					"target_id":    "r-8m2b",
+				},
+				"after_sensitive": {},
+				"after_unknown": {
+					"id":        true,
+					"policy_id": true,
+				},
+				"before":           null,
+				"before_sensitive": false,
+			},
+			"index":          "r-8m2b-PreventDisablingKeyRotation",
+			"mode":           "managed",
+			"module_address": "module.scps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"type":           "aws_organizations_policy_attachment",
+		},
+		{
+			"address": "module.scps.aws_organizations_policy_attachment.this[\"r-8m2b-RequireMFAForCriticalKMSActions\"]",
+			"change": {
+				"actions": [
+					"create",
+				],
+				"after": {
+					"skip_destroy": null,
+					"target_id":    "r-8m2b",
+				},
+				"after_sensitive": {},
+				"after_unknown": {
+					"id":        true,
+					"policy_id": true,
+				},
+				"before":           null,
+				"before_sensitive": false,
+			},
+			"index":          "r-8m2b-RequireMFAForCriticalKMSActions",
+			"mode":           "managed",
+			"module_address": "module.scps",
+			"name":           "this",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"type":           "aws_organizations_policy_attachment",
+		},
+	],
+	"terraform_version": "1.11.4",
+	"timestamp":         "2025-05-06T06:31:00Z",
+	"variables": {
+		"aws_access_key_id": {
+			"value": "REDACTED_SENSITIVE",
+		},
+		"aws_region": {
+			"value": "eu-central-1",
+		},
+		"aws_secret_access_key": {
+			"value": "REDACTED_SENSITIVE",
+		},
+		"ou_map": {
+			"value": {
+				"dev": [
+					"root",
+				],
+				"prod": [
+					"root",
+				],
+			},
+		},
+		"policy_type": {
+			"value": "SERVICE_CONTROL_POLICY",
+		},
+	},
+}

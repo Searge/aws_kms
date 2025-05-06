@@ -1,0 +1,523 @@
+import "strings"
+
+providers = {
+	"aws": {
+		"alias": "",
+		"config": {
+			"region": {
+				"references": [
+					"var.aws_region",
+				],
+			},
+		},
+		"full_name":           "registry.terraform.io/hashicorp/aws",
+		"module_address":      "",
+		"name":                "aws",
+		"provider_config_key": "aws",
+		"version_constraint":  "~> 5.94",
+	},
+}
+
+resources = {
+	"data.aws_organizations_organization.org": {
+		"address":             "data.aws_organizations_organization.org",
+		"config":              {},
+		"count":               {},
+		"depends_on":          [],
+		"for_each":            {},
+		"mode":                "data",
+		"module_address":      "",
+		"name":                "org",
+		"provider_config_key": "aws",
+		"provisioners":        [],
+		"type":                "aws_organizations_organization",
+	},
+	"data.aws_organizations_organizational_unit.list": {
+		"address": "data.aws_organizations_organizational_unit.list",
+		"config": {
+			"name": {
+				"references": [
+					"each.key",
+				],
+			},
+			"parent_id": {
+				"references": [
+					"data.aws_organizations_organization.org.roots[0].id",
+					"data.aws_organizations_organization.org.roots[0]",
+					"data.aws_organizations_organization.org.roots",
+					"data.aws_organizations_organization.org",
+				],
+			},
+		},
+		"count":      {},
+		"depends_on": [],
+		"for_each": {
+			"references": [
+				"var.ou_map",
+			],
+		},
+		"mode":                "data",
+		"module_address":      "",
+		"name":                "list",
+		"provider_config_key": "aws",
+		"provisioners":        [],
+		"type":                "aws_organizations_organizational_unit",
+	},
+	"module.rcps.aws_organizations_policy.this": {
+		"address": "module.rcps.aws_organizations_policy.this",
+		"config": {
+			"content": {
+				"references": [
+					"each.value",
+				],
+			},
+			"name": {
+				"references": [
+					"each.value",
+					"local.policies_directory",
+				],
+			},
+			"type": {
+				"references": [
+					"var.policy_type",
+				],
+			},
+		},
+		"count":      {},
+		"depends_on": [],
+		"for_each": {
+			"references": [
+				"path.root",
+				"local.policies_directory",
+			],
+		},
+		"mode":                "managed",
+		"module_address":      "module.rcps",
+		"name":                "this",
+		"provider_config_key": "module.rcps:aws",
+		"provisioners":        [],
+		"type":                "aws_organizations_policy",
+	},
+	"module.rcps.aws_organizations_policy_attachment.this": {
+		"address": "module.rcps.aws_organizations_policy_attachment.this",
+		"config": {
+			"policy_id": {
+				"references": [
+					"local.policy_ids",
+					"each.value.policy",
+					"each.value",
+				],
+			},
+			"target_id": {
+				"references": [
+					"each.value.ou",
+					"each.value",
+				],
+			},
+		},
+		"count": {},
+		"depends_on": [
+			"aws_organizations_policy.this",
+		],
+		"for_each": {
+			"references": [
+				"local.policy_attachments",
+			],
+		},
+		"mode":                "managed",
+		"module_address":      "module.rcps",
+		"name":                "this",
+		"provider_config_key": "module.rcps:aws",
+		"provisioners":        [],
+		"type":                "aws_organizations_policy_attachment",
+	},
+	"module.scps.aws_organizations_policy.this": {
+		"address": "module.scps.aws_organizations_policy.this",
+		"config": {
+			"content": {
+				"references": [
+					"each.value",
+				],
+			},
+			"name": {
+				"references": [
+					"each.value",
+					"local.policies_directory",
+				],
+			},
+			"type": {
+				"references": [
+					"var.policy_type",
+				],
+			},
+		},
+		"count":      {},
+		"depends_on": [],
+		"for_each": {
+			"references": [
+				"path.root",
+				"local.policies_directory",
+			],
+		},
+		"mode":                "managed",
+		"module_address":      "module.scps",
+		"name":                "this",
+		"provider_config_key": "module.scps:aws",
+		"provisioners":        [],
+		"type":                "aws_organizations_policy",
+	},
+	"module.scps.aws_organizations_policy_attachment.this": {
+		"address": "module.scps.aws_organizations_policy_attachment.this",
+		"config": {
+			"policy_id": {
+				"references": [
+					"local.policy_ids",
+					"each.value.policy",
+					"each.value",
+				],
+			},
+			"target_id": {
+				"references": [
+					"each.value.ou",
+					"each.value",
+				],
+			},
+		},
+		"count": {},
+		"depends_on": [
+			"aws_organizations_policy.this",
+		],
+		"for_each": {
+			"references": [
+				"local.policy_attachments",
+			],
+		},
+		"mode":                "managed",
+		"module_address":      "module.scps",
+		"name":                "this",
+		"provider_config_key": "module.scps:aws",
+		"provisioners":        [],
+		"type":                "aws_organizations_policy_attachment",
+	},
+}
+
+provisioners = {}
+
+variables = {
+	"aws_access_key_id": {
+		"default":        null,
+		"description":    "AWS access key ID",
+		"module_address": "",
+		"name":           "aws_access_key_id",
+	},
+	"aws_region": {
+		"default":        "us-east-1",
+		"description":    "AWS region",
+		"module_address": "",
+		"name":           "aws_region",
+	},
+	"aws_secret_access_key": {
+		"default":        null,
+		"description":    "AWS secret access key",
+		"module_address": "",
+		"name":           "aws_secret_access_key",
+	},
+	"module.rcps:ou_map": {
+		"default":        null,
+		"description":    "Map of OUs",
+		"module_address": "module.rcps",
+		"name":           "ou_map",
+	},
+	"module.rcps:policies_directory": {
+		"default":        null,
+		"description":    "Policies directory path",
+		"module_address": "module.rcps",
+		"name":           "policies_directory",
+	},
+	"module.rcps:policy_type": {
+		"default":        "SERVICE_CONTROL_POLICY",
+		"description":    "Policy type",
+		"module_address": "module.rcps",
+		"name":           "policy_type",
+	},
+	"module.scps:ou_map": {
+		"default":        null,
+		"description":    "Map of OUs",
+		"module_address": "module.scps",
+		"name":           "ou_map",
+	},
+	"module.scps:policies_directory": {
+		"default":        null,
+		"description":    "Policies directory path",
+		"module_address": "module.scps",
+		"name":           "policies_directory",
+	},
+	"module.scps:policy_type": {
+		"default":        "SERVICE_CONTROL_POLICY",
+		"description":    "Policy type",
+		"module_address": "module.scps",
+		"name":           "policy_type",
+	},
+	"ou_map": {
+		"default": {
+			"dev": [
+				"root",
+			],
+			"prod": [
+				"root",
+			],
+		},
+		"description":    "Map of OUs",
+		"module_address": "",
+		"name":           "ou_map",
+	},
+	"policy_type": {
+		"default":        "SERVICE_CONTROL_POLICY",
+		"description":    "Policy type with validation",
+		"module_address": "",
+		"name":           "policy_type",
+	},
+}
+
+outputs = {
+	"module.rcps:attachment_debug": {
+		"depends_on":     [],
+		"description":    "Debug info for attachments",
+		"module_address": "module.rcps",
+		"name":           "attachment_debug",
+		"sensitive":      false,
+		"value": {
+			"references": [
+				"local.policy_attachments",
+			],
+		},
+	},
+	"module.rcps:ou_map": {
+		"depends_on":     [],
+		"description":    "Output of the input OU map",
+		"module_address": "module.rcps",
+		"name":           "ou_map",
+		"sensitive":      false,
+		"value": {
+			"references": [
+				"var.ou_map",
+			],
+		},
+	},
+	"module.rcps:policies_directory": {
+		"depends_on":     [],
+		"description":    "Get the policies directory",
+		"module_address": "module.rcps",
+		"name":           "policies_directory",
+		"sensitive":      false,
+		"value": {
+			"references": [
+				"local.policies_directory",
+			],
+		},
+	},
+	"module.rcps:policy_ids_debug": {
+		"depends_on":     [],
+		"description":    "Debug policy IDs map",
+		"module_address": "module.rcps",
+		"name":           "policy_ids_debug",
+		"sensitive":      false,
+		"value": {
+			"references": [
+				"local.policy_ids",
+			],
+		},
+	},
+	"module.rcps:policy_keys": {
+		"depends_on":     [],
+		"description":    "Keys in the policy_ids map",
+		"module_address": "module.rcps",
+		"name":           "policy_keys",
+		"sensitive":      false,
+		"value": {
+			"references": [
+				"local.policy_keys",
+			],
+		},
+	},
+	"module.scps:attachment_debug": {
+		"depends_on":     [],
+		"description":    "Debug info for attachments",
+		"module_address": "module.scps",
+		"name":           "attachment_debug",
+		"sensitive":      false,
+		"value": {
+			"references": [
+				"local.policy_attachments",
+			],
+		},
+	},
+	"module.scps:ou_map": {
+		"depends_on":     [],
+		"description":    "Output of the input OU map",
+		"module_address": "module.scps",
+		"name":           "ou_map",
+		"sensitive":      false,
+		"value": {
+			"references": [
+				"var.ou_map",
+			],
+		},
+	},
+	"module.scps:policies_directory": {
+		"depends_on":     [],
+		"description":    "Get the policies directory",
+		"module_address": "module.scps",
+		"name":           "policies_directory",
+		"sensitive":      false,
+		"value": {
+			"references": [
+				"local.policies_directory",
+			],
+		},
+	},
+	"module.scps:policy_ids_debug": {
+		"depends_on":     [],
+		"description":    "Debug policy IDs map",
+		"module_address": "module.scps",
+		"name":           "policy_ids_debug",
+		"sensitive":      false,
+		"value": {
+			"references": [
+				"local.policy_ids",
+			],
+		},
+	},
+	"module.scps:policy_keys": {
+		"depends_on":     [],
+		"description":    "Keys in the policy_ids map",
+		"module_address": "module.scps",
+		"name":           "policy_keys",
+		"sensitive":      false,
+		"value": {
+			"references": [
+				"local.policy_keys",
+			],
+		},
+	},
+	"ou_map_list": {
+		"depends_on":     [],
+		"description":    "Get the ou map list",
+		"module_address": "",
+		"name":           "ou_map_list",
+		"sensitive":      false,
+		"value": {
+			"references": [
+				"data.aws_organizations_organizational_unit.list",
+			],
+		},
+	},
+	"policy_attachments": {
+		"depends_on":     [],
+		"description":    "Map of OUs/accounts with their attached policies",
+		"module_address": "",
+		"name":           "policy_attachments",
+		"sensitive":      false,
+		"value": {
+			"references": [
+				"module.scps.ou_map",
+				"module.scps",
+				"module.rcps.ou_map",
+				"module.rcps",
+				"module.scps.ou_map",
+				"module.scps",
+				"module.rcps.ou_map",
+				"module.rcps",
+			],
+		},
+	},
+	"policy_details": {
+		"depends_on":     [],
+		"description":    "Details of created policies",
+		"module_address": "",
+		"name":           "policy_details",
+		"sensitive":      false,
+		"value": {
+			"references": [
+				"module.scps.policy_ids_debug",
+				"module.scps",
+				"module.rcps.policy_ids_debug",
+				"module.rcps",
+			],
+		},
+	},
+	"root_account_id": {
+		"depends_on":     [],
+		"description":    "Get the root account ID",
+		"module_address": "",
+		"name":           "root_account_id",
+		"sensitive":      false,
+		"value": {
+			"references": [
+				"data.aws_organizations_organization.org.roots[0].id",
+				"data.aws_organizations_organization.org.roots[0]",
+				"data.aws_organizations_organization.org.roots",
+				"data.aws_organizations_organization.org",
+			],
+		},
+	},
+}
+
+module_calls = {
+	"rcps": {
+		"config": {
+			"ou_map": {
+				"references": [
+					"local.root_id",
+					"local.prod_id",
+				],
+			},
+			"policies_directory": {
+				"constant_value": "./policies/resource_control_policy",
+			},
+			"policy_type": {
+				"constant_value": "RESOURCE_CONTROL_POLICY",
+			},
+		},
+		"count":              {},
+		"depends_on":         [],
+		"for_each":           {},
+		"module_address":     "",
+		"name":               "rcps",
+		"source":             "./modules/org_policies",
+		"version_constraint": "",
+	},
+	"scps": {
+		"config": {
+			"ou_map": {
+				"references": [
+					"local.root_id",
+					"local.dev_id",
+					"local.prod_id",
+				],
+			},
+			"policies_directory": {
+				"constant_value": "./policies/service_control_policy",
+			},
+			"policy_type": {
+				"constant_value": "SERVICE_CONTROL_POLICY",
+			},
+		},
+		"count":              {},
+		"depends_on":         [],
+		"for_each":           {},
+		"module_address":     "",
+		"name":               "scps",
+		"source":             "./modules/org_policies",
+		"version_constraint": "",
+	},
+}
+
+strip_index = func(addr) {
+	s = strings.split(addr, ".")
+	for s as i, v {
+		s[i] = strings.split(v, "[")[0]
+	}
+
+	return strings.join(s, ".")
+}
