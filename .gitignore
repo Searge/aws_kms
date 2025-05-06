@@ -30,6 +30,11 @@ override.tf.json
 .terraformrc
 terraform.rc
 
+# Sentinel specific
+.sentinel
+tf.plan
+plan.json
+
 # Ignore diff
 *.diff
 
