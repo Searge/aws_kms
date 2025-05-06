@@ -1,0 +1,25 @@
+# Sentinel policy to enforce allowed values for the "policy_type" Terraform variable.
+# Uses the tfplan/v2 import to inspect Terraform plan variables (root module):contentReference[oaicite:0]{index=0}:contentReference[oaicite:1]{index=1}.
+import "tfplan/v2" as tfplan
+
+# Define the set of permitted policy_type values.
+allowed_policy_types = [
+	"AISERVICES_OPT_OUT_POLICY",
+	"BACKUP_POLICY",
+	"RESOURCE_CONTROL_POLICY",
+	"SERVICE_CONTROL_POLICY",
+	"TAG_POLICY",
+]
+
+# Filter the tfplan variables to extract the 'policy_type' variable (if it exists):contentReference[oaicite:2]{index=2}.
+policy_type_vars = filter tfplan.variables as _, v {
+	v.name is "policy_type"
+}
+
+# Main rule: pass only if 'policy_type' is unset (not present) or its value is in the allowed list.
+# If the variable is absent (length == 0), skip the check; otherwise ensure the value is one of the allowed values.
+# The 'in' operator checks membership in a collection (list):contentReference[oaicite:3]{index=3}.
+main = rule {
+	length(policy_type_vars) is 0 or
+	(policy_type_vars["policy_type"].value in allowed_policy_types)
+}

@@ -1,0 +1,83 @@
+###############################################################################
+# Sentinel Policy – AWS KMS Key Baseline
+# Validates every *new* aws_kms_key created in the plan.
+#
+# 1. Mandatory tags  : environment, owner, data-classification
+# 2. Key rotation    : enable_key_rotation must be true
+# 3. Deletion delay  : deletion_window_in_days must be >= 30
+###############################################################################
+
+import "tfplan/v2" as tfplan
+
+# ---------------------------------------------------------------------------
+# Static data
+# ---------------------------------------------------------------------------
+required_tags = ["environment", "owner", "data-classification"]
+
+# Return only those resource_changes that create a managed KMS key
+new_kms_keys = filter tfplan.resource_changes as _, rc {
+	rc.type is "aws_kms_key" and
+		rc.mode is "managed" and
+		rc.change.actions contains "create"
+}
+
+# ---------------------------------------------------------------------------
+# Helper  – fetch `after` block safely (returns null if absent)
+# ---------------------------------------------------------------------------
+after = func(res) { return res.change.after }
+
+# ---------------------------------------------------------------------------
+# Function  – does the `tags` block contain every required tag?
+# ---------------------------------------------------------------------------
+has_required_tags = func(res) {
+	aft = after(res)
+	if aft is null {
+		return false
+	}
+	if not (aft contains "tags") {
+		return false
+	}
+
+	tags = aft.tags
+	if tags is null {
+		return false
+	}
+
+	return all required_tags as t { (tags contains t) and tags[t] is not null }
+}
+
+# ---------------------------------------------------------------------------
+# Function  – is automatic key rotation explicitly enabled?
+# ---------------------------------------------------------------------------
+rotation_enabled = func(res) {
+	aft = after(res)
+	return aft is not null and
+		(aft contains "enable_key_rotation") and
+		aft.enable_key_rotation is true
+}
+
+# ---------------------------------------------------------------------------
+# Function  – is the deletion delay at least 30 days?
+# ---------------------------------------------------------------------------
+deletion_delay_ok = func(res) {
+	aft = after(res)
+	return aft is not null and
+		(aft contains "deletion_window_in_days") and
+		aft.deletion_window_in_days >= 30
+}
+
+# ---------------------------------------------------------------------------
+# Individual rules (appear in trace output)
+# ---------------------------------------------------------------------------
+tags_ok_rule = rule { all new_kms_keys as _, k { has_required_tags(k) } }
+rotation_ok_rule = rule { all new_kms_keys as _, k { rotation_enabled(k) } }
+delay_ok_rule = rule { all new_kms_keys as _, k { deletion_delay_ok(k) } }
+
+# ---------------------------------------------------------------------------
+# Master rule – policy passes only if every sub-rule passes
+# ---------------------------------------------------------------------------
+main = rule {
+	tags_ok_rule and
+	rotation_ok_rule and
+	delay_ok_rule
+}
