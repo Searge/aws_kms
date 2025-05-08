@@ -111,7 +111,7 @@ jobs:
           echo "Sentinel version:"
           sentinel --version
           echo "Running tests …"
-          sentinel test .
+          sentinel test env/dev
           # ::error:: is emitted automatically if any test fails and exit-code ≠ 0
 
       # ──────────────────────────────────────────────────────────────────────
