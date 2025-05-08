@@ -17,7 +17,7 @@ jobs:
       AWS_REGION: us-east-1
       ROLE_ARN: arn:aws:iam::007695491693:role/github-actions
       ROLE_SESSION_NAME: github-actions-session
-      TF_DIR: env/dev # keep paths in one place
+      TF_DIR: kms # keep paths in one place
       SENTINEL_DIR: sentinel/env/dev
 
     steps:
@@ -44,7 +44,7 @@ jobs:
       # ──────────────────────────────────────────────────────────────────────
       - name: Terraform Init
         working-directory: ${{ env.TF_DIR }}
-        run: terraform init -input=false
+        run: terraform init -input=false -backend-config=env/dev/backend.tfvars
 
       - name: Terraform Validate
         working-directory: ${{ env.TF_DIR }}
@@ -54,7 +54,7 @@ jobs:
         id: tfplan
         working-directory: ${{ env.TF_DIR }}
         run: |
-          terraform plan -out=plan.tfplan -input=false
+          terraform plan -out=plan.tfplan -input=false -var-file=env/dev/terraform.tfvars
           terraform show -json plan.tfplan > plan.json
 
       # ──────────────────────────────────────────────────────────────────────
@@ -120,4 +120,4 @@ jobs:
       - name: Terraform Apply
         if: success() # skip if Sentinel or any previous step failed
         working-directory: ${{ env.TF_DIR }}
-        run: terraform apply --auto-approve -input=false
+        run: terraform apply --auto-approve -input=false "plan.tfplan"
