@@ -3,7 +3,7 @@ name: Terraform Deploy (dev)
 on:
   push:
     branches: [main]
-    paths: ["env/dev/**"]
+    paths: ["kms/env/dev/**"]
 
 permissions:
   id-token: write       # 🔐 For OIDC authentication
@@ -18,7 +18,7 @@ jobs:
       ROLE_ARN: arn:aws:iam::007695491693:role/github-actions
       ROLE_SESSION_NAME: github-actions-session
       TF_DIR: kms # keep paths in one place
-      SENTINEL_DIR: sentinel/env/dev
+      SENTINEL_DIR: sentinel
 
     steps:
       # ──────────────────────────────────────────────────────────────────────
