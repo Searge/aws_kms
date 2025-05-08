@@ -55,7 +55,7 @@ jobs:
         working-directory: ${{ env.TF_DIR }}
         run: |
           terraform plan -out=plan.tfplan -input=false -var-file=env/dev/terraform.tfvars
-          terraform show -json plan.tfplan > plan.json
+          terraform show -no-color -json plan.tfplan > plan.json
 
       # ──────────────────────────────────────────────────────────────────────
       #  Convert plan.json → Sentinel mock
