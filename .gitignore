@@ -34,6 +34,7 @@ terraform.rc
 # Sentinel specific
 .sentinel
 tf.plan
+plan.tfplan
 plan.json
 
 # Ignore diff
