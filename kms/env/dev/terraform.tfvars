@@ -7,7 +7,7 @@ key_purpose      = "fun"
 
 description = "KMS key for signing"
 
-deletion_window_in_days = 29
+deletion_window_in_days = 30
 enable_key_rotation     = false
 custom_policy           = "kms-key-policy.json"
 
