@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 module "kms_keys" {
-  source           = "../../modules/kms_key"
+  source           = "../modules/kms_key"
   environment_name = var.environment_name
   tags             = var.tags
 
