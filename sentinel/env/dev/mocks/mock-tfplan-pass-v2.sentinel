@@ -47,10 +47,6 @@ variables = {
     },
 }#
 
-planned_values = {
-    "resources": {},
-}#
-
 resource_changes = {
     "module.kms_keys.aws_kms_alias.key_alias": {
         "address": "module.kms_keys.aws_kms_alias.key_alias",
@@ -130,12 +126,3 @@ resource_changes = {
         },
     },
 }#
-
-strip_index = func(addr) {
-	s = strings.split(addr, ".")
-	for s as i, v {
-		s[i] = strings.split(v, "[")[0]
-	}
-
-	return strings.join(s, ".")
-}
