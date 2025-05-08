@@ -76,11 +76,11 @@ jobs:
             --infile  ${{ env.TF_DIR }}/plan.json \
             --outfile ./tmp/mock-tfplan-v2.sentinel
           echo "Sentinel mock saved to ./tmp/mock-tfplan-v2.sentinel"
-          echo "Moving file to ${{ env.SENTINEL_DIR }}/mocks ..."
+          echo "Moving file to ${{ env.SENTINEL_DIR }}/env/dev/mocks ..."
           mv ./tmp/mock-tfplan-v2.sentinel \
-            ${{ env.SENTINEL_DIR }}/mocks/mock-tfplan-v2.sentinel
-          echo "${{ env.SENTINEL_DIR }}/mocks/mock-tfplan-v2.sentinel" >>\
-            ${{ env.SENTINEL_DIR }}/mocks/mock-tfplan-pass-v2.sentinel
+            ${{ env.SENTINEL_DIR }}/env/dev/mocks/mock-tfplan-v2.sentinel
+          echo "${{ env.SENTINEL_DIR }}/env/dev/mocks/mock-tfplan-v2.sentinel" >>\
+            ${{ env.SENTINEL_DIR }}/env/dev/mocks/mock-tfplan-pass-v2.sentinel
 
       # ───────────────────────────────────────────────────────────────
       #  Install Sentinel CLI (download → unzip → add to PATH)
