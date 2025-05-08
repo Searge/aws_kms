@@ -74,7 +74,9 @@ jobs:
           mkdir -p ./tmp
           python -m sentinel_mock_plan \
             --infile  ${{ env.TF_DIR }}/plan.json \
-            --outfile ${{ env.SENTINEL_DIR }}/env/dev/mocks/mock-tfplan-pass-v2.sentinel
+            --outfile ./tmp/mock-tfplan-pass-v2.sentinel
+
+          mv ./tmp/mock-tfplan-pass-v2.sentinel ${{ env.SENTINEL_DIR }}/env/dev/mocks/mock-tfplan-pass-v2.sentinel
 
           ls -lha ${{ env.SENTINEL_DIR }}/env/dev/mocks/
 
