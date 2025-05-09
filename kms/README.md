@@ -21,6 +21,13 @@ classDiagram
         ✓ Automatic key rotation
         ✓ Minimum deletion waiting period
         ✓ Environment boundary enforcement
+        ✓ Prevent disabling key rotation
+    }
+
+    class OrganizationRCPs {
+        ✓ Identity perimeter controls
+        ✓ Confused deputy protection
+        ✓ Accidental deletion prevention
     }
 
     class KMSKeyConfiguration {
@@ -28,6 +35,7 @@ classDiagram
         ✓ Automatic rotation enabled
         ✓ Appropriate deletion window
         ✓ Required tags (owner, environment, data-classification)
+        ✓ Environment-specific access boundaries
     }
 
     class SentinelValidation {
@@ -37,9 +45,11 @@ classDiagram
     }
 
     OrganizationSCPs --> KMSKeyConfiguration : enforces
+    OrganizationRCPs --> KMSKeyConfiguration : protects
     KMSKeyConfiguration --> SentinelValidation : validates
 
     style OrganizationSCPs stroke:#0066cc
+    style OrganizationRCPs stroke:#ff9900
     style KMSKeyConfiguration stroke:#2e8b57
     style SentinelValidation stroke:#cc0066
 ```
