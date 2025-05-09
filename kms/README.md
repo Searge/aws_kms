@@ -25,9 +25,9 @@ classDiagram
 
     class KMSKeyConfiguration {
         ✓ Secure key policies
-        ✓ Required tags (owner, env, etc)
         ✓ Automatic rotation enabled
         ✓ Appropriate deletion window
+        ✓ Required tags (owner, environment, data-classification)
     }
 
     class SentinelValidation {
