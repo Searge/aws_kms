@@ -37,30 +37,11 @@ classDiagram
     }
 
     OrganizationSCPs --> KMSKeyConfiguration : enforces
-    KMSKeyConfiguration --> SentinelValidation : validatesclassDiagram
-    class OrganizationSCPs {
-        ✓ MFA enforcement
-        ✓ Mandatory tagging
-        ✓ Automatic key rotation
-        ✓ Minimum deletion waiting period
-        ✓ Environment boundary enforcement
-    }
-
-    class KMSKeyConfiguration {
-        ✓ Secure key policies
-        ✓ Required tags (owner, env, etc)
-        ✓ Automatic rotation enabled
-        ✓ Appropriate deletion window
-    }
-
-    class SentinelValidation {
-        ✓ Key rotation compliance
-        ✓ Tag validation
-        ✓ Deletion window verification
-    }
-
-    OrganizationSCPs --> KMSKeyConfiguration : enforces
     KMSKeyConfiguration --> SentinelValidation : validates
+
+    style OrganizationSCPs stroke:#0066cc
+    style KMSKeyConfiguration stroke:#2e8b57
+    style SentinelValidation stroke:#cc0066
 ```
 
 ## Key Features
