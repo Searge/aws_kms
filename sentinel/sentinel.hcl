@@ -3,7 +3,12 @@ policy "ensure-policy-type" {
   enforcement_level = "hard-mandatory"
 }
 
-policy "ensure-secure-kms-policy" {
-  source            = "./env/dev/ensure-secure-kms-policy.sentinel"
+policy "ensure-secure-kms-policy-dev" {
+  source            = "./env/dev/ensure-secure-kms-policy-dev.sentinel"
+  enforcement_level = "hard-mandatory"
+}
+
+policy "ensure-secure-kms-policy-prod" {
+  source            = "./env/dev/ensure-secure-kms-policy-prod.sentinel"
   enforcement_level = "hard-mandatory"
 }

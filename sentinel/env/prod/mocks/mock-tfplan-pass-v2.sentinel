@@ -10,7 +10,7 @@ variables = {
         "name": "custom_policy",
     },
     "deletion_window_in_days": {
-        "value": 7,
+        "value": 30,
         "name": "deletion_window_in_days",
     },
     "description": {
@@ -90,7 +90,7 @@ resource_changes = {
                 "bypass_policy_lockout_safety_check": false,
                 "custom_key_store_id": null,
                 "customer_master_key_spec": "SYMMETRIC_DEFAULT",
-                "deletion_window_in_days": 7,
+                "deletion_window_in_days": 30,
                 "description": "KMS key for signing",
                 "enable_key_rotation": true,
                 "is_enabled": true,

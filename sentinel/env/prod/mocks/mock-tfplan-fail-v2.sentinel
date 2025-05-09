@@ -92,7 +92,7 @@ resource_changes = {
                 "customer_master_key_spec": "SYMMETRIC_DEFAULT",
                 "deletion_window_in_days": 7,
                 "description": "KMS key for signing",
-                "enable_key_rotation": true,
+                "enable_key_rotation": false,
                 "is_enabled": true,
                 "key_usage": "ENCRYPT_DECRYPT",
                 "policy": "{\"Statement\":[{\"Action\":[\"kms:*\",\"kms:PutKeyPolicy\"],\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::069137988389:root\"},\"Resource\":\"*\",\"Sid\":\"AllowRootFullAccess\"},{\"Action\":\"kms:*\",\"Condition\":{\"StringNotEquals\":{\"aws:PrincipalAccount\":\"069137988389\"}},\"Effect\":\"Deny\",\"Principal\":\"*\",\"Resource\":\"*\",\"Sid\":\"DenyExternalAccounts\"},{\"Action\":[\"kms:Encrypt\",\"kms:Decrypt\",\"kms:ReEncrypt*\",\"kms:GenerateDataKey*\",\"kms:DescribeKey\"],\"Condition\":{\"StringEquals\":{\"aws:PrincipalOrgID\":\"o-gihnpgehpg\"}},\"Effect\":\"Allow\",\"Principal\":{\"Service\":[\"logs.amazonaws.com\",\"ssm.amazonaws.com\"]},\"Resource\":\"*\",\"Sid\":\"AllowCloudWatchAndSSM\"},{\"Action\":[\"kms:Encrypt\",\"kms:Decrypt\",\"kms:ReEncrypt*\",\"kms:GenerateDataKey*\",\"kms:DescribeKey\"],\"Condition\":{\"StringEquals\":{\"aws:PrincipalOrgID\":\"o-gihnpgehpg\"}},\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Resource\":\"*\",\"Sid\":\"AllowUseWithinOrg\"},{\"Action\":[\"kms:DescribeKey\",\"kms:GetKeyPolicy\",\"kms:Decrypt\",\"kms:Encrypt\",\"kms:GenerateDataKey\",\"kms:ReEncryptFrom\",\"kms:ReEncryptTo\"],\"Condition\":{\"Bool\":{\"aws:MultiFactorAuthPresent\":\"false\"}},\"Effect\":\"Deny\",\"Principal\":{\"AWS\":\"*\"},\"Resource\":\"*\",\"Sid\":\"DenyMFANotEnabled\"}],\"Version\":\"2012-10-17\"}",
