@@ -55,6 +55,8 @@ classDiagram
 
 ## Usage
 
+Please follow kms_key module [usage instructions](modules/kms_key/README.md).
+
 ### Basic Deployment
 
 ```hcl
