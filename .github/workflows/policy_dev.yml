@@ -1,0 +1,56 @@
+name: OPA
+
+on:
+  push:
+    branches: [main]
+    paths: ["kms/**"]
+
+permissions:
+  id-token: write       # 🔐 For OIDC authentication
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    env:
+      TF_DIR: kms
+
+    steps:
+    - name: Checkout source
+      uses: actions/checkout@v4
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: latest
+
+    - name: Setup OPA Conftest
+      uses: princespaghetti/setup-conftest@v1.1.23
+
+    ####################################################################
+    #  Terraform init / validate / plan → JSON
+    ####################################################################
+    - name: Terraform Init
+      working-directory: ${{ env.TF_DIR }}
+      run: terraform init -input=false -backend-config=env/dev/backend.tfvars
+
+    - name: Terraform Validate
+      working-directory: ${{ env.TF_DIR }}
+      run: terraform validate
+
+    - name: Terraform Plan (save & export JSON)
+      id: tfplan
+      working-directory: ${{ env.TF_DIR }}
+      run: |
+        terraform plan -out=plan.tfplan -input=false -var-file=env/dev/terraform.tfvars
+        # Export tf.plan to OPA input
+        terraform show -no-color -json plan.tfplan | grep '^{.*}$' > plan.json
+
+    ####################################################################
+    # Run Opa Tests
+    ####################################################################
+    - name: Run OPA Tests
+      working-directory: ${{ env.TF_DIR }}
+      run: |
+        conftest test plan.json
