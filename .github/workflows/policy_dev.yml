@@ -14,6 +14,9 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
+      AWS_REGION: us-east-1
+      ROLE_ARN: arn:aws:iam::007695491693:role/github-actions
+      ROLE_SESSION_NAME: github-actions-session
       TF_DIR: kms
 
     steps:

@@ -5,7 +5,7 @@ deny contains msg if {
 	# Iterate over all resources
 	resource := input.resource_changes[_]
 
-	# Перевіряємо, чи це ресурс aws_kms_key, який створюється
+	# Check it is a resource of type aws_kms_key
 	resource.type == "aws_kms_key"
 	resource.change.actions[_] == "create"
 
