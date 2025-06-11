@@ -3,6 +3,10 @@ package kms.policy
 import input as tfplan
 import rego.v1
 
+# Global variables
+required_tags := {"environment", "owner", "data-classification"}
+max_del_days := 30
+
 # Rule 1: Check mandatory tags
 deny contains msg if {
 	# Iterate over all resources
@@ -14,7 +18,6 @@ deny contains msg if {
 	"create" in resource.change.actions
 
 	# --- Logic ---
-	required_tags := {"environment", "owner", "data-classification"}
 	provided_tags := object.get(resource.change.after, "tags", {})
 	provided_keys := object.keys(provided_tags)
 	missing_tags := required_tags - provided_keys
@@ -49,9 +52,8 @@ deny contains msg if {
 	# --- Logic ---
 	deletion_window := object.get(resource.change.after, "deletion_window_in_days", null)
 
-	# If deletion_window less then 7 or not a number
-	# not is_number(deletion_window)
-	deletion_window < 30
+	# If deletion_window less then max_del_days
+	deletion_window < max_del_days
 	msg := sprintf(
 		"KMS key '%s' deletion window must be at least 30 days, but is set to %v.",
 		[resource.address, deletion_window],
