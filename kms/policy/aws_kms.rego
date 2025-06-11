@@ -1,6 +1,6 @@
 package kms.policy
 
-# Правило 1: Перевірка обов'язкових тегів
+# Check mandatory tags
 deny contains msg if {
 	# Ітеруємо по всіх змінах ресурсів
 	resource := input.resource_changes[_]
