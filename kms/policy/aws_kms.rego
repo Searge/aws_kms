@@ -18,7 +18,11 @@ deny contains msg if {
 	some resource in kms_keys_created
 
 	# Get provided tags safely
-	provided_tags := object.get(resource.change.after, "tags", {})
+	provided_tags := object.get(
+		resource.change.after,
+		"tags",
+		{},
+	)
 	provided_keys := object.keys(provided_tags)
 	missing_tags := required_tags - provided_keys
 
@@ -33,7 +37,11 @@ deny contains msg if {
 deny contains msg if {
 	some resource in kms_keys_created
 
-	enable_rotation := object.get(resource.change.after, "enable_key_rotation", null)
+	enable_rotation := object.get(
+		resource.change.after,
+		"enable_key_rotation",
+		null,
+	)
 	enable_rotation != true
 
 	msg := sprintf(
@@ -46,7 +54,11 @@ deny contains msg if {
 deny contains msg if {
 	some resource in kms_keys_created
 
-	deletion_window := object.get(resource.change.after, "deletion_window_in_days", null)
+	deletion_window := object.get(
+		resource.change.after,
+		"deletion_window_in_days",
+		null,
+	)
 	deletion_window != null
 	deletion_window < max_del_days
 
