@@ -19,7 +19,7 @@ deny contains msg if {
 	msg := sprintf("KMS key '%s' is missing required tags: %v", [resource.address, missing_tags])
 }
 
-# Правило 2: Перевірка ротації ключів
+# Rule 2: Check key rotation
 deny contains msg if {
 	resource := input.resource_changes[_]
 	resource.type == "aws_kms_key"
@@ -30,7 +30,7 @@ deny contains msg if {
 	msg := sprintf("KMS key '%s' must have key rotation enabled.", [resource.address])
 }
 
-# Правило 3: Перевірка періоду видалення
+# Rule 3: Перевірка періоду видалення
 deny contains msg if {
 	resource := input.resource_changes[_]
 	resource.type == "aws_kms_key"
