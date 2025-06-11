@@ -9,7 +9,7 @@ deny contains msg if {
 	resource.type == "aws_kms_key"
 	resource.change.actions[_] == "create"
 
-	# --- Логіка перевірки ---
+	# --- Logic ---
 	required_tags := {"environment", "owner", "data-classification"}
 	provided_tags := object.get(resource.change.after, "tags", {})
 	provided_keys := {key | provided_tags[key]}
@@ -25,7 +25,7 @@ deny contains msg if {
 	resource.type == "aws_kms_key"
 	resource.change.actions[_] == "create"
 
-	# --- Логіка перевірки ---
+	# --- Logic ---
 	object.get(resource.change.after, "enable_key_rotation", null) != true
 	msg := sprintf("KMS key '%s' must have key rotation enabled.", [resource.address])
 }
@@ -36,7 +36,7 @@ deny contains msg if {
 	resource.type == "aws_kms_key"
 	resource.change.actions[_] == "create"
 
-	# --- Логіка перевірки ---
+	# --- Logic ---
 	deletion_window := object.get(resource.change.after, "deletion_window_in_days", null)
 
 	# Якщо deletion_window не є числом АБО воно менше 30

@@ -43,7 +43,7 @@ jobs:
     ####################################################################
     - name: Terraform Init
       working-directory: ${{ env.TF_DIR }}
-      run: terraform init -input=false -backend=false
+      run: terraform init -input=false -backend=false -migrate-state
 
     - name: Terraform Validate
       working-directory: ${{ env.TF_DIR }}
