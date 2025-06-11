@@ -38,6 +38,11 @@ jobs:
     - name: Setup OPA Conftest
       uses: princespaghetti/setup-conftest@v1.1.23
 
+    - name: Setup OPA
+      uses: open-policy-agent/setup-opa@v2
+      with:
+        version: latest
+
     ####################################################################
     #  Terraform init / validate / plan → JSON
     ####################################################################
@@ -62,7 +67,12 @@ jobs:
     ####################################################################
     # Run Opa Tests
     ####################################################################
-    - name: Run OPA Tests
+    - name: Run Opa Tests
       working-directory: ${{ env.TF_DIR }}
       run: |
-        conftest test plan.json
+        opa exec --decision kms/policy --bundle policy plan.json
+
+    - name: Run Conftest Tests
+      working-directory: ${{ env.TF_DIR }}
+      run: |
+        conftest test -o github -n kms.policy plan.json

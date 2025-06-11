@@ -1,23 +1,23 @@
 package kms.policy
 
-import input as tfplan
 import rego.v1
 
 # Global variables
 required_tags := {"environment", "owner", "data-classification"}
 max_del_days := 30
 
-# Rule 1: Check mandatory tags
-deny contains msg if {
-	# Iterate over all resources
-
-	some resource in tfplan.resource_changes
-
-	# Check it is a resource of type aws_kms_key
+# Helper function to get KMS keys being created
+kms_keys_created contains resource if {
+	some resource in input.resource_changes
 	resource.type == "aws_kms_key"
 	"create" in resource.change.actions
+}
 
-	# --- Logic ---
+# Rule 1: Check mandatory tags
+deny contains msg if {
+	some resource in kms_keys_created
+
+	# Get provided tags safely
 	provided_tags := object.get(resource.change.after, "tags", {})
 	provided_keys := object.keys(provided_tags)
 	missing_tags := required_tags - provided_keys
@@ -31,12 +31,11 @@ deny contains msg if {
 
 # Rule 2: Check key rotation
 deny contains msg if {
-	some resource in tfplan.resource_changes
-	resource.type == "aws_kms_key"
-	"create" in resource.change.actions
+	some resource in kms_keys_created
 
-	# --- Logic ---
-	object.get(resource.change.after, "enable_key_rotation", null) != true
+	enable_rotation := object.get(resource.change.after, "enable_key_rotation", null)
+	enable_rotation != true
+
 	msg := sprintf(
 		"KMS key '%s' must have key rotation enabled.",
 		[resource.address],
@@ -45,15 +44,12 @@ deny contains msg if {
 
 # Rule 3: Check deletion window
 deny contains msg if {
-	some resource in tfplan.resource_changes
-	resource.type == "aws_kms_key"
-	"create" in resource.change.actions
+	some resource in kms_keys_created
 
-	# --- Logic ---
 	deletion_window := object.get(resource.change.after, "deletion_window_in_days", null)
-
-	# If deletion_window less then max_del_days
+	deletion_window != null
 	deletion_window < max_del_days
+
 	msg := sprintf(
 		"KMS key '%s' deletion window must be at least 30 days, but is set to %v.",
 		[resource.address, deletion_window],
