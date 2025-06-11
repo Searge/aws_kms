@@ -2,7 +2,7 @@ package kms.policy
 
 # Check mandatory tags
 deny contains msg if {
-	# Ітеруємо по всіх змінах ресурсів
+	# Iterate over all resources
 	resource := input.resource_changes[_]
 
 	# Перевіряємо, чи це ресурс aws_kms_key, який створюється
