@@ -139,7 +139,7 @@ resource "aws_iam_role_policy" "kms_hsm_policy" {
           "cloudhsm:ConnectCustomKeyStore",
           "cloudhsm:DisconnectCustomKeyStore"
         ]
-        Resource = var.hsm_instance_count > 0 ? aws_cloudhsm_v2_cluster.hsm_cluster[0].arn : "*"
+        Resource = var.hsm_instance_count > 0 ? aws_cloudhsm_v2_cluster.hsm_cluster[0].cluster_id : "*"
       },
       {
         Effect = "Allow"

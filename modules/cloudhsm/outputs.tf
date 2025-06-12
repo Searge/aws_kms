@@ -14,16 +14,14 @@ output "cluster_state" {
 output "cluster_certificates" {
   description = "CloudHSM cluster certificates"
   value = try({
-    cluster_csr              = aws_cloudhsm_v2_cluster.hsm_cluster[0].cluster_csr
-    cluster_certificate      = aws_cloudhsm_v2_cluster.hsm_cluster[0].cluster_certificate
-    aws_hardware_certificate = aws_cloudhsm_v2_cluster.hsm_cluster[0].aws_hardware_certificate
+    cluster_certificates = aws_cloudhsm_v2_cluster.hsm_cluster[0].cluster_certificates
   }, null)
   sensitive = true
 }
 
 output "security_group_id" {
   description = "ID of the CloudHSM security group"
-  value       = try(aws_security_group.hsm_cluster[0].id, null)
+  value       = try(module.vpc.hsm_cluster_security_group_id, null)
 }
 
 ###############################################################################
@@ -59,7 +57,7 @@ output "key_store_name" {
 
 output "key_store_state" {
   description = "State of the KMS custom key store"
-  value       = try(aws_kms_custom_key_store.hsm_key_store[0].connection_state, null)
+  value       = try(aws_kms_custom_key_store.hsm_key_store[0].id, null)
 }
 
 ###############################################################################
@@ -67,17 +65,17 @@ output "key_store_state" {
 ###############################################################################
 output "vpc_id" {
   description = "ID of the CloudHSM VPC"
-  value       = try(aws_vpc.hsm_vpc[0].id, null)
+  value       = try(module.vpc.vpc_id, null)
 }
 
 output "private_subnet_ids" {
   description = "List of private subnet IDs"
-  value       = try([for subnet in aws_subnet.hsm_private_subnets : subnet.id], [])
+  value       = try(module.vpc.private_subnet_ids, [])
 }
 
 output "route_table_id" {
   description = "ID of the private route table"
-  value       = try(aws_route_table.hsm_private[0].id, null)
+  value       = try(module.vpc.private_route_table_ids[0], null)
 }
 
 ###############################################################################
