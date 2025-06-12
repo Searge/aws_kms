@@ -96,7 +96,7 @@ variable "hsm_instance_count" {
 variable "cluster_certificates" {
   description = "Cluster certificate configuration"
   type = object({
-    cluster_csr_path        = optional(string, "")
+    cluster_csr_path         = optional(string, "")
     cluster_certificate_path = optional(string, "")
     issuing_certificate_path = optional(string, "")
   })

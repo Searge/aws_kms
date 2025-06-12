@@ -14,9 +14,9 @@ output "cluster_state" {
 output "cluster_certificates" {
   description = "CloudHSM cluster certificates"
   value = try({
-    cluster_csr                = aws_cloudhsm_v2_cluster.hsm_cluster[0].cluster_csr
-    cluster_certificate        = aws_cloudhsm_v2_cluster.hsm_cluster[0].cluster_certificate
-    aws_hardware_certificate   = aws_cloudhsm_v2_cluster.hsm_cluster[0].aws_hardware_certificate
+    cluster_csr              = aws_cloudhsm_v2_cluster.hsm_cluster[0].cluster_csr
+    cluster_certificate      = aws_cloudhsm_v2_cluster.hsm_cluster[0].cluster_certificate
+    aws_hardware_certificate = aws_cloudhsm_v2_cluster.hsm_cluster[0].aws_hardware_certificate
   }, null)
   sensitive = true
 }
@@ -105,7 +105,7 @@ output "estimated_monthly_cost_usd" {
   description = "Estimated monthly cost in USD (HSM instances only, approximate)"
   value = format("%.2f",
     var.hsm_instance_count *
-    24 * 30 * # hours per month
+    24 * 30 *                                     # hours per month
     (var.hsm_type == "hsm1.medium" ? 1.60 : 1.60) # cost per hour
   )
 }
@@ -121,9 +121,9 @@ output "module_info" {
     module_version     = "1.0.0"
     environment        = var.environment_name
     hsm_instance_count = var.hsm_instance_count
-    hsm_type          = var.hsm_type
-    cost_optimized    = var.hsm_type == "hsm1.medium"
-    ha_enabled        = var.hsm_instance_count >= 2
-    custom_key_store  = var.create_custom_key_store
+    hsm_type           = var.hsm_type
+    cost_optimized     = var.hsm_type == "hsm1.medium"
+    ha_enabled         = var.hsm_instance_count >= 2
+    custom_key_store   = var.create_custom_key_store
   }
 }
