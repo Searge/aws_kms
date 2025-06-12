@@ -1,412 +1,91 @@
-# VPC for CloudHSM Module - Technical Specification
+# VPC for CloudHSM Module Development - Technical Specification
 
 ## Objective
 
-Create a specialized VPC Terraform module designed specifically for AWS CloudHSM deployment requirements. The module should provide secure, isolated network infrastructure that meets CloudHSM's specific networking needs while maintaining cost optimization and educational focus.
+Create a specialized VPC Terraform module designed for AWS CloudHSM deployment requirements within the existing AWS KMS Security Framework. The module should provide secure, isolated network infrastructure that meets CloudHSM's specific networking needs while maintaining educational focus and cost optimization.
 
 ## Architecture Overview
 
-CloudHSM requires specific network architecture:
+Implement **dedicated VPC module** specifically for CloudHSM with integration into existing `modules/cloudhsm` module structure.
 
-- **Private Subnets Only**: HSM instances must be in private subnets across multiple AZs
-- **No Direct Internet Access**: HSM instances communicate only within VPC
-- **Secure Management Access**: Controlled administrative access through bastion hosts or VPN
-- **Service Endpoints**: VPC endpoints for AWS services to avoid internet routing
+CloudHSM networking requirements:
+
+- **Private Subnets Only**: HSM instances must be deployed in private subnets across multiple AZs
+- **Controlled Outbound Access**: Limited internet access through NAT gateways for AWS API communication
+- **Specific Port Requirements**: HSM communication uses ports 2223-2225/TCP
+- **High Availability**: Minimum 2 AZs required for production CloudHSM clusters
 
 ## Module Structure
 
 ```bash
 modules/vpc_cloudhsm/
-├── main.tf          # Core VPC resources
-├── variables.tf     # Input variables
-├── outputs.tf       # Output values
-├── locals.tf        # Local calculations
-├── versions.tf      # Provider requirements
-├── README.md        # Documentation
+├── main.tf          # Core VPC, subnets, routing resources
+├── security.tf      # Security groups for CloudHSM communication
+├── endpoints.tf     # VPC endpoints for cost optimization
+├── variables.tf     # Input variables with validation
+├── outputs.tf       # Output values for CloudHSM integration
+├── locals.tf        # Local calculations and data sources
+├── versions.tf      # Provider requirements (align with existing)
+├── README.md        # Module documentation
 └── tests/
-    ├── basic.tftest.hcl
-    ├── multi_az.tftest.hcl
-    └── endpoints.tftest.hcl
+    ├── basic.tftest.hcl        # Basic VPC creation
+    ├── multi_az.tftest.hcl     # Multi-AZ validation
+    └── integration.tftest.hcl  # CloudHSM integration test
 ```
 
 ## Technical Requirements
 
-### 1. Core VPC Resources
+### 1. Core Network Resources
 
-```hcl
-# Required Resources
-resource "aws_vpc" "cloudhsm_vpc"
-resource "aws_subnet" "hsm_private_subnets"      # Multi-AZ private subnets
-resource "aws_route_table" "hsm_private"         # Private routing
-resource "aws_internet_gateway" "hsm_igw"        # For NAT gateway only
-resource "aws_nat_gateway" "hsm_nat"             # Conditional outbound access
-resource "aws_security_group" "hsm_cluster"      # HSM communication
-resource "aws_security_group" "hsm_management"   # Management access
-```
+- **VPC**: Dedicated VPC with customizable CIDR block
+- **Private Subnets**: Multi-AZ private subnets for HSM instances
+- **Public Subnets**: Optional public subnets for NAT gateways
+- **Internet Gateway**: For NAT gateway connectivity
+- **NAT Gateway(s)**: Configurable (single vs per-AZ for cost optimization)
+- **Route Tables**: Separate routing for private/public subnets
 
-### 2. Network Design Requirements
-
-| Component           | Specification                   | Justification                          |
-| ------------------- | ------------------------------- | -------------------------------------- |
-| **VPC CIDR**        | /16 minimum (e.g., 10.1.0.0/16) | Sufficient address space for expansion |
-| **Private Subnets** | /24 per AZ, minimum 2 AZs       | CloudHSM HA requirement                |
-| **Public Subnets**  | Optional, /24 per AZ            | For NAT gateways if needed             |
-| **Route Tables**    | Separate for private/public     | Network isolation                      |
-| **NAT Gateway**     | Optional, single shared         | Cost optimization                      |
-
-### 3. Security Groups Design
-
-#### HSM Cluster Security Group
+### 2. CloudHSM Security Groups (in security.tf)
 
 ```yaml
-Name: ${environment}-cloudhsm-cluster-sg
-Inbound Rules:
-  - Port 2223-2225/TCP from VPC CIDR    # HSM client communication
-  - Port 443/TCP from management SG     # HTTPS management
-Outbound Rules:
-  - Port 443/TCP to 0.0.0.0/0          # AWS API calls
-  - All traffic to VPC CIDR             # Internal communication
+HSM Cluster Security Group:
+- Inbound: 2223-2225/TCP from VPC CIDR (HSM client communication)
+- Inbound: 443/TCP from management SG (HTTPS management)
+- Outbound: 443/TCP to 0.0.0.0/0 (AWS API calls)
+
+HSM Management Security Group:
+- Inbound: 22/TCP from admin CIDR blocks (SSH access)
+- Inbound: 443/TCP from admin CIDR blocks (Management console)
+- Outbound: 2223-2225/TCP to HSM cluster SG
+- Outbound: 443/TCP to 0.0.0.0/0 (Internet access)
 ```
 
-#### HSM Management Security Group
+### 3. VPC Endpoints (in endpoints.tf)
 
-```yaml
-Name: ${environment}-cloudhsm-mgmt-sg
-Inbound Rules:
-  - Port 22/TCP from admin_cidr_blocks   # SSH access
-  - Port 443/TCP from admin_cidr_blocks  # Web console
-Outbound Rules:
-  - Port 443/TCP to 0.0.0.0/0          # Internet access
-  - Port 2223-2225/TCP to HSM cluster   # HSM communication
-```
+- **Gateway Endpoints**: S3, DynamoDB (free tier)
+- **Interface Endpoints**: KMS, CloudWatch Logs (conditional)
+- Cost optimization through reduced NAT gateway usage
 
-### 4. VPC Endpoints (Cost Optimization)
+### 4. Integration with Existing CloudHSM Module
+
+Modify `modules/cloudhsm/main.tf` to consume VPC module:
 
 ```hcl
-# Gateway Endpoints (Free)
-resource "aws_vpc_endpoint" "s3"
-resource "aws_vpc_endpoint" "dynamodb"
-
-# Interface Endpoints (Conditional)
-resource "aws_vpc_endpoint" "kms"        # If create_kms_endpoint = true
-resource "aws_vpc_endpoint" "logs"       # If enable_logging = true
-resource "aws_vpc_endpoint" "ssm"        # If enable_ssm_access = true
-```
-
-### 5. Variables Design
-
-```hcl
-###############################################################################
-# Network Configuration
-###############################################################################
-variable "environment_name" {
-  description = "Environment name (dev, prod, etc.)"
-  type        = string
-}
-
-variable "vpc_cidr" {
-  description = "CIDR block for CloudHSM VPC"
-  type        = string
-  default     = "10.1.0.0/16"
-
-  validation {
-    condition     = can(cidrhost(var.vpc_cidr, 0))
-    error_message = "VPC CIDR must be a valid IPv4 CIDR block."
-  }
-}
-
-variable "availability_zones" {
-  description = "List of AZs for HSM deployment (minimum 2)"
-  type        = list(string)
-  default     = []  # Auto-discover if empty
-
-  validation {
-    condition     = length(var.availability_zones) == 0 || length(var.availability_zones) >= 2
-    error_message = "At least 2 availability zones required for CloudHSM HA."
-  }
-}
-
-variable "private_subnet_cidrs" {
-  description = "CIDR blocks for HSM private subnets"
-  type        = list(string)
-  default     = ["10.1.1.0/24", "10.1.2.0/24", "10.1.3.0/24"]
-}
-
-variable "public_subnet_cidrs" {
-  description = "CIDR blocks for public subnets (NAT gateways)"
-  type        = list(string)
-  default     = ["10.1.101.0/24", "10.1.102.0/24", "10.1.103.0/24"]
-}
-
-###############################################################################
-# CloudHSM Specific Configuration
-###############################################################################
-variable "create_nat_gateway" {
-  description = "Create NAT gateway for outbound internet access"
-  type        = bool
-  default     = true
-}
-
-variable "single_nat_gateway" {
-  description = "Use single NAT gateway to reduce costs"
-  type        = bool
-  default     = true
-}
-
-variable "admin_cidr_blocks" {
-  description = "CIDR blocks for administrative access"
-  type        = list(string)
-  default     = []
-
-  validation {
-    condition = alltrue([
-      for cidr in var.admin_cidr_blocks : can(cidrhost(cidr, 0))
-    ])
-    error_message = "All admin CIDR blocks must be valid IPv4 CIDR notation."
-  }
-}
-
-###############################################################################
-# VPC Endpoints Configuration
-###############################################################################
-variable "create_vpc_endpoints" {
-  description = "Create VPC endpoints for AWS services"
-  type        = bool
-  default     = true
-}
-
-variable "create_kms_endpoint" {
-  description = "Create VPC endpoint for KMS service"
-  type        = bool
-  default     = true
-}
-
-variable "enable_dns_hostnames" {
-  description = "Enable DNS hostnames in VPC"
-  type        = bool
-  default     = true
-}
-
-variable "enable_dns_support" {
-  description = "Enable DNS support in VPC"
-  type        = bool
-  default     = true
-}
-
-###############################################################################
-# Monitoring and Logging
-###############################################################################
-variable "enable_flow_logs" {
-  description = "Enable VPC Flow Logs for security monitoring"
-  type        = bool
-  default     = false  # Cost optimization for learning
-}
-
-variable "flow_logs_retention_days" {
-  description = "CloudWatch Logs retention period for VPC Flow Logs"
-  type        = number
-  default     = 7
-}
-
-###############################################################################
-# Tagging
-###############################################################################
-variable "tags" {
-  description = "Common tags for all resources"
-  type        = map(string)
-  default     = {}
-}
-```
-
-### 6. Outputs Design
-
-```hcl
-###############################################################################
-# VPC Information
-###############################################################################
-output "vpc_id" {
-  description = "ID of the CloudHSM VPC"
-  value       = aws_vpc.cloudhsm_vpc.id
-}
-
-output "vpc_cidr_block" {
-  description = "CIDR block of the VPC"
-  value       = aws_vpc.cloudhsm_vpc.cidr_block
-}
-
-###############################################################################
-# Subnet Information
-###############################################################################
-output "private_subnet_ids" {
-  description = "List of private subnet IDs for CloudHSM"
-  value       = aws_subnet.hsm_private_subnets[*].id
-}
-
-output "private_subnet_cidrs" {
-  description = "List of private subnet CIDR blocks"
-  value       = aws_subnet.hsm_private_subnets[*].cidr_block
-}
-
-output "public_subnet_ids" {
-  description = "List of public subnet IDs (if created)"
-  value       = try(aws_subnet.hsm_public_subnets[*].id, [])
-}
-
-output "availability_zones" {
-  description = "List of availability zones used"
-  value       = local.azs
-}
-
-###############################################################################
-# Security Groups
-###############################################################################
-output "hsm_cluster_security_group_id" {
-  description = "Security group ID for CloudHSM cluster"
-  value       = aws_security_group.hsm_cluster.id
-}
-
-output "hsm_management_security_group_id" {
-  description = "Security group ID for CloudHSM management"
-  value       = aws_security_group.hsm_management.id
-}
-
-###############################################################################
-# Routing Information
-###############################################################################
-output "private_route_table_ids" {
-  description = "List of private route table IDs"
-  value       = aws_route_table.hsm_private[*].id
-}
-
-output "nat_gateway_ids" {
-  description = "List of NAT Gateway IDs"
-  value       = try(aws_nat_gateway.hsm_nat[*].id, [])
-}
-
-###############################################################################
-# VPC Endpoints
-###############################################################################
-output "vpc_endpoint_s3_id" {
-  description = "S3 VPC endpoint ID"
-  value       = try(aws_vpc_endpoint.s3[0].id, null)
-}
-
-output "vpc_endpoint_kms_id" {
-  description = "KMS VPC endpoint ID"
-  value       = try(aws_vpc_endpoint.kms[0].id, null)
-}
-
-###############################################################################
-# Cost Information
-###############################################################################
-output "estimated_monthly_cost_usd" {
-  description = "Estimated monthly cost for VPC infrastructure"
-  value = format("%.2f",
-    (var.create_nat_gateway ? (var.single_nat_gateway ? 32.85 : 32.85 * length(local.azs)) : 0) +
-    (var.create_vpc_endpoints && var.create_kms_endpoint ? 7.30 : 0) # KMS interface endpoint
-  )
-}
-
-output "cost_breakdown" {
-  description = "Detailed cost breakdown"
-  value = {
-    nat_gateways = var.create_nat_gateway ? (var.single_nat_gateway ? "1 x $32.85" : "${length(local.azs)} x $32.85") : "0"
-    kms_endpoint = var.create_vpc_endpoints && var.create_kms_endpoint ? "1 x $7.30" : "0"
-    note = "Costs are approximate monthly USD estimates"
-  }
-}
-```
-
-### 7. Local Values Design
-
-```hcl
-locals {
-  # Auto-discover AZs if not specified
-  azs = length(var.availability_zones) > 0 ? var.availability_zones : [
-    for az in data.aws_availability_zones.available.names : az
-    if length(regexall("^${data.aws_region.current.name}[a-c]$", az)) > 0
-  ][0:min(3, length(data.aws_availability_zones.available.names))]
-
-  # Validate subnet configuration
-  az_count = length(local.azs)
-
-  # Common tags
-  common_tags = merge(var.tags, {
-    Module      = "vpc-cloudhsm"
-    Purpose     = "CloudHSM Infrastructure"
-    Environment = var.environment_name
-  })
-
-  # Cost optimization flags
-  is_production = var.environment_name == "prod"
-  enable_ha_nat = local.is_production ? !var.single_nat_gateway : false
-}
-```
-
-### 8. CloudHSM-Specific Features
-
-#### Network ACLs (Optional Enhanced Security)
-
-```hcl
-resource "aws_network_acl" "hsm_private" {
-  count  = var.enable_network_acls ? 1 : 0
-  vpc_id = aws_vpc.cloudhsm_vpc.id
-
-  # HSM communication ports
-  ingress {
-    rule_no    = 100
-    protocol   = "tcp"
-    from_port  = 2223
-    to_port    = 2225
-    cidr_block = var.vpc_cidr
-    action     = "allow"
-  }
-
-  # Management HTTPS
-  ingress {
-    rule_no    = 110
-    protocol   = "tcp"
-    from_port  = 443
-    to_port    = 443
-    cidr_block = var.vpc_cidr
-    action     = "allow"
-  }
-}
-```
-
-#### DNS Resolution for CloudHSM
-
-```hcl
-resource "aws_vpc_dhcp_options" "cloudhsm" {
-  count = var.enable_custom_dns ? 1 : 0
-
-  domain_name         = "${data.aws_region.current.name}.compute.internal"
-  domain_name_servers = ["AmazonProvidedDNS"]
-
-  tags = merge(local.common_tags, {
-    Name = "${var.environment_name}-cloudhsm-dhcp"
-  })
-}
-```
-
-## Integration Points
-
-### 1. CloudHSM Module Integration
-
-```hcl
-# In modules/cloudhsm/main.tf
 module "vpc" {
   source = "../vpc_cloudhsm"
 
-  environment_name    = var.environment_name
-  vpc_cidr           = var.vpc_cidr
-  availability_zones = var.availability_zones
-  admin_cidr_blocks  = var.admin_cidr_blocks
+  environment_name     = var.environment_name
+  vpc_cidr            = var.vpc_cidr
+  availability_zones  = var.availability_zones
+  admin_cidr_blocks   = var.admin_ssh_cidr_blocks
+
+  # Cost optimization
+  single_nat_gateway  = var.environment_name != "prod"
+  create_vpc_endpoints = true
 
   tags = var.tags
 }
 
-# Use VPC outputs
+# Use VPC outputs in CloudHSM resources
 resource "aws_cloudhsm_v2_cluster" "hsm_cluster" {
   hsm_type   = var.hsm_type
   subnet_ids = module.vpc.private_subnet_ids
@@ -415,50 +94,101 @@ resource "aws_cloudhsm_v2_cluster" "hsm_cluster" {
 }
 ```
 
-### 2. Existing KMS Module
+### 5. Variables Design
 
-No changes required - integration happens at CloudHSM module level.
+```hcl
+# Required Variables
+variable "environment_name" { type = string }
+variable "vpc_cidr" { type = string, default = "10.1.0.0/16" }
 
-## Testing Strategy
+# CloudHSM Specific
+variable "availability_zones" { type = list(string), default = [] }
+variable "admin_cidr_blocks" { type = list(string), default = [] }
 
-### Test Cases
+# Cost Optimization
+variable "single_nat_gateway" { type = bool, default = true }
+variable "create_vpc_endpoints" { type = bool, default = true }
 
-1. **basic.tftest.hcl**: VPC creation with minimal configuration
-2. **multi_az.tftest.hcl**: Multi-AZ deployment validation
-3. **endpoints.tftest.hcl**: VPC endpoints functionality
-4. **cost_optimized.tftest.hcl**: Single NAT gateway configuration
+# Validation rules for CloudHSM requirements
+validation {
+  condition = length(var.availability_zones) >= 2
+  error_message = "CloudHSM requires minimum 2 AZs for HA."
+}
+```
 
-### Validation Points
+### 6. Outputs for CloudHSM Integration
 
-- Subnet count matches AZ count
-- Private subnets have no direct internet route
-- Security groups allow HSM communication ports
-- VPC endpoints reduce data transfer costs
-- Cost estimates are accurate
+```hcl
+# Network Infrastructure
+output "vpc_id" { value = aws_vpc.cloudhsm_vpc.id }
+output "private_subnet_ids" { value = aws_subnet.hsm_private[*].id }
 
-## Best Practices Implementation
+# Security Groups
+output "hsm_cluster_security_group_id" { value = aws_security_group.hsm_cluster.id }
+output "hsm_management_security_group_id" { value = aws_security_group.hsm_management.id }
 
-1. **Cost Optimization**: Single NAT gateway option, gateway endpoints
-2. **Security**: Private subnets only, restricted security groups
-3. **High Availability**: Multi-AZ subnet distribution
-4. **Monitoring**: Optional VPC Flow Logs
-5. **Maintainability**: Clear variable naming, comprehensive outputs
-6. **Educational**: Cost breakdowns, clear documentation
+# Cost Information
+output "estimated_monthly_cost_usd" {
+  description = "Estimated monthly VPC infrastructure costs"
+  value = "calculated_cost"
+}
+```
+
+## Key Constraints
+
+- **Educational Focus**: Prioritize learning over production complexity
+- **Budget Conscious**: Implement cost controls and cost transparency
+- **Clean Integration**: Seamless integration with existing CloudHSM module
+- **English Only**: All code and comments in English
+- **Consistent Versioning**: Align with existing module requirements (Terraform >= 1.10, AWS ~> 5.94)
+
+## Prerequisites Documentation
+
+Document in README.md:
+
+- CloudHSM networking requirements explanation
+- VPC design decisions and trade-offs
+- Cost implications of different configurations
+- Integration examples with CloudHSM module
 
 ## Success Criteria
 
-1. ✅ VPC meets CloudHSM networking requirements
-2. ✅ Security groups properly configured for HSM communication
-3. ✅ Cost-optimized defaults for learning environment
-4. ✅ Seamless integration with CloudHSM module
-5. ✅ Comprehensive test coverage
-6. ✅ Clear cost transparency and estimation
+1. Module creates VPC infrastructure suitable for CloudHSM deployment
+2. Security groups properly configured for HSM communication ports
+3. Seamless integration with existing `modules/cloudhsm` structure
+4. Cost-optimized defaults for educational environments
+5. Comprehensive input validation prevents misconfigurations
+6. Clear documentation for educational use
+7. All security best practices implemented
 
 ## Development Phases
 
-1. **Phase 1**: Basic VPC structure and variables
-2. **Phase 2**: Subnet and routing configuration
-3. **Phase 3**: Security groups for CloudHSM
-4. **Phase 4**: VPC endpoints and cost optimization
-5. **Phase 5**: Integration testing with CloudHSM module
-6. **Phase 6**: Documentation and examples
+1. **Phase 1**: Basic module structure (versions.tf, variables.tf, outputs.tf)
+2. **Phase 2**: Core VPC infrastructure (main.tf)
+3. **Phase 3**: CloudHSM security groups (security.tf)
+4. **Phase 4**: VPC endpoints for cost optimization (endpoints.tf)
+5. **Phase 5**: Local calculations and validation (locals.tf)
+6. **Phase 6**: Integration with CloudHSM module
+7. **Phase 7**: Terraform tests
+8. **Phase 8**: Documentation and examples
+
+## Integration Points
+
+### CloudHSM Module Consumption
+
+The VPC module will be consumed by CloudHSM module through:
+
+- **Network**: Private subnet IDs for HSM cluster placement
+- **Security**: Security group IDs for HSM communication
+- **Cost**: Shared infrastructure costs in estimations
+
+### Existing KMS Module
+
+No direct integration required - connection happens through CloudHSM module layer.
+
+## Cost Optimization Features
+
+- Single NAT gateway option for non-production environments
+- Gateway VPC endpoints to reduce data transfer costs
+- Cost estimation outputs for budget planning
+- Environment-based configuration recommendations
