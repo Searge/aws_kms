@@ -37,7 +37,7 @@ modules/cloudhsm/
 
 ### 2. Security Groups Configuration
 
-```markdown
+```yaml
 HSM Cluster SG:
 - Inbound: 2223-2225/TCP (HSM communication), 443/TCP (management)
 - Outbound: All to VPC CIDR
@@ -136,4 +136,12 @@ Document in README.md:
 5. Cost-optimized defaults for learning environment
 6. All security best practices implemented
 
-Create the complete CloudHSM module following this specification.
+## Development Phases
+
+1. **Phase 1**: Basic module structure (versions.tf, variables.tf, outputs.tf)
+2. **Phase 2**: VPC infrastructure (vpc.tf)
+3. **Phase 3**: IAM roles and policies (iam.tf)
+4. **Phase 4**: Core CloudHSM resources (main.tf)
+5. **Phase 5**: Integration with existing KMS module
+6. **Phase 6**: Terraform tests
+7. **Phase 7**: Documentation and examples
