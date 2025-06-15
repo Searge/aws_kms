@@ -14,5 +14,12 @@ terraform {
       source  = "hashicorp/random"
       version = "~> 3.1"
     }
+
+    # Provides constructs that intentionally do nothing –
+    # useful in various situations to help orchestrate tricky behavior or work around limitations.
+    null = {
+      source  = "hashicorp/null"
+      version = "~> 3.2"
+    }
   }
 }

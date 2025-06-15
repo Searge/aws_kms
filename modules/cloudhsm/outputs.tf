@@ -100,12 +100,17 @@ output "kms_integration_role_arn" {
 # Cost and Monitoring Outputs
 ###############################################################################
 output "estimated_monthly_cost_usd" {
-  description = "Estimated monthly cost in USD (HSM instances only, approximate)"
-  value = format("%.2f",
-    var.hsm_instance_count *
-    24 * 30 *                                     # hours per month
-    (var.hsm_type == "hsm1.medium" ? 1.60 : 1.60) # cost per hour
-  )
+  description = "Estimated total monthly cost in USD (HSM + VPC infrastructure)"
+  value       = format("%.2f", local.total_estimated_cost)
+}
+
+output "cost_breakdown" {
+  description = "Detailed cost breakdown"
+  value = {
+    hsm_instances      = format("$%.2f", local.estimated_hsm_cost)
+    vpc_infrastructure = format("$%.2f", local.estimated_vpc_cost)
+    total              = format("$%.2f", local.total_estimated_cost)
+  }
 }
 
 output "cluster_endpoint" {

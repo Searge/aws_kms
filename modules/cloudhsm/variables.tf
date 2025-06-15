@@ -62,12 +62,6 @@ variable "private_subnet_cidrs" {
   }
 }
 
-variable "create_nat_gateway" {
-  description = "Whether to create NAT gateway for private subnet internet access"
-  type        = bool
-  default     = true
-}
-
 ###############################################################################
 # CloudHSM Configuration
 ###############################################################################
@@ -91,16 +85,6 @@ variable "hsm_instance_count" {
     condition     = var.hsm_instance_count >= 1 && var.hsm_instance_count <= 28
     error_message = "HSM instance count must be between 1 and 28."
   }
-}
-
-variable "cluster_certificates" {
-  description = "Cluster certificate configuration"
-  type = object({
-    cluster_csr_path         = optional(string, "")
-    cluster_certificate_path = optional(string, "")
-    issuing_certificate_path = optional(string, "")
-  })
-  default = {}
 }
 
 ###############################################################################
@@ -155,12 +139,6 @@ variable "enable_hsm_logging" {
 ###############################################################################
 # Cost Optimization
 ###############################################################################
-variable "enable_deletion_protection" {
-  description = "Enable deletion protection for HSM cluster (disable for dev/testing)"
-  type        = bool
-  default     = false
-}
-
 variable "auto_cleanup_enabled" {
   description = "Enable automatic cleanup for cost optimization in non-prod environments"
   type        = bool
